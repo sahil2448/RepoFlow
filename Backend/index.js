@@ -18,7 +18,9 @@ yargs(hideBin(process.argv))
         type: "string",
       });
     },
-    addRepo,
+    (argv) => {
+      addRepo(argv.file);
+    },
   )
   .command(
     "commit <message>",
@@ -29,10 +31,12 @@ yargs(hideBin(process.argv))
         type: "string",
       });
     },
-    commitRepo,
+    (argv) => {
+      commitRepo(argv.message);
+    },
   )
   .command("push", "push file to the repository/(S3)", {}, pushRepo)
-  .command("pull", "pull file from the repository/(S3)", {}, commitRepo)
+  .command("pull", "pull file from the repository/(S3)", {}, pullRepo)
   .command(
     "revert <commitID>",
     "Revert file to the repository",
@@ -42,7 +46,9 @@ yargs(hideBin(process.argv))
         type: "string",
       });
     },
-    revertRepo,
+    (argv) => {
+      revertRepo(argv.commitID);
+    },
   )
   .demandCommand(1, "Please specify a command")
   .help().argv;

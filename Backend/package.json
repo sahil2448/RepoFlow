@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "type":"module",
+  "type": "module",
   "version": "1.0.0",
   "description": "Alternative of github",
   "main": "index.js",
@@ -11,6 +11,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws": "^0.0.3-2",
+    "aws-sdk": "^2.1693.0",
+    "uuid": "^13.0.0",
     "yargs": "^18.0.0"
   }
 }
