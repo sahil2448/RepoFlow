@@ -13,6 +13,7 @@ import mongoose from "mongoose";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
+import mainRouter from "./routes/main.router.js";
 
 dotenv.config();
 yargs(hideBin(process.argv))
@@ -78,6 +79,8 @@ function startServer() {
     .catch((err) => console.log("Error connecting to MongoDB", err));
 
   app.use(cors({ origin: "*" }));
+
+  app.use("/", mainRouter);
   app.get("/", (req, res) => {
     res.send("Welcome!");
   });
