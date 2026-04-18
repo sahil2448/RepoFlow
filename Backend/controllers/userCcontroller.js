@@ -55,8 +55,33 @@ const signup = async (req, res) => {
   }
 };
 
-const login = (req, res) => {
-  res.send("Logging in");
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    await connectToClient();
+    const db = client.db(DB_NAME);
+    const userCollection = db.collection("users");
+
+    const user = await userCollection.findOne({ email });
+
+    if (!user) {
+      return res.status(404).send("Invalid credentials");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).send("Invalid password");
+    }
+
+    // check if token is expired
+
+    const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
+
+    res.json({ token, userId: user._id }).status(200);
+  } catch (error) {}
+  console.log("Error during login", error);
+  res.status(500).send("Server error", error);
 };
 
 const getUserProfile = (req, res) => {
