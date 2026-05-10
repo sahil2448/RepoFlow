@@ -17,8 +17,8 @@ userRouter.get("/", (req, res) => {
 userRouter.get("/allUsers", getAllUsers);
 userRouter.post("/signup", signup);
 userRouter.post("/login", login);
-userRouter.get("/userProfile", getUserProfile);
-userRouter.put("/updateProfile", updateUserProfile);
-userRouter.delete("/deleteProfile", deleteUser);
+userRouter.get("/userProfile/:id", getUserProfile);
+userRouter.put("/updateProfile/:id", updateUserProfile);
+userRouter.delete("/deleteProfile/:id", deleteUser);
 
 export default userRouter;

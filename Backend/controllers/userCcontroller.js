@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { MongoClient } from "mongodb";
+import { MongoClient, ReturnDocument } from "mongodb";
 import { configDotenv } from "dotenv";
+import { ObjectId } from "mongodb";
 configDotenv();
 
 const URI = process.env.MONGO_URI;
@@ -15,9 +16,6 @@ async function connectToClient() {
   }
   await client.connect();
 }
-const getAllUsers = (req, res) => {
-  res.send("All users fetched");
-};
 
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -84,16 +82,97 @@ const login = async (req, res) => {
   res.status(500).send("Server error", error);
 };
 
-const getUserProfile = (req, res) => {
-  res.send("Getting user profile");
+async function getAllUsers(req, res) {
+  try {
+    // connect to db
+    await connectToClient();
+    const db = client.db(DB_NAME);
+    const userCollection = db.collection("users");
+    const users = await userCollection.find({}).toArray(); // .toArray() returns a promise....written here otherwise will get error because will not be able to convert to json hence no response
+
+    res.json(users[0]).status(200);
+  } catch (err) {
+    console.log("Error during getting all users", err.message);
+    res.status(500).send("Server Error");
+  }
+}
+
+async function getUserProfile(req, res) {
+  const currentId = req.params.id;
+
+  try {
+    await connectToClient();
+    const db = client.db(DB_NAME);
+    const userCollection = db.collection("users");
+
+    const user = await userCollection.findOne({
+      _id: new ObjectId(currentId),
+    });
+
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    res.json(user).status(200);
+    console.log("User profile fetched successfully");
+  } catch (error) {
+    res.status(500).send("Server Error");
+  }
+}
+
+const updateUserProfile = async (req, res) => {
+  const currentId = req.params.id;
+  const { email, password } = req.body;
+
+  try {
+    await connectToClient();
+    const db = client.db(DB_NAME);
+    const userCollection = db.collection("users");
+
+    const updateFields = {};
+    if (email) updateFields.email = email;
+
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      updateFields.password = hashedPassword;
+    }
+
+    const result = await userCollection.findOneAndUpdate(
+      { _id: new ObjectId(currentId) },
+      { $set: updateFields },
+      { returnDocument: "after" },
+    );
+
+    if (!result.value) {
+      return res.status(404).send("User not found!");
+    }
+
+    return res.status(200).json(result.value);
+  } catch (error) {
+    return res.status(500).send("Server Error");
+  }
 };
 
-const updateUserProfile = (req, res) => {
-  res.send("Updating user profile");
-};
+const deleteUser = async (req, res) => {
+  const currentId = req.params.id;
 
-const deleteUser = (req, res) => {
-  res.send("Deleting user");
+  try {
+    await connectToClient();
+    const db = client.db(DB_NAME);
+    const userCollection = db.collection("users");
+
+    const result = await userCollection.findOneAndDelete({
+      _id: new ObjectId(currentId),
+    });
+
+    if (!result.deleteCount == 0) {
+      return res.status(404).send("User not found");
+    }
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).send("Server Error");
+  }
 };
 
 export {
