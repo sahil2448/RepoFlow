@@ -4,6 +4,7 @@ import { MongoClient, ReturnDocument } from "mongodb";
 import { configDotenv } from "dotenv";
 import { ObjectId } from "mongodb";
 configDotenv();
+// Note --> In this file we have used mongo queries using MongoDB ...not Mongoose -> in the repositories we have used Mongoose
 
 const URI = process.env.MONGO_URI;
 const DB_NAME = process.env.DB_NAME;
@@ -90,7 +91,7 @@ async function getAllUsers(req, res) {
     const userCollection = db.collection("users");
     const users = await userCollection.find({}).toArray(); // .toArray() returns a promise....written here otherwise will get error because will not be able to convert to json hence no response
 
-    res.json(users[0]).status(200);
+    res.json(users).status(200);
   } catch (err) {
     console.log("Error during getting all users", err.message);
     res.status(500).send("Server Error");

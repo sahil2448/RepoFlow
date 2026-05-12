@@ -18,9 +18,9 @@ repoRouter.get("/", (req, res) => {
 
 repoRouter.post("/repo/create", createRepository);
 repoRouter.get("/repo/all", getAllRepositories);
-repoRouter.get("/repo/:userId", fetchRepositoriesForCurrentUser);
 repoRouter.get("/repo/:id", fetchRepositoryById);
-repoRouter.get("/repo/:name", fetchRepositoryByName);
+repoRouter.get("/repo/user/:userId", fetchRepositoriesForCurrentUser);
+repoRouter.get("/repo/name/:name", fetchRepositoryByName);
 repoRouter.put("/repo/update/:id", updateRepositoryById);
 repoRouter.patch("/repo/toggle/:id", toggleVisibility);
 repoRouter.delete("/repo/delete/:id", deleteRepositoryById);
