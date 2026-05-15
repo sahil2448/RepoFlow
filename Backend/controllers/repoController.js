@@ -17,6 +17,12 @@ async function createRepository(req, res) {
       return res.status(400).json({ error: "Invalid user id" });
     }
 
+    // ✅ Add this — ensure the owner actually exists
+    const ownerUser = await User.findById(owner);
+    if (!ownerUser) {
+      return res.status(404).json({ error: "Owner user not found" });
+    }
+
     const newRepository = new Repository({
       name,
       description,
@@ -29,7 +35,7 @@ async function createRepository(req, res) {
     const result = await newRepository.save();
     res.status(201).json({
       message: "Repository created successfully",
-      repositoryId: result._id, 
+      repositoryId: result._id,
     });
   } catch (error) {
     console.log("Error :", error);

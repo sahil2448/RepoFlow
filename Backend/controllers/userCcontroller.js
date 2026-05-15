@@ -36,7 +36,7 @@ const signup = async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      respositories: [],
+      repositories: [],
       followedUsers: [],
       starRepositories: [],
     };
@@ -78,7 +78,9 @@ const login = async (req, res) => {
     const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
 
     res.json({ token, userId: user._id }).status(200);
-  } catch (error) {}
+  } catch (error) {
+    return res.status(500).send("Server error");
+  }
   console.log("Error during login", error);
   res.status(500).send("Server error", error);
 };

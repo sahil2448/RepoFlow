@@ -4,11 +4,11 @@ import { Schema } from "mongoose";
 const IssueSchema = new Schema({
   title: {
     type: String,
-    Required: true,
+    required: true,
   },
   description: {
     type: String,
-    Required: true,
+    required: true,
   },
   status: {
     type: String,
