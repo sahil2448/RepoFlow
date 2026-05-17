@@ -102,19 +102,89 @@ async function fetchRepositoryByName(req, res) {
 }
 
 async function fetchRepositoriesForCurrentUser(req, res) {
-  res.send("Got Repos for current user");
+  const userId = req.user;
+
+  try {
+    const repositories = await Repository.find({ owner: userId });
+
+    if (!repositories || reqpositories.length === 0) {
+      return res.status(404).json({ error: "No repositories found" });
+    }
+
+    res.status(200).json({ repositories, message: "Repositories fetched" });
+  } catch (error) {
+    console.log("Error during fetching repositories for current user", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 }
 
 async function updateRepositoryById(req, res) {
-  res.send("updating Repo by id");
+  const { id } = req.params;
+  const { content, description } = req.body;
+
+  try {
+    const repository = await Repository.findById(id);
+
+    if (!repository) {
+      return res.status(404).json({ error: "Repository not found" });
+    }
+
+    repository.content.push(content);
+    repository.description = description;
+
+    const updatedRepository = await repository.save();
+
+    res.status(200).json({
+      message: "Repository updated successfully",
+      repository: updatedRepository,
+    });
+  } catch (error) {
+    console.log("Error during updateing repositories for current id", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 }
 
 async function toggleVisibility(req, res) {
-  res.send("toggling visibility");
+  const { id } = req.params;
+
+  try {
+    const repository = await Repository.findById(id);
+
+    if (!repository) {
+      return res.status(404).json({ error: "Repository not found" });
+    }
+
+    repository.visibility = !repository.visibility;
+
+    // Save the updated repository
+
+    const updatedRepository = await repository.save();
+
+    res.status(200).json({
+      message: "Repository visibility toggled successfully",
+      repository: updatedRepository,
+    });
+  } catch (error) {
+    console.log("Error during toggeling repository visibility", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 }
 
 async function deleteRepositoryById(req, res) {
-  res.send("deleting Repo by id");
+  const { id } = req.params;
+
+  try {
+    const repository = await Repository.findByIdAndDelete(id);
+
+    if (!repository) {
+      return res.status(404).json({ error: "Repository not found" });
+    }
+
+    res.status(200).json({ message: "Repository deleted successfully" });
+  } catch (error) {
+    console.log("Error during deleting repository by id", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 }
 
 export {
