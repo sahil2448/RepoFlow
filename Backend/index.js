@@ -64,19 +64,21 @@ yargs(hideBin(process.argv))
   .help().argv;
 
 const user = "userXYZ";
-function startServer() {
+async function startServer() {
   const app = express();
   app.use(bodyParser.json());
   app.use(express.json());
 
   const mongoURI = process.env.MONGO_URI;
 
-  mongoose
-    .connect(mongoURI)
-    .then(() => {
-      console.log("Connected to MongoDB");
-    })
-    .catch((err) => console.log("Error connecting to MongoDB", err));
+  try {
+    await mongoose.connect(mongoURI, {
+      dbName: process.env.DB_NAME,
+    });
+    console.log("Connected to MongoDB");
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+  }
 
   app.use(cors({ origin: "*" }));
 

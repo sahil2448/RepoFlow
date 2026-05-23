@@ -47,7 +47,7 @@ const signup = async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.json({ token }).status(200); // status code -- 200 means success
+    res.json({ token, userId: result.insertedId }).status(200); // status code -- 200 means success
   } catch (error) {
     console.error("Error during signup", error);
     res.status(500).send("Server error");
@@ -81,8 +81,6 @@ const login = async (req, res) => {
   } catch (error) {
     return res.status(500).send("Server error");
   }
-  console.log("Error during login", error);
-  res.status(500).send("Server error", error);
 };
 
 async function getAllUsers(req, res) {

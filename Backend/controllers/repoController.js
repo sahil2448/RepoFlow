@@ -8,6 +8,7 @@ import { ObjectId } from "mongodb";
 
 async function createRepository(req, res) {
   const { owner, name, issues, content, description, visibility } = req.body;
+
   try {
     if (!name) {
       return res.status(400).json({ error: "Name is required" });
@@ -17,8 +18,7 @@ async function createRepository(req, res) {
       return res.status(400).json({ error: "Invalid user id" });
     }
 
-    // ✅ Add this — ensure the owner actually exists
-    const ownerUser = await User.findById(owner);
+    const ownerUser = await User.exists({ _id: owner });
     if (!ownerUser) {
       return res.status(404).json({ error: "Owner user not found" });
     }
@@ -33,13 +33,21 @@ async function createRepository(req, res) {
     });
 
     const result = await newRepository.save();
-    res.status(201).json({
+
+    await User.findByIdAndUpdate(owner, {
+      $push: { repositories: result._id },
+    });
+
+    // print user details
+    console.log(ownerUser);
+
+    return res.status(201).json({
       message: "Repository created successfully",
       repositoryId: result._id,
     });
   } catch (error) {
     console.log("Error :", error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
 async function getAllRepositories(req, res) {
@@ -102,12 +110,12 @@ async function fetchRepositoryByName(req, res) {
 }
 
 async function fetchRepositoriesForCurrentUser(req, res) {
-  const userId = req.user;
+  const { userId } = req.params;
 
   try {
     const repositories = await Repository.find({ owner: userId });
 
-    if (!repositories || reqpositories.length === 0) {
+    if (!repositories || repositories.length === 0) {
       return res.status(404).json({ error: "No repositories found" });
     }
 
@@ -180,10 +188,14 @@ async function deleteRepositoryById(req, res) {
       return res.status(404).json({ error: "Repository not found" });
     }
 
-    res.status(200).json({ message: "Repository deleted successfully" });
+    await User.findByIdAndUpdate(repository.owner, {
+      $pull: { repositories: repository._id },
+    });
+
+    return res.status(200).json({ message: "Repository deleted successfully" });
   } catch (error) {
     console.log("Error during deleting repository by id", error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
 

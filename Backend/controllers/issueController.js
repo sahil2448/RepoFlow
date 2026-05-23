@@ -5,7 +5,7 @@ import Repository from "../model/repoModel.js";
 
 import { ObjectId } from "mongodb";
 
-const createIssue = (req, res) => {
+const createIssue = async (req, res) => {
   const { title, description } = req.body;
   const { id } = req.params; // repository id
 
@@ -96,10 +96,10 @@ async function getIssueById(req, res) {
   }
 }
 
-export{
-    createIssue,
-    updateIssueById,
-    deleteIssueById,
-    getAllIssues,
-    getIssueById
-}
+export {
+  createIssue,
+  updateIssueById,
+  deleteIssueById,
+  getAllIssues,
+  getIssueById,
+};
