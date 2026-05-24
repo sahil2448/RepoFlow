@@ -199,6 +199,40 @@ async function deleteRepositoryById(req, res) {
   }
 }
 
+async function starRepository(req, res) {
+  const { id } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const repository = await Repository.findById(id);
+
+    if (!repository) {
+      return res.status(404).json({ error: "Repository not found" });
+    }
+
+    // single user should be able to star one repository only one time
+    const updatedRepository = repository.save();
+    if (repository.starredUsers.includes(userId)) {
+      // toggle the start to 0
+      repository.stars = 0;
+      updatedRepository = await repository.save();
+      return res.status(400).json({ error: "Repository already starred" });
+    } else {
+      repository.stars += 1;
+      updatedRepository = await repository.save();
+    }
+
+    return res.status(200).json({
+      message: "Repository starred successfully",
+      stars: updatedRepository.stars,
+    });
+  } catch (error) {
+    console.log("Error during starring repository", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+// fetch all the starred repos
+
 export {
   createRepository,
   getAllRepositories,
@@ -208,4 +242,5 @@ export {
   updateRepositoryById,
   toggleVisibility,
   deleteRepositoryById,
+  starRepository,
 };

@@ -6,6 +6,7 @@ import {
   deleteUser,
   signup,
   login,
+  fetchStarredRepos,
 } from "../controllers/userCcontroller.js";
 
 const userRouter = express.Router();
@@ -20,5 +21,6 @@ userRouter.post("/login", login);
 userRouter.get("/userProfile/:id", getUserProfile);
 userRouter.put("/updateProfile/:id", updateUserProfile);
 userRouter.delete("/deleteProfile/:id", deleteUser);
+userRouter.get("/getStarredRepos/:id", fetchStarredRepos);
 
 export default userRouter;

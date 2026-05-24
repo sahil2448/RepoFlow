@@ -176,6 +176,38 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// fetch all the starred repos
+
+const fetchStarredRepos = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await connectToClient();
+    const db = client.db(DB_NAME);
+
+    const userCollection = db.collection("users");
+    const repoCollection = db.collection("repositories");
+
+    const user = await userCollection.findOne({
+      _id: new ObjectId(id),
+    });
+
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    const starredRepos = await repoCollection
+      .find({
+        _id: { $in: user.starredRepos || [] },
+      })
+      .toArray();
+
+    return res.status(200).json(starredRepos);
+  } catch (error) {
+    return res.status(500).send("Server Error");
+  }
+};
+
 export {
   getAllUsers,
   signup,
@@ -183,4 +215,5 @@ export {
   getUserProfile,
   updateUserProfile,
   deleteUser,
+  fetchStarredRepos,
 };

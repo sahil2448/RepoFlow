@@ -6,6 +6,7 @@ import {
   fetchRepositoryById,
   fetchRepositoryByName,
   getAllRepositories,
+  starRepository,
   toggleVisibility,
   updateRepositoryById,
 } from "../controllers/repoController.js";
@@ -24,5 +25,6 @@ repoRouter.get("/repo/name/:name", fetchRepositoryByName);
 repoRouter.put("/repo/update/:id", updateRepositoryById);
 repoRouter.patch("/repo/toggle/:id", toggleVisibility);
 repoRouter.delete("/repo/delete/:id", deleteRepositoryById);
+repoRouter.post("/repo/star/:id", starRepository);
 
 export default repoRouter;

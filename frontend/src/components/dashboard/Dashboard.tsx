@@ -136,7 +136,7 @@ const Dashboard = () => {
         ::-webkit-scrollbar-thumb { background: #1e1e2e; border-radius: 4px; }
       `}</style>
 
-      <Navbar />
+      {/* <Navbar /> */}
       <section
         id="dashboard"
         className="dot-grid font-dm min-h-screen text-white relative overflow-hidden"

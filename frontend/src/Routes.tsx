@@ -4,43 +4,46 @@ import Login from "./components/auth/Login";
 import Signup from "./components/auth/Signup";
 import Dashboard from "./components/dashboard/Dashboard";
 import Profile from "./components/user/Profile";
+import Layout from "./Layout";
 import { useAuth } from "./authContext";
 
-const ProjectRoutes = () => {
-    const {currentUser,setCurrentUser} = useAuth();
-    const navigate = useNavigate();
+const ProjectRoutes: React.FC = () => {
+  const { currentUser, setCurrentUser } = useAuth();
+  const navigate = useNavigate();
 
-    useEffect(()=>{
-        const userIdFromStorage = localStorage.getItem("userId");
-        if(userIdFromStorage && !["/login","/signup"].includes(window.location.pathname)){
-            setCurrentUser({ userId: userIdFromStorage });
-        } else if(!userIdFromStorage && !["/login","/signup"].includes(window.location.pathname)){
-            navigate("/login");
-        } else if(userIdFromStorage && ["/login","/signup"].includes(window.location.pathname)){
-            navigate("/");
-        }
-    }, [currentUser, navigate, setCurrentUser]);
+  useEffect(() => {
+    const userIdFromStorage = localStorage.getItem("userId");
+    const isAuthPage = ["/login", "/signup"].includes(window.location.pathname);
 
-    const element = useRoutes([
-        {
-            path:"/",
-            element:<Dashboard/>
-        },
-        {
-            path:"/login",
-            element:<Login/>
-        },
-        {
-            path:"/signup",
-            element:<Signup/>
-        },
-        {
-            path:"/profile",
-            element:<Profile/>
-        }
-    ])
+    if (userIdFromStorage && !isAuthPage) {
+      // Only set if not already set — prevents infinite re-render loop
+      if (!currentUser) {
+        setCurrentUser({ userId: userIdFromStorage });
+      }
+    } else if (!userIdFromStorage && !isAuthPage) {
+      navigate("/login");
+    } else if (userIdFromStorage && isAuthPage) {
+      navigate("/");
+    }
+  }, [currentUser, navigate, setCurrentUser]);
 
-    return element;
-}
+  const element = useRoutes([
+    // ── Auth routes (no navbar, no dot-grid) ──
+    { path: "/login",  element: <Login /> },
+    { path: "/signup", element: <Signup /> },
 
-export default ProjectRoutes
+    // ── App routes (shared Layout with Navbar) ──
+    {
+      element: <Layout />,
+      children: [
+        { path: "/",        element: <Dashboard /> },
+        { path: "/profile", element: <Profile /> },
+        // add more protected routes here
+      ],
+    },
+  ]);
+
+  return element;
+};
+
+export default ProjectRoutes;
