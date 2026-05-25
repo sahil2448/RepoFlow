@@ -23,7 +23,15 @@ const UserSchema = new Schema({
       ref: "Repository",
     },
   ],
-  followedUsers: [
+  followingUsers: [
+    // the users that the current user is following
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
+  myFollowers: [
+    // the users that are following the current user
     {
       type: Schema.Types.ObjectId,
       ref: "User",

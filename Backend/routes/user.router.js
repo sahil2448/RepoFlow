@@ -7,6 +7,7 @@ import {
   signup,
   login,
   fetchStarredRepos,
+  followUser,
 } from "../controllers/userCcontroller.js";
 
 const userRouter = express.Router();
@@ -22,5 +23,6 @@ userRouter.get("/userProfile/:id", getUserProfile);
 userRouter.put("/updateProfile/:id", updateUserProfile);
 userRouter.delete("/deleteProfile/:id", deleteUser);
 userRouter.get("/getStarredRepos/:id", fetchStarredRepos);
+userRouter.post("/followUser/:id", followUser);
 
 export default userRouter;

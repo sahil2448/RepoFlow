@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Navbar from "../Navbar";
+import { useNavigate } from "react-router-dom";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -64,6 +64,7 @@ const Dashboard = () => {
   const [suggestedRepositories, setSuggestedRepositories] = useState<Repository[]>([]);
   const [searchResults, setSearchResults]             = useState<Repository[]>([]);
 
+  const navigate = useNavigate();
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     if (!userId) { console.error("No userId found in localStorage"); return; }
@@ -160,6 +161,8 @@ const Dashboard = () => {
               {suggestedRepositories.map((repo) => (
                 <li
                   key={repo._id}
+                            onClick={() => navigate(`/repo/${repo._id}`)}
+
                   className="group p-3.5 rounded-lg border border-white/[0.05] bg-white/[0.02]
                              hover:bg-[#00FFA3]/[0.04] hover:border-[#00FFA3]/20
                              transition-all duration-250 cursor-pointer"
@@ -209,7 +212,7 @@ const Dashboard = () => {
                 <input
                   type="text"
                   value={searchQuery}
-                  placeholder="Search repositories…"
+                  placeholder="Search your own repositories…"
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                   className="flex-1 bg-transparent font-dm text-sm text-gray-200 placeholder-gray-700 outline-none"
                 />
@@ -226,6 +229,7 @@ const Dashboard = () => {
               {searchResults.map((repo, i) => (
                 <li
                   key={repo._id}
+                 onClick={() => navigate(`/repo/${repo._id}`)}
                   className="repo-card group relative flex items-center gap-4 px-5 py-4 rounded-xl
                              border border-white/[0.05] bg-white/[0.02]
                              hover:bg-white/[0.04] hover:border-white/[0.09]
@@ -266,6 +270,7 @@ const Dashboard = () => {
                 <p className="font-plex text-xs text-gray-700">
                   no match for{" "}
                   <span className="text-[#00FFA3]/60">"{searchQuery}"</span>
+                  {" "}in your repositories
                 </p>
               </div>
             )}

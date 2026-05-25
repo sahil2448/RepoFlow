@@ -1,17 +1,20 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+// ✅ Updated interface to match your repo schema more closely
 interface StarredRepository {
   _id: string;
   name: string;
   description: string;
   language?: string;
   stars?: number;
-  owner?: string;
+  owner?: string;        // display name — populate from userId if needed
+  userId?: string;       // raw creator ID from DB
+  createdAt?: string;    // useful for sorting later
 }
-
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
 const FolderIcon: React.FC = () => (
@@ -51,6 +54,7 @@ const LANG_COLORS: Record<string, string> = {
 const StarredRepo: React.FC = () => {
   const [starred, setStarred]   = useState<StarredRepository[]>([]);
   const [loading, setLoading]   = useState<boolean>(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStarred = async (): Promise<void> => {
@@ -59,7 +63,7 @@ const StarredRepo: React.FC = () => {
       try {
         // TODO: replace with your real endpoint
         const response = await axios.get(`http://localhost:3000/getStarredRepos/${userId}`);
-        setStarred(response.data);
+        setStarred(response.data.repositories);
       } catch (err) {
         console.error("Failed to fetch starred repos:", err);
       } finally {
@@ -102,6 +106,7 @@ const StarredRepo: React.FC = () => {
       {starred.map((repo, i) => (
         <li
           key={repo._id}
+          onClick={() => navigate(`/repo/${repo._id}`)}
           className="group relative flex items-center gap-4 px-5 py-4 rounded-xl
                      border border-white/[0.05] bg-white/[0.02]
                      hover:bg-white/[0.04] hover:border-white/[0.09]

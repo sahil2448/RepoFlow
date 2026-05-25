@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 import { useAuth } from "../../authContext";
 import HeatMapProfile from "./HeatMap";
 import StarredRepo from "./StarredRepo";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface UserDetails {
+  _id?: string;
   username: string;
   email?: string;
   followers?: number;
@@ -40,25 +43,56 @@ const LogoutIcon: React.FC = () => (
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const Profile: React.FC = () => {
+  const { id } = useParams<{ id: string }>();           // ← id of profile being viewed
+  const currentUserId = localStorage.getItem("userId"); // ← logged-in user
+  const isOwnProfile  = currentUserId === id;           // ← true when viewing your own page
+
   const { setCurrentUser } = useAuth();
 
-  const [userDetails, setUserDetails] = useState<UserDetails>({ username: "username" });
-  const [activeTab, setActiveTab]     = useState<ProfileTab>("overview");
+  const [userDetails,   setUserDetails]   = useState<UserDetails>({ username: "username" });
+  const [activeTab,     setActiveTab]     = useState<ProfileTab>("overview");
+  const [isFollowing,   setIsFollowing]   = useState<boolean>(false);
+  const [followLoading, setFollowLoading] = useState<boolean>(false);
 
+  // ── Fetch profile of the user whose id is in the URL ──
   useEffect(() => {
+    if (!id) return;
     const fetchUserDetails = async (): Promise<void> => {
-      const userId = localStorage.getItem("userId");
-      if (!userId) return;
       try {
-        const response = await axios.get(`http://localhost:3000/userProfile/${userId}`);
+        const response = await axios.get(`http://localhost:3000/userProfile/${id}`);
         setUserDetails(response.data);
       } catch (err) {
         console.error("Cannot fetch user details:", err);
       }
     };
     fetchUserDetails();
-  }, []);
+  }, [id]);
 
+  // ── Follow / Unfollow ──
+  const handleFollowUser = async (): Promise<void> => {
+    if (!currentUserId || !id || followLoading) return;
+
+    setFollowLoading(true);
+    try {
+     await axios.post(`http://localhost:3000/followUser/${id}`, { currentUserId });
+      setIsFollowing((prev) => !prev);
+      const nextFollowing = !isFollowing;
+setIsFollowing(nextFollowing);
+
+setUserDetails((prev) => ({
+  ...prev,
+  followers: nextFollowing
+    ? (prev.followers ?? 0) + 1
+    : (prev.followers ?? 0) - 1,
+}));
+    } catch (error: any) {
+      console.error("Follow failed:", error?.response?.data?.error ?? error);
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
+  // ── Logout ──
   const handleLogout = (): void => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
@@ -87,7 +121,6 @@ const Profile: React.FC = () => {
         .fade-up { animation: fade-up 0.35s ease both; }
       `}</style>
 
-      {/* ── Ambient blob ── */}
       <div className="glow-teal pointer-events-none fixed -top-24 left-1/2
                       -translate-x-1/2 w-[700px] h-[400px] z-0" />
 
@@ -109,7 +142,6 @@ const Profile: React.FC = () => {
               >
                 <Icon />
                 {label}
-                {/* Active underline */}
                 {activeTab === key && (
                   <span className="absolute bottom-0 left-0 right-0 h-[2px]
                                    bg-[#00FFA3] rounded-full" />
@@ -138,7 +170,7 @@ const Profile: React.FC = () => {
                 </span>
               </div>
 
-              {/* Name */}
+              {/* Name + email */}
               <h2 className="font-syne text-xl font-bold text-white tracking-tight mb-0.5">
                 {userDetails.username}
               </h2>
@@ -148,86 +180,91 @@ const Profile: React.FC = () => {
                 </p>
               )}
 
-              {/* Follow button */}
-              <button
-                className="w-full py-2 mb-5 rounded-lg font-plex text-[11px] tracking-widest uppercase
-                           bg-white/[0.03] border border-white/[0.07] text-gray-400
-                           hover:bg-[#00FFA3]/[0.07] hover:border-[#00FFA3]/25 hover:text-[#00FFA3]
-                           transition-all duration-200"
-              >
-                Follow
-              </button>
+              {/* Follow button — only shown on OTHER people's profiles */}
+              {!isOwnProfile && (
+                <button
+                  onClick={handleFollowUser}
+                  disabled={followLoading}
+                  className={`w-full py-2 mb-5 rounded-lg font-plex text-[11px] tracking-widest uppercase
+                              border transition-all duration-200
+                              disabled:opacity-40 disabled:cursor-not-allowed
+                              ${isFollowing
+                                ? "bg-[#00FFA3]/[0.08] border-[#00FFA3]/25 text-[#00FFA3] hover:bg-[#00FFA3]/[0.04]"
+                                : "bg-white/[0.03] border-white/[0.07] text-gray-400 hover:bg-[#00FFA3]/[0.07] hover:border-[#00FFA3]/25 hover:text-[#00FFA3]"
+                              }`}
+                >
+                  {followLoading ? "..." : isFollowing ? "Following" : "Follow"}
+                </button>
+              )}
 
               {/* Stats */}
               <div className="flex gap-4 mb-6">
                 <div className="flex flex-col">
                   <span className="font-syne text-sm font-bold text-white">
-                    {userDetails.followers ?? 10}
+                    {userDetails.followers ?? 0}
                   </span>
                   <span className="font-plex text-[10px] text-gray-600">followers</span>
                 </div>
                 <span className="w-px bg-white/[0.05]" />
                 <div className="flex flex-col">
                   <span className="font-syne text-sm font-bold text-white">
-                    {userDetails.following ?? 3}
+                    {userDetails.following ?? 0}
                   </span>
                   <span className="font-plex text-[10px] text-gray-600">following</span>
                 </div>
               </div>
 
-              {/* Divider */}
-              <div className="border-t border-white/[0.05] pt-5">
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 font-plex text-[11px] text-gray-700
-                             hover:text-[#FF6B4A] transition-colors duration-200 group"
-                >
-                  <LogoutIcon />
-                  <span>Sign out</span>
-                </button>
-              </div>
+              {/* Sign out — only on your own profile */}
+              {isOwnProfile && (
+                <div className="border-t border-white/[0.05] pt-5">
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 font-plex text-[11px] text-gray-700
+                               hover:text-[#FF6B4A] transition-colors duration-200"
+                  >
+                    <LogoutIcon />
+                    <span>Sign out</span>
+                  </button>
+                </div>
+              )}
+
             </aside>
 
             {/* ── Right: Content ── */}
             <main className="flex-1 min-w-0 fade-up" style={{ animationDelay: "60ms" }}>
 
-  {/* Section header */}
-  <div className="flex items-center gap-2 mb-6">
-    <span className="block w-1.5 h-4 rounded-full bg-[#00FFA3]" />
-    <h3 className="font-syne text-[10px] tracking-[0.22em] uppercase text-gray-500">
-      {activeTab === "overview" ? "Activity" : "Starred"}
-    </h3>
-  </div>
+              <div className="flex items-center gap-2 mb-6">
+                <span className="block w-1.5 h-4 rounded-full bg-[#00FFA3]" />
+                <h3 className="font-syne text-[10px] tracking-[0.22em] uppercase text-gray-500">
+                  {activeTab === "overview" ? "Activity" : "Starred"}
+                </h3>
+              </div>
 
-  {activeTab === "overview" ? (
-    /* ── Heatmap card ── */
-    <div className="relative rounded-2xl border border-white/[0.07]
-                    bg-white/[0.02] p-5 overflow-hidden">
-      <div className="absolute inset-x-0 top-0 h-px
-                      bg-gradient-to-r from-transparent via-[#00FFA3]/15 to-transparent" />
-      <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600 mb-4">
-        Contributions
-      </p>
-      <HeatMapProfile />
-    </div>
-  ) : (
-    /* ── Starred repos ── */
-    <div className="relative rounded-2xl border border-white/[0.07]
-                    bg-white/[0.02] p-5 overflow-hidden">
-      <div className="absolute inset-x-0 top-0 h-px
-                      bg-gradient-to-r from-transparent via-[#00FFA3]/15 to-transparent" />
-      <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600 mb-4">
-        Starred Repositories
-      </p>
-      <StarredRepo />
-    </div>
-  )}
+              {activeTab === "overview" ? (
+                <div className="relative rounded-2xl border border-white/[0.07]
+                                bg-white/[0.02] p-5 overflow-hidden">
+                  <div className="absolute inset-x-0 top-0 h-px
+                                  bg-gradient-to-r from-transparent via-[#00FFA3]/15 to-transparent" />
+                  <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600 mb-4">
+                    Contributions
+                  </p>
+                  <HeatMapProfile />
+                </div>
+              ) : (
+                <div className="relative rounded-2xl border border-white/[0.07]
+                                bg-white/[0.02] p-5 overflow-hidden">
+                  <div className="absolute inset-x-0 top-0 h-px
+                                  bg-gradient-to-r from-transparent via-[#00FFA3]/15 to-transparent" />
+                  <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600 mb-4">
+                    Starred Repositories
+                  </p>
+                  <StarredRepo />
+                </div>
+              )}
 
-</main>
+            </main>
           </div>
         </div>
-
-        {/* ── Logout (fixed, mobile fallback) — hidden since sidebar has it ── */}
       </div>
     </>
   );

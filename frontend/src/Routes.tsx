@@ -6,6 +6,8 @@ import Dashboard from "./components/dashboard/Dashboard";
 import Profile from "./components/user/Profile";
 import Layout from "./Layout";
 import { useAuth } from "./authContext";
+import CreateRepo from "./components/repo/CreateRepo";
+import RepositoryDetails from "./components/repo/RepoDetails";
 
 const ProjectRoutes: React.FC = () => {
   const { currentUser, setCurrentUser } = useAuth();
@@ -16,7 +18,6 @@ const ProjectRoutes: React.FC = () => {
     const isAuthPage = ["/login", "/signup"].includes(window.location.pathname);
 
     if (userIdFromStorage && !isAuthPage) {
-      // Only set if not already set — prevents infinite re-render loop
       if (!currentUser) {
         setCurrentUser({ userId: userIdFromStorage });
       }
@@ -28,17 +29,15 @@ const ProjectRoutes: React.FC = () => {
   }, [currentUser, navigate, setCurrentUser]);
 
   const element = useRoutes([
-    // ── Auth routes (no navbar, no dot-grid) ──
     { path: "/login",  element: <Login /> },
     { path: "/signup", element: <Signup /> },
-
-    // ── App routes (shared Layout with Navbar) ──
     {
       element: <Layout />,
       children: [
-        { path: "/",        element: <Dashboard /> },
-        { path: "/profile", element: <Profile /> },
-        // add more protected routes here
+        { path: "/",             element: <Dashboard /> },
+        { path: "/profile/:id",  element: <Profile /> },  // ← updated
+        { path: "/repo/create",  element: <CreateRepo /> },
+        { path: "/repo/:id",     element: <RepositoryDetails /> },
       ],
     },
   ]);

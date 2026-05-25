@@ -4,6 +4,7 @@ import User from "../model/userModel.js";
 import Repository from "../model/repoModel.js";
 
 import { ObjectId } from "mongodb";
+import logContribution from "../helpers/logContribution.js";
 // as we are using mongoose here....we don't need to always setup our databse connection and also don't need to get collection....we can do queries directly on model
 
 async function createRepository(req, res) {
@@ -40,6 +41,7 @@ async function createRepository(req, res) {
 
     // print user details
     console.log(ownerUser);
+    await logContribution(owner, "repo_created"); // ← add this
 
     return res.status(201).json({
       message: "Repository created successfully",
@@ -205,29 +207,51 @@ async function starRepository(req, res) {
 
   try {
     const repository = await Repository.findById(id);
+    const user = await User.findById(userId);
 
     if (!repository) {
       return res.status(404).json({ error: "Repository not found" });
     }
 
-    // single user should be able to star one repository only one time
-    const updatedRepository = repository.save();
-    if (repository.starredUsers.includes(userId)) {
-      // toggle the start to 0
-      repository.stars = 0;
-      updatedRepository = await repository.save();
-      return res.status(400).json({ error: "Repository already starred" });
-    } else {
-      repository.stars += 1;
-      updatedRepository = await repository.save();
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
 
-    return res.status(200).json({
-      message: "Repository starred successfully",
-      stars: updatedRepository.stars,
-    });
+    let updatedRepository;
+
+    if (repository.starredUsers.includes(userId)) {
+      // ── Unstar ──
+      repository.stars = Math.max(0, repository.stars - 1);
+      repository.starredUsers = repository.starredUsers.filter(
+        (starredId) => starredId.toString() !== userId,
+      );
+      user.starredRepositories = user.starredRepositories.filter(
+        (repoId) => repoId.toString() !== id,
+      );
+      updatedRepository = await repository.save();
+      await user.save();
+
+      return res.status(200).json({
+        message: "Repository unstarred successfully",
+        stars: updatedRepository.stars,
+      });
+    } else {
+      // ── Star ──
+      repository.stars += 1;
+      repository.starredUsers.push(userId);
+      user.starredRepositories.push(repository._id);
+      updatedRepository = await repository.save();
+      await user.save();
+
+      await logContribution(userId, "repo_starred");
+
+      return res.status(200).json({
+        message: "Repository starred successfully",
+        stars: updatedRepository.stars,
+      });
+    }
   } catch (error) {
-    console.log("Error during starring repository", error);
+    console.error("Error during starring repository:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 }

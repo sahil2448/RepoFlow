@@ -193,18 +193,68 @@ const fetchStarredRepos = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).send("User not found");
+      return res.status(404).json({ error: "User not found" });
     }
 
     const starredRepos = await repoCollection
       .find({
-        _id: { $in: user.starredRepos || [] },
+        _id: {
+          $in: (user.starredRepositories || []).map(
+            (repoId) => new ObjectId(repoId),
+          ),
+        },
       })
       .toArray();
 
-    return res.status(200).json(starredRepos);
+    return res.status(200).json({ repositories: starredRepos });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    console.error("Error fetching starred repos:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const followUser = async (req, res) => {
+  const { id } = req.params;
+  const { currentUserId } = req.body;
+
+  try {
+    await connectToClient();
+    const db = client.db(DB_NAME);
+    const userCollection = db.collection("users");
+
+    const targetUser = await userCollection.findOne({ _id: new ObjectId(id) });
+    const currentUser = await userCollection.findOne({
+      _id: new ObjectId(currentUserId),
+    });
+
+    if (!targetUser) {
+      return res.status(404).json({ error: "Target User not found" });
+    }
+
+    if (!currentUser) {
+      return res.status(404).json({ error: "Current User not found" });
+    }
+
+    if (currentUserId === id) {
+      return res.status(400).json({ error: "You cannot follow yourself" });
+    }
+
+    await userCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $addToSet: { myFollowers: currentUserId } },
+    );
+
+    await userCollection.updateOne(
+      { _id: new ObjectId(currentUserId) },
+      { $addToSet: { followingUsers: id } },
+    );
+
+    return res
+      .status(200)
+      .json({ message: `You are now following ${targetUser.name}` });
+  } catch (error) {
+    console.error("Error following user:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -216,4 +266,5 @@ export {
   updateUserProfile,
   deleteUser,
   fetchStarredRepos,
+  followUser,
 };

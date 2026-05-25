@@ -16,8 +16,14 @@ const createIssue = async (req, res) => {
       repository: id,
     });
 
-    await createIssue.save();
+    const repository = await Repository.findById(id);
 
+    if (!repository) {
+      return res.status(404).json({ error: "Repository not found" });
+    }
+
+    await createIssue.save();
+    await logContribution(repository.owner, "issue_created");
     res.status(201).json({ message: "Issue created successfully", issue });
   } catch (error) {
     console.log("Error during creating issue", error);

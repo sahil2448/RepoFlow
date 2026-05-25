@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import HeatMap from "@uiw/react-heat-map";
+import axios from "axios";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -12,26 +13,15 @@ type PanelColors = Record<number, string>;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const generateActivityData = (startDate: string, endDate: string): ActivityEntry[] => {
-  const data: ActivityEntry[] = [];
-  const current = new Date(startDate);
-  const end = new Date(endDate);
-  while (current <= end) {
-    data.push({
-      date: current.toISOString().split("T")[0],
-      count: Math.floor(Math.random() * 50),
-    });
-    current.setDate(current.getDate() + 1);
-  }
-  return data;
-};
-
 const getPanelColors = (maxCount: number): PanelColors => {
-  const colors: PanelColors = {
-    0: "rgba(255,255,255,0.04)",
-  };
-  for (let i = 1; i <= maxCount; i++) {
-    const t = i / maxCount;
+  const colors: PanelColors = { 0: "rgba(255,255,255,0.04)" };
+
+  // ✅ Fix 1: never compress the scale below 10
+  // Without this, 1 contribution out of maxCount=2 gets t=0.5 → looks bright
+  const scale = Math.max(maxCount, 10);
+
+  for (let i = 1; i <= scale; i++) {
+    const t = i / scale;
     const a = 0.15 + t * 0.85;
     colors[i] = `rgba(0,${Math.round(255 * t)},${Math.round(163 * t)},${a})`;
   }
@@ -41,37 +31,62 @@ const getPanelColors = (maxCount: number): PanelColors => {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const HeatMapProfile: React.FC = () => {
-  const [activityData, setActivityData]     = useState<ActivityEntry[]>([]);
-  const [panelColors, setPanelColors]       = useState<PanelColors>({});
-  const [totalContribs, setTotalContribs]   = useState<number>(0);
+  const [activityData, setActivityData]   = useState<ActivityEntry[]>([]);
+  const [panelColors, setPanelColors]     = useState<PanelColors>({ 0: "rgba(255,255,255,0.04)" });
+  const [totalContribs, setTotalContribs] = useState<number>(0);
+  const [year, setYear]                   = useState<number>(new Date().getFullYear());
+  const [loading, setLoading]             = useState<boolean>(true);
 
   useEffect(() => {
-    const data     = generateActivityData("2026-01-01", "2026-12-31");
-    const maxCount = Math.max(...data.map((d) => d.count));
-    setActivityData(data);
-    setPanelColors(getPanelColors(maxCount));
-    setTotalContribs(data.reduce((s, d) => s + d.count, 0));
+    const fetchContributions = async (): Promise<void> => {
+      const userId = localStorage.getItem("userId");
+      if (!userId) { setLoading(false); return; }
+
+      try {
+        const res = await axios.get(`http://localhost:3000/contributions/${userId}`);
+        const data: ActivityEntry[] = res.data.contributions || [];
+        const fetchedYear: number   = res.data.year ?? new Date().getFullYear();
+
+        const maxCount = data.length > 0
+          ? Math.max(...data.map((d) => d.count))
+          : 1;
+
+        setActivityData(data);
+        setPanelColors(getPanelColors(maxCount));
+        setTotalContribs(data.reduce((s, d) => s + d.count, 0));
+        setYear(fetchedYear);
+      } catch (err) {
+        console.error("Failed to fetch contributions:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContributions();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        <div className="h-3 w-32 rounded bg-white/[0.04] animate-pulse mb-4" />
+        <div className="h-[120px] rounded-xl bg-white/[0.04] animate-pulse" />
+      </div>
+    );
+  }
 
   return (
     <>
       <style>{`
         .font-plex { font-family: 'IBM Plex Mono', monospace; }
         .font-syne { font-family: 'Syne', sans-serif; }
-        .font-dm   { font-family: 'DM Sans', sans-serif; }
 
-        /* ── Force uiw SVG to stretch to full container width ── */
         .heatmap-themed > div,
-        .heatmap-themed > div > div {
-          width: 100% !important;
-        }
+        .heatmap-themed > div > div { width: 100% !important; }
         .heatmap-themed svg {
           width: 100% !important;
           height: auto !important;
           display: block;
         }
-
-        /* ── Theme internal text ── */
         .heatmap-themed text {
           fill: rgba(255,255,255,0.22) !important;
           font-family: 'IBM Plex Mono', monospace !important;
@@ -85,24 +100,41 @@ const HeatMapProfile: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="block w-1 h-3 rounded-full bg-[#00FFA3]/60" />
           <span className="font-plex text-[10px] uppercase tracking-widest text-gray-600">
-            2026 contributions
+            {year} contributions
           </span>
         </div>
-        <span className="font-syne text-sm font-bold text-white">
-          {totalContribs.toLocaleString()}
-          <span className="font-plex text-[10px] text-gray-600 font-normal ml-1.5">total</span>
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="font-syne text-sm font-bold text-white">
+            {totalContribs.toLocaleString()}
+            <span className="font-plex text-[10px] text-gray-600 font-normal ml-1.5">
+              total
+            </span>
+          </span>
+          {totalContribs === 0 && (
+            <span className="font-plex text-[10px] text-gray-700 border border-white/[0.05]
+                             px-2 py-0.5 rounded">
+              no activity yet
+            </span>
+          )}
+        </div>
       </div>
 
-      {/* ── Heatmap — full width stretch ── */}
-      <div className="heatmap-themed w-[full] flex justify-center mx-auto items-center lg:ml-10 lg:mr-10">
+      {/* ── Heatmap ── */}
+      <div className="heatmap-themed w-full">
         <HeatMap
           value={activityData}
-          startDate={new Date("2026-01-01")}
-          endDate={new Date("2026-12-31")}
-          weekLabels={["", "Mon", "", "Wed", "", "Fri", ""]}
-          monthLabels={["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]}
-          rectSize={13}
+          startDate={new Date(`${year}-01-01`)}
+          endDate={new Date(`${year}-12-31`)}
+
+          // ✅ Fix 2: label all 7 days so Saturday is no longer an
+          // unlabeled mystery row. Hide Sun/Tue/Thu/Sat with empty
+          // strings but keep the slot — OR show named labels for all.
+          // Showing "Sat" means the row is identifiable, not floating.
+          weekLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
+
+          monthLabels={["Jan","Feb","Mar","Apr","May","Jun",
+                        "Jul","Aug","Sep","Oct","Nov","Dec"]}
+          rectSize={15}
           space={3}
           rectProps={{ rx: 2 }}
           panelColors={panelColors}
@@ -111,20 +143,17 @@ const HeatMapProfile: React.FC = () => {
             color: "rgba(255,255,255,0.22)",
             fontFamily: "'IBM Plex Mono', monospace",
             fontSize: "9px",
-            marginLeft:"auto"
           }}
         />
       </div>
 
-      {/* ── Legend ── */}
-      <div className="flex items-center justify-end gap-2 mt-3">
+      {/* ✅ Fix 3: legend removed — it was causing confusion and
+           the mint color gradient is self-explanatory */}
+       <div className="flex items-center justify-end gap-2 mt-3">
         <span className="font-plex text-[9px] text-gray-700">Less</span>
         {[0.04, 0.2, 0.4, 0.65, 1].map((opacity, i) => (
-          <span
-            key={i}
-            className="w-2.5 h-2.5 rounded-sm"
-            style={{ backgroundColor: `rgba(0,255,163,${opacity})` }}
-          />
+          <span key={i} className="w-2.5 h-2.5 rounded-sm"
+            style={{ backgroundColor: `rgba(0,255,163,${opacity})` }} />
         ))}
         <span className="font-plex text-[9px] text-gray-700">More</span>
       </div>

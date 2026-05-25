@@ -7,6 +7,8 @@ const Navbar: React.FC = () => {
 
   const isActive = (path: string): boolean => location.pathname === path;
 
+  const userId = localStorage.getItem("userId");
+
   useEffect(() => {
     const onScroll = (): void => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -48,10 +50,10 @@ const Navbar: React.FC = () => {
         <div className="flex items-center gap-1">
 
           <Link
-            to="/create"
+            to="/repo/create"
             className={`flex items-center gap-1.5 font-plex text-[11px] px-3.5 py-1.5
                         rounded-lg border transition-all duration-200
-                        ${isActive("/create")
+                        ${isActive("/repo/create")
                           ? "text-[#00FFA3] bg-[#00FFA3]/[0.07] border-[#00FFA3]/20"
                           : "text-gray-500 border-transparent hover:text-gray-200 hover:bg-white/[0.04] hover:border-white/[0.06]"
                         }`}
@@ -63,10 +65,10 @@ const Navbar: React.FC = () => {
           <span className="mx-1 w-px h-4 bg-white/[0.07]" />
 
           <Link
-            to="/profile"
+            to={`/profile/${userId}`}
             className={`flex items-center gap-2.5 font-dm text-sm px-3 py-1.5
                         rounded-lg border transition-all duration-200
-                        ${isActive("/profile")
+                        ${isActive(`/profile/${userId}`)
                           ? "text-white bg-white/[0.05] border-white/[0.09]"
                           : "text-gray-500 border-transparent hover:text-gray-200 hover:bg-white/[0.04] hover:border-white/[0.06]"
                         }`}
