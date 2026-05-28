@@ -13,8 +13,9 @@ issueRouter.get("/", (req, res) => {
   res.send("issue router");
 });
 
-issueRouter.post("/issue/create", createIssue);
-issueRouter.get("/issue/all", getAllIssues);
+// issueRouter.js
+issueRouter.post("/issue/create/:id", createIssue); // ← add :id
+issueRouter.get("/issue/all/:id", getAllIssues); // ← add :id (repo id)
 issueRouter.get("/issue/:id", getIssueById);
 issueRouter.put("/issue/update/:id", updateIssueById);
 issueRouter.delete("/issue/delete/:id", deleteIssueById);

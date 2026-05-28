@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import IssueList from "../issues/IssueList";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -24,6 +25,7 @@ interface Repository {
 }
 
 type RepoTab = "content" | "issues" | "delete";
+
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -259,6 +261,7 @@ const RepositoryDetails: React.FC = () => {
   // ── Open issues count ──
   const openIssues = repo?.issues.filter((i) => i.status !== "closed").length ?? 0;
 
+const isOwner: boolean = !!(repo && typeof repo.owner === "object" && repo.owner._id === userId);
   // ─── Loading state ──────────────────────────────────────────────────────────
   if (loading) {
     return (
@@ -581,70 +584,12 @@ const RepositoryDetails: React.FC = () => {
 
             {/* ── ISSUES TAB ── */}
             {activeTab === "issues" && (
-              <div className="relative rounded-2xl border border-white/[0.07]
-                              bg-white/[0.02] overflow-hidden">
-                <div className="absolute inset-x-0 top-0 h-px
-                                bg-gradient-to-r from-transparent via-[#FF6B4A]/20 to-transparent" />
-
-                {repo.issues.length === 0 ? (
-                  <div className="px-6 py-16 flex flex-col items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl border border-white/[0.07]
-                                    bg-white/[0.02] flex items-center justify-center
-                                    text-[#00FFA3]/40">
-                      <IssueIcon />
-                    </div>
-                    <p className="font-plex text-[11px] text-gray-700">no issues filed</p>
-                  </div>
-                ) : (
-                  <ul className="divide-y divide-white/[0.04]">
-                    {repo.issues.map((issue, i) => {
-                      const isOpen = issue.status !== "closed";
-                      return (
-                        <li
-                          key={issue._id}
-                          className="group flex items-center gap-4 px-5 py-4
-                                     hover:bg-white/[0.02] transition-colors duration-150
-                                     cursor-pointer relative"
-                          style={{ animationDelay: `${i * 30}ms` }}
-                        >
-                          {/* Severity rail */}
-                          <span className={`absolute left-0 top-0 bottom-0 w-[2px]
-                                            ${isOpen ? "bg-[#FF6B4A]/40" : "bg-[#00FFA3]/30"}`} />
-
-                          {/* Status dot */}
-                          <span className={`shrink-0 w-2 h-2 rounded-full mt-0.5
-                                            ${isOpen ? "bg-[#FF6B4A]" : "bg-[#00FFA3]/50"}`} />
-
-                          {/* Issue info */}
-                          <div className="flex-1 min-w-0">
-                            <p className="font-dm text-sm text-gray-300
-                                          group-hover:text-white transition-colors truncate">
-                              {issue.title}
-                            </p>
-                            {issue.createdAt && (
-                              <p className="font-plex text-[10px] text-gray-700 mt-0.5">
-                                {new Date(issue.createdAt).toLocaleDateString("en-US", {
-                                  month: "short", day: "numeric", year: "numeric",
-                                })}
-                              </p>
-                            )}
-                          </div>
-
-                          {/* Status badge */}
-                          <span className={`font-plex text-[9px] px-2 py-0.5 rounded border
-                                            uppercase tracking-widest shrink-0
-                                            ${isOpen
-                                              ? "text-[#FF6B4A] bg-[#FF6B4A]/[0.08] border-[#FF6B4A]/20"
-                                              : "text-[#00FFA3] bg-[#00FFA3]/[0.08] border-[#00FFA3]/20"
-                                            }`}>
-                            {isOpen ? "open" : "closed"}
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </div>
+                <div className="relative rounded-2xl border border-white/[0.07]
+                  bg-white/[0.02] overflow-hidden p-5">
+                  <div className="absolute inset-x-0 top-0 h-px
+                                  bg-gradient-to-r from-transparent via-[#FF6B4A]/20 to-transparent" />
+                  <IssueList repoId={id!} isOwner={isOwner} />
+                </div>
             )}
 
           {
