@@ -16,9 +16,30 @@ import cors from "cors";
 import mainRouter from "./routes/main.router.js";
 
 dotenv.config();
+
 yargs(hideBin(process.argv))
   .command("start", "Start the server", {}, startServer)
-  .command("init", "Initialize the new repository", {}, initRepo)
+
+  // ✅ Fix 2: added builder for --repoId and --userId, pass argv to initRepo
+  .command(
+    "init",
+    "Initialize the new repository",
+    (yargs) => {
+      yargs
+        .option("repoId", {
+          type: "string",
+          describe: "MongoDB Repository ID to link this folder to",
+        })
+        .option("userId", {
+          type: "string",
+          describe: "Your MongoDB User ID",
+        });
+    },
+    (argv) => {
+      initRepo(argv);
+    },
+  )
+
   .command(
     "add <file>",
     "Add a new file to the repository",
@@ -32,6 +53,7 @@ yargs(hideBin(process.argv))
       addRepo(argv.file);
     },
   )
+
   .command(
     "commit <message>",
     "Commit file to the repository",
@@ -45,14 +67,20 @@ yargs(hideBin(process.argv))
       commitRepo(argv.message);
     },
   )
-  .command("push", "push file to the repository/(S3)", {}, pushRepo)
-  .command("pull", "pull file from the repository/(S3)", {}, pullRepo)
+
+  // ✅ Fix 3: pass argv to pushRepo so it can read flags if needed
+  .command("push", "Push commits to S3 and MongoDB", {}, (argv) => {
+    pushRepo(argv);
+  })
+
+  .command("pull", "Pull commits from S3", {}, pullRepo)
+
   .command(
     "revert <commitID>",
-    "Revert file to the repository",
+    "Revert to a specific commit",
     (yargs) => {
       yargs.positional("commitID", {
-        describe: "revert commit ID",
+        describe: "Commit ID to revert to",
         type: "string",
       });
     },
@@ -60,10 +88,13 @@ yargs(hideBin(process.argv))
       revertRepo(argv.commitID);
     },
   )
+
   .demandCommand(1, "Please specify a command")
   .help().argv;
 
-const user = "userXYZ";
+// ✅ Fix 1: let instead of const — socket.io reassigns this
+let user = "userXYZ";
+
 async function startServer() {
   const app = express();
   app.use(bodyParser.json());
@@ -81,8 +112,8 @@ async function startServer() {
   }
 
   app.use(cors({ origin: "*" }));
-
   app.use("/", mainRouter);
+
   app.get("/", (req, res) => {
     res.send("Welcome!");
   });
@@ -97,7 +128,7 @@ async function startServer() {
 
   io.on("connection", (socket) => {
     socket.on("joinRoom", (userID) => {
-      user = userID;
+      user = userID; // ✅ now works — let allows reassignment
       console.log("=====");
       console.log(user);
       console.log("=====");
@@ -115,5 +146,5 @@ async function startServer() {
     console.log(`Server is running on port ${PORT}`);
   });
 
-  console.log("Server has started !");
+  console.log("Server has started!");
 }

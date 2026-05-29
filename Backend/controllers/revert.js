@@ -1,25 +1,32 @@
-import fs from "fs";
+import fs from "fs/promises"; // ✅ use fs/promises like every other controller
 import path from "path";
-import { s3, S3_BUCKET } from "../config/aws-config.js";
-import { promisify } from "util";
+// ✅ removed unused s3 and S3_BUCKET import
 
-const readdir = promisify(fs.readdir);
-const copyFile = promisify(fs.copyFile);
 export async function revertRepo(commitID) {
-  const repoPath = await path.resolve(process.cwd(), ".repoFlowGit");
-  const commitsPath = await path.join(repoPath, "commits");
+  // ✅ path.resolve and path.join are sync — no await needed
+  const repoPath = path.resolve(process.cwd(), ".repoFlowGit");
+  const commitsPath = path.join(repoPath, "commits");
 
   try {
-    const commitDir = await path.join(commitsPath, commitID);
-    const files = await readdir(commitDir);
-    const parendDir = path.resolve(repoPath, "..");
+    const commitDir = path.join(commitsPath, commitID);
+    const files = await fs.readdir(commitDir);
+    const parentDir = path.resolve(repoPath, "..");
 
-    for (const file of files) {
-      await copyFile(path.join(commitDir, file), path.join(parendDir, file));
+    // ✅ Skip commit.json — it's metadata, not a user file
+    const userFiles = files.filter((f) => f !== "commit.json");
+
+    if (userFiles.length === 0) {
+      console.log("No files found in this commit.");
+      return;
     }
-    console.log(`Commit ${commitID} reverted back`);
+
+    for (const file of userFiles) {
+      await fs.copyFile(path.join(commitDir, file), path.join(parentDir, file));
+      console.log(`  restored: ${file}`);
+    }
+
+    console.log(`Commit ${commitID} reverted successfully.`);
   } catch (err) {
-    console.error("Unable to revert: ", err);
+    console.error("Unable to revert:", err);
   }
-  console.log("File reverted back sucessfully");
 }

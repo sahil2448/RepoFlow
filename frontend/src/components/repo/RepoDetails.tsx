@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import IssueList from "../issues/IssueList";
+import CommitHistory from "./commitHistory";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -24,7 +25,7 @@ interface Repository {
   starredUsers: string[];
 }
 
-type RepoTab = "content" | "issues" | "delete";
+type RepoTab = "content" | "issues" | "delete" | "commits";
 
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -72,6 +73,12 @@ const TrashIcon: React.FC = () => (
   </svg>
 );
 
+const CommitIcon: React.FC = () => (
+  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+      d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+  </svg>
+);
 const ArrowLeftIcon: React.FC = () => (
   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -478,7 +485,9 @@ const isOwner: boolean = !!(repo && typeof repo.owner === "object" && repo.owner
               [
                 { key: "content" as RepoTab, label: "Content",  icon: <TerminalIcon /> },
                 { key: "issues"  as RepoTab, label: `Issues`,   icon: <IssueIcon /> },
-                { key: "delete"  as RepoTab, label: `Delete`,   icon: <TrashIcon /> },
+                { key: "commits" as RepoTab, label: "Commits", icon: <CommitIcon /> },
+                isOwner && { key: "delete" as RepoTab, label: `Delete`, icon: <TrashIcon /> },
+
               ] as { key: RepoTab; label: string; icon: React.ReactNode }[]
             ).map(({ key, label, icon }) => (
               <button
@@ -591,10 +600,19 @@ const isOwner: boolean = !!(repo && typeof repo.owner === "object" && repo.owner
                   <IssueList repoId={id!} isOwner={isOwner} />
                 </div>
             )}
+                    {activeTab === "commits" && (
+                 <div className="relative rounded-2xl border border-white/[0.07]
+                  bg-white/[0.02] overflow-hidden p-5">
+                  <div className="absolute inset-x-0 top-0 h-px
+                                  bg-gradient-to-r from-transparent via-[#FF6B4A]/20 to-transparent" />
+            <CommitHistory repoId={id!} />
+          </div>
+        )}
+
 
           {
       /* ── DELETE TAB ── */
-          activeTab === "delete" && (
+           isOwner && activeTab === "delete" && (
             <DeleteTabPanel
               repoName={repo.name}
               onDelete={handleDeleteRepo}
