@@ -1,5 +1,8 @@
 import express from "express";
-import { getCommitsByRepo, revertToCommit } from "../controllers/commit.js";
+import {
+  getCommitsByRepo,
+  revertToCommit,
+} from "../controllers/commitHttpController.js";
 
 const commitRouter = express.Router();
 

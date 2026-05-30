@@ -10,6 +10,7 @@ interface Repository {
   language?: string;
   stars?: number;
   updatedAt?: string;
+  visibility: true | false;
 }
 
 interface UpcomingEvent {
@@ -83,7 +84,8 @@ const Dashboard = () => {
         const response = await fetch(`http://localhost:3000/repo/all`);
         const data = await response.json();
         if (!response.ok) { console.error(data); return; }
-        setSuggestedRepositories(data.repositories || []);
+        const allPublic: Repository[] = data.repositories.filter((repo: Repository) => repo.visibility === true);
+        setSuggestedRepositories(allPublic || []);
       } catch (error) { console.error("Error fetching suggested repositories:", error); }
     };
 
