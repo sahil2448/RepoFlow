@@ -2,6 +2,8 @@
 import Issue from "../model/issueModel.js";
 import Repository from "../model/repoModel.js";
 import logContribution from "../helpers/logContribution.js";
+import { embedAndIndexIssue } from "./issueAIController.js";
+import { deleteIssueVector } from "../helpers/vectorStore.js";
 
 const createIssue = async (req, res) => {
   const { title, description, userId } = req.body;
@@ -27,6 +29,7 @@ const createIssue = async (req, res) => {
 
     if (userId) await logContribution(userId, "issue_created");
 
+    embedAndIndexIssue(createdIssue._id, id, title, description);
     res
       .status(201)
       .json({ message: "Issue created successfully", issue: createdIssue }); // ❌ was: issue (undefined)
@@ -66,6 +69,8 @@ async function deleteIssueById(req, res) {
       { _id: issue.repository },
       { $pull: { issues: issue._id } },
     );
+
+    deleteIssueVector(id, issue.repository.toString());
 
     res.status(200).json({ message: "Issue deleted" });
   } catch (err) {

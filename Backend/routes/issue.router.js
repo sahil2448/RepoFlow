@@ -6,6 +6,7 @@ import {
   updateIssueById,
   deleteIssueById,
 } from "../controllers/issueController.js";
+import { checkDuplicateIssue } from "../controllers/issueAIController.js";
 
 const issueRouter = express.Router();
 
@@ -19,5 +20,6 @@ issueRouter.get("/issue/all/:id", getAllIssues); // ← add :id (repo id)
 issueRouter.get("/issue/:id", getIssueById);
 issueRouter.put("/issue/update/:id", updateIssueById);
 issueRouter.delete("/issue/delete/:id", deleteIssueById);
+issueRouter.post("/issue/check-duplicate/:repoId", checkDuplicateIssue);
 
 export default issueRouter;
