@@ -4,6 +4,7 @@ import { s3, S3_BUCKET } from "../config/aws-config.js";
 import mongoose from "mongoose";
 import Commit from "../model/commitModel.js";
 import dotenv from "dotenv";
+import Repository from "../model/repoModel.js";
 
 dotenv.config();
 
@@ -152,9 +153,15 @@ export async function pushRepo() {
       console.log(
         `  ✓ commit saved [${storageType}]: "${message}" (${short}...)`,
       );
-    }
 
-    console.log("\nPush complete.");
+      console.log("\nPush complete.");
+
+      // ✅ Update repo.content with latest file snapshot
+      await Repository.findByIdAndUpdate(repoId, {
+        $set: { content: filesToUpload },
+      });
+      console.log(`  ✓ repo.content updated with: ${filesToUpload.join(", ")}`);
+    }
   } catch (error) {
     console.error("Error during push:", error);
   }

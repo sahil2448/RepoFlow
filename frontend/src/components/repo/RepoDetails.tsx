@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import IssueList from "../issues/IssueList";
-import CommitHistory from "./commitHistory";
+import CommitHistory from "./CommitHistory";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -197,6 +197,8 @@ const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({ repoName, onDelete }) =
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const RepositoryDetails: React.FC = () => {
+
+
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -207,6 +209,38 @@ const RepositoryDetails: React.FC = () => {
   const [starCount, setStarCount] = useState<number>(0);
   const [starLoading, setStarLoading] = useState<boolean>(false);
   const [copiedLine, setCopiedLine]   = useState<number | null>(null);
+    // ── Add new state at top of component ──
+const [files, setFiles]           = useState<{
+  name: string;
+  content: string | null;
+  url?:    string;
+  source:  string;
+}[]>([]);
+const [filesLoading, setFilesLoading] = useState<boolean>(false);
+const [latestCommitMsg, setLatestCommitMsg] = useState<string>("");
+const [selectedFile, setSelectedFile]   = useState<{
+  name: string;
+  content: string;
+} | null>(null);
+
+// ── Fetch files when tab opens ──
+useEffect(() => {
+  if (activeTab !== "content") return;
+  const fetchFiles = async (): Promise<void> => {
+    setFilesLoading(true);
+    try {
+      const res = await axios.get(`http://localhost:3000/repo/${id}/files`);
+      setFiles(res.data.files || []);
+      setLatestCommitMsg(res.data.message || "");
+    } catch (err) {
+      console.error("Failed to fetch files:", err);
+    } finally {
+      setFilesLoading(false);
+    }
+  };
+  fetchFiles();
+}, [activeTab, id]);
+
 
   const userId = localStorage.getItem("userId");
 
@@ -516,80 +550,176 @@ const isOwner: boolean = !!(repo && typeof repo.owner === "object" && repo.owner
           <div className="fade-up" style={{ animationDelay: "140ms" }}>
 
             {/* ── CONTENT TAB ── */}
-            {activeTab === "content" && (
-              <div className="relative rounded-2xl border border-white/[0.07]
-                              bg-[#060611] overflow-hidden scanlines">
+{activeTab === "content" && (
+  <div className="relative rounded-2xl border border-white/[0.07]
+                  bg-[#060611] overflow-hidden scanlines">
 
-                {/* Terminal top bar */}
-                <div className="flex items-center justify-between px-4 py-2.5
-                                border-b border-white/[0.05] bg-white/[0.02]">
-                  <div className="flex items-center gap-1.5">
-                    {/* Traffic lights */}
-                    {["#FF6B4A", "#F59E0B", "#00FFA3"].map((c) => (
-                      <span key={c} className="w-2.5 h-2.5 rounded-full opacity-60"
-                        style={{ backgroundColor: c }} />
-                    ))}
-                  </div>
-                  <span className="font-plex text-[10px] text-gray-700">
-                    {repo.name} — {repo.content.length} entries
-                  </span>
-                  <span className="font-plex text-[10px] text-[#00FFA3]/40">
-                    read-only
-                  </span>
-                </div>
+    {/* Terminal top bar */}
+    <div className="flex items-center justify-between px-4 py-2.5
+                    border-b border-white/[0.05] bg-white/[0.02]">
+      <div className="flex items-center gap-1.5">
+        {["#FF6B4A", "#F59E0B", "#00FFA3"].map((c) => (
+          <span key={c} className="w-2.5 h-2.5 rounded-full opacity-60"
+            style={{ backgroundColor: c }} />
+        ))}
+      </div>
+      <span className="font-plex text-[10px] text-gray-700">
+        {repo.name}
+        {latestCommitMsg && (
+          <span className="text-gray-800 ml-2">— {latestCommitMsg}</span>
+        )}
+      </span>
+      {/* Back button when file is open */}
+      {selectedFile ? (
+        <button
+          onClick={() => setSelectedFile(null)}
+          className="font-plex text-[10px] text-[#00FFA3]/60
+                     hover:text-[#00FFA3] transition-colors"
+        >
+          ← back
+        </button>
+      ) : (
+        <span className="font-plex text-[10px] text-[#00FFA3]/40">
+          {files.length} file{files.length !== 1 ? "s" : ""}
+        </span>
+      )}
+    </div>
 
-                {/* Content lines */}
-                {repo.content.length === 0 ? (
-                  <div className="px-6 py-16 flex flex-col items-center gap-3">
-                    <p className="font-plex text-[11px] text-gray-700">
-                      no content yet
-                    </p>
-                    <p className="font-plex text-[10px] text-gray-800">
-                      push your first entry to see it here
-                    </p>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-white/[0.03]">
-                    {repo.content.map((line, i) => (
-                      <div
-                        key={i}
-                        className="content-line group flex items-start gap-0 px-0
-                                   hover:bg-[#00FFA3]/[0.03] transition-colors duration-150"
-                      >
-                        {/* Line number */}
-                        <span className="shrink-0 w-12 py-3 text-center font-plex
-                                         text-[11px] text-gray-800 select-none
-                                         border-r border-white/[0.04]">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-
-                        {/* Line content */}
-                        <span className="flex-1 px-5 py-3 font-plex text-[12px]
-                                         text-gray-300 leading-relaxed break-all">
-                          {line}
-                          {/* Blinking cursor on last line */}
-                          {i === repo.content.length - 1 && (
-                            <span className="cursor-blink ml-0.5 inline-block
-                                             w-[7px] h-[13px] bg-[#00FFA3]/60 align-middle" />
-                          )}
-                        </span>
-
-                        {/* Copy button */}
-                        <button
-                          onClick={() => handleCopyLine(line, i)}
-                          className="copy-btn shrink-0 mr-3 mt-2.5 px-2 py-1 rounded
-                                     font-plex text-[9px] border transition-all duration-150
-                                     border-white/[0.07] text-gray-600 hover:text-[#00FFA3]
-                                     hover:border-[#00FFA3]/20 bg-white/[0.02]"
-                        >
-                          {copiedLine === i ? "copied!" : "copy"}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+    {filesLoading ? (
+      <div className="space-y-2 p-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i}
+            className="h-10 rounded-lg bg-white/[0.03] animate-pulse" />
+        ))}
+      </div>
+    ) : selectedFile ? (
+      /* ── File content viewer ── */
+      <div>
+        {/* File name bar */}
+        <div className="flex items-center gap-2 px-4 py-2
+                        border-b border-white/[0.04] bg-white/[0.02]">
+          <svg className="w-3 h-3 text-[#A78BFA]" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span className="font-plex text-[11px] text-[#A78BFA]">
+            {selectedFile.name}
+          </span>
+        </div>
+        {/* Line-by-line content */}
+        <div className="divide-y divide-white/[0.03]">
+          {selectedFile.content.split("\n").map((line, i) => (
+            <div key={i}
+              className="content-line group flex items-start
+                         hover:bg-[#00FFA3]/[0.03] transition-colors duration-150">
+              <span className="shrink-0 w-12 py-2.5 text-center font-plex
+                               text-[11px] text-gray-800 select-none
+                               border-r border-white/[0.04]">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="flex-1 px-5 py-2.5 font-plex text-[12px]
+                               text-gray-300 leading-relaxed break-all">
+                {line || " "}
+              </span>
+              <button
+                onClick={() => handleCopyLine(line, i)}
+                className="copy-btn shrink-0 mr-3 mt-2 px-2 py-1 rounded
+                           font-plex text-[9px] border transition-all duration-150
+                           border-white/[0.07] text-gray-600 hover:text-[#00FFA3]
+                           hover:border-[#00FFA3]/20 bg-white/[0.02]"
+              >
+                {copiedLine === i ? "copied!" : "copy"}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    ) : files.length === 0 ? (
+      /* ── Empty state with CLI instructions ── */
+      <div className="px-6 py-16 flex flex-col items-center gap-4">
+        <p className="font-plex text-[11px] text-gray-700">
+          no files pushed yet
+        </p>
+        <div className="w-full max-w-sm rounded-xl border border-white/[0.06]
+                        bg-[#060611] overflow-hidden">
+          <div className="flex items-center gap-1.5 px-4 py-2
+                          border-b border-white/[0.05]">
+            {["#FF6B4A","#F59E0B","#00FFA3"].map((c) => (
+              <span key={c} className="w-2 h-2 rounded-full opacity-50"
+                style={{ backgroundColor: c }} />
+            ))}
+            <span className="font-plex text-[10px] text-gray-700 ml-1">
+              terminal
+            </span>
+          </div>
+          <div className="px-4 py-3 space-y-1.5 font-plex text-[11px]">
+            {[
+              { cmd: `node index.js init --repoId ${id}`, comment: "# link to this repo" },
+              { cmd: "node index.js add yourfile.js",     comment: "# stage a file" },
+              { cmd: 'node index.js commit "message"',    comment: "# snapshot" },
+              { cmd: "node index.js push",                comment: "# sync here" },
+            ].map(({ cmd, comment }) => (
+              <div key={cmd}>
+                <span className="text-[#00FFA3]/80">{cmd}</span>
+                <span className="text-gray-700 ml-2">{comment}</span>
               </div>
-            )}
+            ))}
+          </div>
+        </div>
+      </div>
+    ) : (
+      /* ── File list ── */
+      <ul className="divide-y divide-white/[0.03]">
+        {files.map((file) => (
+          <li
+            key={file.name}
+            onClick={() => {
+              if (file.content) {
+                setSelectedFile({ name: file.name, content: file.content });
+              } else if (file.url) {
+                window.open(file.url, "_blank");
+              }
+            }}
+            className="group flex items-center gap-4 px-5 py-3.5
+                       hover:bg-[#00FFA3]/[0.03] transition-colors
+                       duration-150 cursor-pointer"
+          >
+            {/* File icon */}
+            <svg className="w-3.5 h-3.5 text-[#A78BFA]/60 shrink-0"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+
+            {/* File name */}
+            <span className="flex-1 font-plex text-[12px] text-gray-400
+                             group-hover:text-white transition-colors">
+              {file.name}
+            </span>
+
+            {/* Source badge */}
+            <span className={`font-plex text-[9px] px-1.5 py-0.5 rounded border
+                              ${file.source === "s3"
+                                ? "text-[#00FFA3]/50 border-[#00FFA3]/15"
+                                : "text-[#A78BFA]/50 border-[#A78BFA]/15"
+                              }`}>
+              {file.source}
+            </span>
+
+            {/* Chevron */}
+            <svg className="w-3.5 h-3.5 text-gray-700
+                             group-hover:text-[#00FFA3] transition-colors"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round"
+                strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+)}
 
             {/* ── ISSUES TAB ── */}
             {activeTab === "issues" && (
@@ -619,6 +749,7 @@ const isOwner: boolean = !!(repo && typeof repo.owner === "object" && repo.owner
             />
           )
         }
+
 
           </div>
         </div>

@@ -5,11 +5,6 @@ dotenv.config();
 const client = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 const EMBEDDING_DIMENSIONS = 768;
 
-/**
- * Converts text into a 768-dimensional vector
- * This vector captures MEANING, not just keywords
- * "Login broken" and "Can't sign in" will have similar vectors
- */
 export async function generateEmbedding(text) {
   try {
     const model = client.getGenerativeModel({ model: "gemini-embedding-2" });
@@ -28,9 +23,20 @@ export async function generateEmbedding(text) {
       return null;
     }
 
-    return values; // [0.23, -0.11, 0.87, ...] 768 numbers
+    return values;
   } catch (error) {
     console.error("Embedding failed:", error.message);
     return null;
   }
+}
+
+/**
+ * Weighted embedding — title repeated twice so model
+ * pays 2x attention to it over description
+ * Both search queries AND indexed issues must use this
+ * same function so vectors live in the same space
+ */
+export async function generateWeightedEmbedding(title, description) {
+  const weightedText = `${title}. ${title}. ${description}`;
+  return generateEmbedding(weightedText);
 }

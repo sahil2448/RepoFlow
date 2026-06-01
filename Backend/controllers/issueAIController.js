@@ -1,39 +1,53 @@
-import { generateEmbedding } from "../helpers/embeddings.js";
+import { generateWeightedEmbedding } from "../helpers/embeddings.js";
 import {
   upsertIssueVector,
   searchSimilarIssues,
 } from "../helpers/vectorStore.js";
 
-const DUPLICATE_THRESHOLD = 0.75; // 75% similarity = warn user
+// ✅ Raised from 0.75 to 0.82
+// Real duplicates score 0.85+ with text-embedding-004
+// Generic overlap (like "description" matching) stays below 0.82
+const DUPLICATE_THRESHOLD = 0.82;
 
-/**
- * POST /issue/check-duplicate/:repoId
- * Called while user is TYPING — before they submit
- */
+// Minimum content quality — prevents garbage data from triggering
+const MIN_TITLE_LENGTH = 10;
+const MIN_DESCRIPTION_LENGTH = 20;
+
 export const checkDuplicateIssue = async (req, res) => {
   const { repoId } = req.params;
   const { title, description } = req.body;
 
-  if (!title?.trim() || !description?.trim()) {
-    return res.status(400).json({ error: "title and description required" });
+  // ✅ Quality gate — don't check until user has typed enough
+  if (
+    !title?.trim() ||
+    !description?.trim() ||
+    title.trim().length < MIN_TITLE_LENGTH ||
+    description.trim().length < MIN_DESCRIPTION_LENGTH
+  ) {
+    return res.status(200).json({
+      isDuplicate: false,
+      confidence: 0,
+      similarIssues: [],
+      reason: "not_enough_content",
+    });
   }
 
   try {
-    // 1. Convert user's text to a vector
-    const userText = `${title} ${description}`;
-    const userEmbedding = await generateEmbedding(userText);
+    // ✅ Use weighted embedding — title gets 2x importance
+    const userEmbedding = await generateWeightedEmbedding(
+      title.trim(),
+      description.trim(),
+    );
 
     if (!userEmbedding) {
-      // AI failed — don't block issue creation, just skip check
       return res.status(200).json({
         isDuplicate: false,
         confidence: 0,
         similarIssues: [],
-        warning: "AI check unavailable — proceed normally",
+        warning: "AI unavailable — proceed normally",
       });
     }
 
-    // 2. Search Pinecone for similar issues in THIS repo's namespace
     const matches = await searchSimilarIssues(repoId, userEmbedding, 3);
 
     if (matches.length === 0) {
@@ -44,22 +58,28 @@ export const checkDuplicateIssue = async (req, res) => {
       });
     }
 
-    // 3. Shape the response
-    const similarIssues = matches.map((match) => ({
+    // ✅ Only include results that actually cross the threshold
+    const relevantMatches = matches.filter(
+      (m) => m.score >= DUPLICATE_THRESHOLD,
+    );
+
+    const similarIssues = relevantMatches.map((match) => ({
       issueId: match.id,
       title: match.metadata?.title,
       description: match.metadata?.description,
       status: match.metadata?.status,
-      similarity: Math.round(match.score * 100), // 87 (percentage)
+      similarity: Math.round(match.score * 100),
     }));
 
-    const topScore = matches[0].score;
-    const isDuplicate = topScore >= DUPLICATE_THRESHOLD;
+    const isDuplicate = relevantMatches.length > 0;
+    const confidence = relevantMatches[0]
+      ? Math.round(relevantMatches[0].score * 100)
+      : 0;
 
     return res.status(200).json({
       isDuplicate,
-      confidence: Math.round(topScore * 100),
-      similarIssues: isDuplicate ? similarIssues : [],
+      confidence,
+      similarIssues,
     });
   } catch (error) {
     console.error("Duplicate check error:", error);
@@ -68,8 +88,8 @@ export const checkDuplicateIssue = async (req, res) => {
 };
 
 /**
- * Called AFTER issue is created in issueController.js
- * Fire and forget — don't await in the main controller
+ * Called after issue creation — uses weighted embedding
+ * so future searches match on the same weighted space
  */
 export const embedAndIndexIssue = async (
   issueId,
@@ -77,8 +97,13 @@ export const embedAndIndexIssue = async (
   title,
   description,
 ) => {
-  const text = `${title} ${description}`;
-  const embedding = await generateEmbedding(text);
-  if (!embedding) return;
-  await upsertIssueVector(issueId, repoId, embedding, { title, description });
+  try {
+    // ✅ Must use same weighted approach for consistency
+    // If search uses weighted, indexing must also use weighted
+    const embedding = await generateWeightedEmbedding(title, description);
+    if (!embedding) return;
+    await upsertIssueVector(issueId, repoId, embedding, { title, description });
+  } catch (err) {
+    console.error("Embed and index failed:", err.message);
+  }
 };
