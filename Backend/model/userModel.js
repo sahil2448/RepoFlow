@@ -1,50 +1,24 @@
-import mongoose from "mongoose";
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const UserSchema = new Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-  },
+const UserSchema = new Schema(
+  {
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
 
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-  },
+    // ✅ New profile fields
+    bio: { type: String, default: "" },
+    location: { type: String, default: "" },
+    website: { type: String, default: "" },
+    avatar: { type: String, default: "" },
 
-  repositories: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Repository",
-    },
-  ],
-  followingUsers: [
-    // the users that the current user is following
-    {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-  ],
-  myFollowers: [
-    // the users that are following the current user
-    {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-  ],
-  starredRepositories: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Repository",
-    },
-  ],
-});
+    repositories: [{ type: Schema.Types.ObjectId, ref: "Repository" }],
+    followingUsers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    myFollowers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    starredRepositories: [{ type: Schema.Types.ObjectId, ref: "Repository" }],
+  },
+  { timestamps: true },
+);
 
 const User = mongoose.model("User", UserSchema);
-
 export default User;

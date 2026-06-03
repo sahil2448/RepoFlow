@@ -163,7 +163,7 @@ const Dashboard = () => {
               {suggestedRepositories.map((repo) => (
                 <li
                   key={repo._id}
-                            onClick={() => navigate(`/repo/${repo._id}`)}
+                            onClick={() => navigate(`/repo/${repo.name}/${repo._id}`)}
 
                   className="group p-3.5 rounded-lg border border-white/[0.05] bg-white/[0.02]
                              hover:bg-[#00FFA3]/[0.04] hover:border-[#00FFA3]/20
@@ -231,7 +231,7 @@ const Dashboard = () => {
               {searchResults.map((repo, i) => (
                 <li
                   key={repo._id}
-                 onClick={() => navigate(`/repo/${repo._id}`)}
+                 onClick={() => navigate(`/repo/${repo.name}/${repo._id}`)}
                   className="repo-card group relative flex items-center gap-4 px-5 py-4 rounded-xl
                              border border-white/[0.05] bg-white/[0.02]
                              hover:bg-white/[0.04] hover:border-white/[0.09]

@@ -98,59 +98,122 @@ async function getAllUsers(req, res) {
   }
 }
 
-async function getUserProfile(req, res) {
-  const currentId = req.params.id;
+// async function getUserProfile(req, res) {
+//   const currentId = req.params.id;
 
+//   try {
+//     await connectToClient();
+//     const db = client.db(DB_NAME);
+//     const userCollection = db.collection("users");
+
+//     const user = await userCollection.findOne({
+//       _id: new ObjectId(currentId),
+//     });
+
+//     if (!user) {
+//       return res.status(404).send("User not found");
+//     }
+//     res.json(user).status(200);
+//     console.log("User profile fetched successfully");
+//   } catch (error) {
+//     res.status(500).send("Server Error");
+//   }
+// }
+
+// const updateUserProfile = async (req, res) => {
+//   const currentId = req.params.id;
+//   const { email, password } = req.body;
+
+//   try {
+//     await connectToClient();
+//     const db = client.db(DB_NAME);
+//     const userCollection = db.collection("users");
+
+//     const updateFields = {};
+//     if (email) updateFields.email = email;
+
+//     if (password) {
+//       const salt = await bcrypt.genSalt(10);
+//       const hashedPassword = await bcrypt.hash(password, salt);
+//       updateFields.password = hashedPassword;
+//     }
+
+//     const result = await userCollection.findOneAndUpdate(
+//       { _id: new ObjectId(currentId) },
+//       { $set: updateFields },
+//       { returnDocument: "after" },
+//     );
+
+//     if (!result.value) {
+//       return res.status(404).send("User not found!");
+//     }
+
+//     return res.status(200).json(result.value);
+//   } catch (error) {
+//     return res.status(500).send("Server Error");
+//   }
+// };
+
+// GET /userProfile/:id
+const getUserProfile = async (req, res) => {
+  const { id } = req.params;
   try {
     await connectToClient();
     const db = client.db(DB_NAME);
-    const userCollection = db.collection("users");
-
-    const user = await userCollection.findOne({
-      _id: new ObjectId(currentId),
-    });
-
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    res.json(user).status(200);
-    console.log("User profile fetched successfully");
-  } catch (error) {
-    res.status(500).send("Server Error");
-  }
-}
-
-const updateUserProfile = async (req, res) => {
-  const currentId = req.params.id;
-  const { email, password } = req.body;
-
-  try {
-    await connectToClient();
-    const db = client.db(DB_NAME);
-    const userCollection = db.collection("users");
-
-    const updateFields = {};
-    if (email) updateFields.email = email;
-
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      updateFields.password = hashedPassword;
-    }
-
-    const result = await userCollection.findOneAndUpdate(
-      { _id: new ObjectId(currentId) },
-      { $set: updateFields },
-      { returnDocument: "after" },
+    const user = await db.collection("users").findOne(
+      { _id: new ObjectId(id) },
+      {
+        projection: {
+          password: 0, // ✅ exclusion only — return everything EXCEPT password
+        },
+      },
     );
 
-    if (!result.value) {
-      return res.status(404).send("User not found!");
-    }
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-    return res.status(200).json(result.value);
+    return res.status(200).json({
+      ...user,
+      followers: user.myFollowers?.length ?? 0,
+      following: user.followingUsers?.length ?? 0,
+    });
   } catch (error) {
-    return res.status(500).send("Server Error");
+    console.error("Error fetching user profile:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// PUT /userProfile/:id  (was /updateProfile/:id — check your router)
+const updateUserProfile = async (req, res) => {
+  const { id } = req.params;
+  // ✅ only allow safe fields — never let caller update password/followers here
+  const { username, email, bio, location, website, avatar } = req.body;
+
+  try {
+    await connectToClient();
+    const db = client.db(DB_NAME);
+
+    const updateFields = {};
+    if (username !== undefined) updateFields.username = username;
+    if (email !== undefined) updateFields.email = email;
+    if (bio !== undefined) updateFields.bio = bio;
+    if (location !== undefined) updateFields.location = location;
+    if (website !== undefined) updateFields.website = website;
+    if (avatar !== undefined) updateFields.avatar = avatar;
+
+    const result = await db
+      .collection("users")
+      .findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: updateFields },
+        { returnDocument: "after", projection: { password: 0 } },
+      );
+
+    if (!result) return res.status(404).json({ error: "User not found" });
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Error updating user profile:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 

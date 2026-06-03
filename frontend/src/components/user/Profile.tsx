@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "../../authContext";
 import HeatMapProfile from "./HeatMap";
 import StarredRepo from "./StarredRepo";
-
+import AboutUser from "./AboutUser"
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface UserDetails {
@@ -13,6 +13,10 @@ interface UserDetails {
   email?: string;
   followers?: number;
   following?: number;
+  bio?: string;
+  location?: string;
+  website?: string;
+  avatar?: string;
 }
 
 type ProfileTab = "overview" | "starred";
@@ -43,9 +47,10 @@ const LogoutIcon: React.FC = () => (
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const Profile: React.FC = () => {
-  const { id } = useParams<{ id: string }>();           // ← id of profile being viewed
-  const currentUserId = localStorage.getItem("userId"); // ← logged-in user
-  const isOwnProfile  = currentUserId === id;           // ← true when viewing your own page
+const { id: paramId } = useParams<{ id: string }>();
+const currentUserId   = localStorage.getItem("userId");
+const id              = paramId ?? currentUserId ?? "";
+const isOwnProfile    = currentUserId === id;
 
   const { setCurrentUser } = useAuth();
 
@@ -53,6 +58,56 @@ const Profile: React.FC = () => {
   const [activeTab,     setActiveTab]     = useState<ProfileTab>("overview");
   const [isFollowing,   setIsFollowing]   = useState<boolean>(false);
   const [followLoading, setFollowLoading] = useState<boolean>(false);
+
+  const [isEditing, setIsEditing] = useState(false);
+const [editData, setEditData] = useState({
+  username: "",
+  email: "",
+  bio: "",
+  location: "",
+  website: "",
+  avatar: "",
+});
+const [saveLoading, setSaveLoading] = useState(false);
+
+useEffect(() => {
+  setEditData({
+    username: userDetails.username ?? "",
+    email: userDetails.email ?? "",
+    bio: userDetails.bio ?? "",
+    location: userDetails.location ?? "",
+    website: userDetails.website ?? "",
+    avatar: userDetails.avatar ?? "",
+  });
+}, [userDetails]);
+
+
+const handleEditChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) => {
+  const { name, value } = e.target;
+  setEditData((prev) => ({ ...prev, [name]: value }));
+};
+
+const handleSaveProfile = async () => {
+  if (!id) return;
+
+  setSaveLoading(true);
+  try {
+    const response = await axios.put(`http://localhost:3000/updateProfile/${id}`, editData);
+    setUserDetails((prev) => ({
+  ...prev,
+  ...response.data,
+  username: response.data.username ?? prev.username,
+  email:    response.data.email    ?? prev.email,
+}));
+    setIsEditing(false);
+  } catch (error: any) {
+    console.error("Profile update failed:", error?.response?.data?.error ?? error);
+  } finally {
+    setSaveLoading(false);
+  }
+};
 
   // ── Fetch profile of the user whose id is in the URL ──
   useEffect(() => {
@@ -159,7 +214,7 @@ setUserDetails((prev) => ({
             <aside className="w-[260px] shrink-0 fade-up" style={{ animationDelay: "0ms" }}>
 
               {/* Avatar */}
-              <div className="w-full aspect-square max-w-[220px] rounded-2xl
+              <div className="w-full aspect-square max-w-[260px] rounded-2xl
                               bg-gradient-to-br from-[#00FFA3]/10 to-[#A78BFA]/10
                               border border-white/[0.07] flex items-center justify-center mb-5
                               relative overflow-hidden">
@@ -169,8 +224,8 @@ setUserDetails((prev) => ({
                   {userDetails.username?.[0]?.toUpperCase() ?? "U"}
                 </span>
               </div>
+              <div className="flex flex-col px-2">
 
-              {/* Name + email */}
               <h2 className="font-syne text-xl font-bold text-white tracking-tight mb-0.5">
                 {userDetails.username}
               </h2>
@@ -178,6 +233,17 @@ setUserDetails((prev) => ({
                 <p className="font-plex text-[11px] text-gray-600 mb-4">
                   {userDetails.email}
                 </p>
+              )}
+
+              {isOwnProfile && (
+                <button
+                  onClick={() => setIsEditing((prev) => !prev)}
+                  className="w-full py-2 mb-4 rounded-lg font-plex text-[11px] tracking-widest uppercase
+                            border transition-all duration-200 bg-white/[0.03] border-white/[0.07]
+                            text-gray-400 hover:bg-[#00FFA3]/[0.07] hover:border-[#00FFA3]/25 hover:text-[#00FFA3]"
+                >
+                  {isEditing ? "Close Edit" : "Edit Profile"}
+                </button>
               )}
 
               {/* Follow button — only shown on OTHER people's profiles */}
@@ -227,11 +293,114 @@ setUserDetails((prev) => ({
                   </button>
                 </div>
               )}
+              </div>
+
+              {/* Name + email */}
 
             </aside>
 
             {/* ── Right: Content ── */}
+            {isOwnProfile && isEditing && (
+  <div className="relative rounded-2xl border border-white/[0.07] bg-white/[0.02] p-5 mb-6 overflow-hidden fade-up">
+    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00FFA3]/15 to-transparent" />
+
+    <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600 mb-4">
+      Edit Profile
+    </p>
+
+    <div className="grid gap-4 sm:grid-cols-2">
+      <div>
+        <label className="mb-2 block text-[11px] text-gray-500">Username</label>
+        <input
+          name="username"
+          value={editData.username}
+          onChange={handleEditChange}
+          className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
+                     text-sm text-white outline-none focus:border-[#00FFA3]/40"
+        />
+      </div>
+
+      <div>
+        <label className="mb-2 block text-[11px] text-gray-500">Email</label>
+        <input
+          name="email"
+          value={editData.email}
+          onChange={handleEditChange}
+          className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
+                     text-sm text-white outline-none focus:border-[#00FFA3]/40"
+        />
+      </div>
+
+      <div className="sm:col-span-2">
+        <label className="mb-2 block text-[11px] text-gray-500">Bio</label>
+        <textarea
+          name="bio"
+          rows={4}
+          value={editData.bio}
+          onChange={handleEditChange}
+          className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
+                     text-sm text-white outline-none focus:border-[#00FFA3]/40"
+        />
+      </div>
+
+      <div>
+        <label className="mb-2 block text-[11px] text-gray-500">Location</label>
+        <input
+          name="location"
+          value={editData.location}
+          onChange={handleEditChange}
+          className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
+                     text-sm text-white outline-none focus:border-[#00FFA3]/40"
+        />
+      </div>
+
+      <div>
+        <label className="mb-2 block text-[11px] text-gray-500">Website</label>
+        <input
+          name="website"
+          value={editData.website}
+          onChange={handleEditChange}
+          className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
+                     text-sm text-white outline-none focus:border-[#00FFA3]/40"
+        />
+      </div>
+
+      <div className="sm:col-span-2">
+        <label className="mb-2 block text-[11px] text-gray-500">Avatar URL</label>
+        <input
+          name="avatar"
+          value={editData.avatar}
+          onChange={handleEditChange}
+          className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
+                     text-sm text-white outline-none focus:border-[#00FFA3]/40"
+        />
+      </div>
+    </div>
+
+    <div className="flex gap-3 mt-5">
+      <button
+        onClick={handleSaveProfile}
+        disabled={saveLoading}
+        className="rounded-lg border border-[#00FFA3]/25 bg-[#00FFA3]/[0.08] px-4 py-2
+                   text-[11px] uppercase tracking-widest text-[#00FFA3] hover:bg-[#00FFA3]/[0.12]
+                   disabled:opacity-50"
+      >
+        {saveLoading ? "Saving..." : "Save Changes"}
+      </button>
+
+      <button
+        onClick={() => setIsEditing(false)}
+        className="rounded-lg border border-white/[0.07] bg-white/[0.03] px-4 py-2
+                   text-[11px] uppercase tracking-widest text-gray-400 hover:text-white"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
             <main className="flex-1 min-w-0 fade-up" style={{ animationDelay: "60ms" }}>
+              
+              <AboutUser userDetails={userDetails} />
 
               <div className="flex items-center gap-2 mb-6">
                 <span className="block w-1.5 h-4 rounded-full bg-[#00FFA3]" />

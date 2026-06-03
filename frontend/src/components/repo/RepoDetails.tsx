@@ -199,7 +199,7 @@ const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({ repoName, onDelete }) =
 const RepositoryDetails: React.FC = () => {
 
 
-  const { id } = useParams<{ id: string }>();
+  const {  id } = useParams<{ name: string; id: string }>();
   const navigate = useNavigate();
 
   const [repo, setRepo]         = useState<Repository | null>(null);

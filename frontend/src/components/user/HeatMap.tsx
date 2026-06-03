@@ -30,6 +30,7 @@ const getPanelColors = (maxCount: number): PanelColors => {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
+
 const HeatMapProfile: React.FC = () => {
   const [activityData, setActivityData]   = useState<ActivityEntry[]>([]);
   const [panelColors, setPanelColors]     = useState<PanelColors>({ 0: "rgba(255,255,255,0.04)" });
