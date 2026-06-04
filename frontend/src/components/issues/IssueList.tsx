@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import CreateIssue from "./createIssue";
-import IssueDetail from "./IssueDetail";
+import CreateIssue from "./CreateIssue.tsx";
+import IssueDetail from "./IssueDetail.tsx";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
