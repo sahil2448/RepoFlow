@@ -139,7 +139,7 @@ const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({ repoName, onDelete }) =
             This action is <span className="text-[#FF6B4A]">irreversible</span>. All content
             and issues will be permanently removed.
           </p>
-           <p className="font-plex text-[10px] text-gray-600 uppercase tracking-widest">
+          <p className="font-plex text-[10px] text-gray-600 uppercase tracking-widest">
             Type the repository name to confirm :  <span className="text-white lowercase">{repoName}</span>
           </p>
         </div>
@@ -151,7 +151,7 @@ const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({ repoName, onDelete }) =
           </p> */}
 
           {/* Repo name hint */}
-         
+
 
           {/* Input */}
           <input
@@ -163,14 +163,14 @@ const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({ repoName, onDelete }) =
                         font-plex text-[12px] outline-none tracking-wide
                         placeholder:text-gray-800 transition-colors duration-200
                         ${matches
-                          ? "border-[#FF6B4A]/50 text-[#FF6B4A] caret-[#FF6B4A]"
-                          : inputValue.length > 0
-                            ? "border-white/[0.08] text-gray-400 caret-gray-500"
-                            : "border-white/[0.06] text-gray-400 caret-gray-500"
-                        }`}
+                ? "border-[#FF6B4A]/50 text-[#FF6B4A] caret-[#FF6B4A]"
+                : inputValue.length > 0
+                  ? "border-white/[0.08] text-gray-400 caret-gray-500"
+                  : "border-white/[0.06] text-gray-400 caret-gray-500"
+              }`}
           />
 
-         
+
         </div>
 
         {/* Delete button */}
@@ -182,9 +182,9 @@ const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({ repoName, onDelete }) =
                       border transition-all duration-200
                       disabled:opacity-30 disabled:cursor-not-allowed
                       ${matches
-                        ? "text-[#FF6B4A] bg-[#FF6B4A]/[0.10] border-[#FF6B4A]/30 hover:bg-[#FF6B4A]/[0.18] hover:border-[#FF6B4A]/50"
-                        : "text-gray-600 bg-white/[0.02] border-white/[0.06]"
-                      }`}
+              ? "text-[#FF6B4A] bg-[#FF6B4A]/[0.10] border-[#FF6B4A]/30 hover:bg-[#FF6B4A]/[0.18] hover:border-[#FF6B4A]/50"
+              : "text-gray-600 bg-white/[0.02] border-white/[0.06]"
+            }`}
         >
           <TrashIcon />
           Delete "{repoName}"
@@ -199,47 +199,47 @@ const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({ repoName, onDelete }) =
 const RepositoryDetails: React.FC = () => {
 
 
-  const {  id } = useParams<{ name: string; id: string }>();
+  const { id } = useParams<{ name: string; id: string }>();
   const navigate = useNavigate();
 
-  const [repo, setRepo]         = useState<Repository | null>(null);
-  const [loading, setLoading]   = useState<boolean>(true);
+  const [repo, setRepo] = useState<Repository | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<RepoTab>("content");
-  const [starred, setStarred]   = useState<boolean>(false);
+  const [starred, setStarred] = useState<boolean>(false);
   const [starCount, setStarCount] = useState<number>(0);
   const [starLoading, setStarLoading] = useState<boolean>(false);
-  const [copiedLine, setCopiedLine]   = useState<number | null>(null);
-    // ── Add new state at top of component ──
-const [files, setFiles]           = useState<{
-  name: string;
-  content: string | null;
-  url?:    string;
-  source:  string;
-}[]>([]);
-const [filesLoading, setFilesLoading] = useState<boolean>(false);
-const [latestCommitMsg, setLatestCommitMsg] = useState<string>("");
-const [selectedFile, setSelectedFile]   = useState<{
-  name: string;
-  content: string;
-} | null>(null);
+  const [copiedLine, setCopiedLine] = useState<number | null>(null);
+  // ── Add new state at top of component ──
+  const [files, setFiles] = useState<{
+    name: string;
+    content: string | null;
+    url?: string;
+    source: string;
+  }[]>([]);
+  const [filesLoading, setFilesLoading] = useState<boolean>(false);
+  const [latestCommitMsg, setLatestCommitMsg] = useState<string>("");
+  const [selectedFile, setSelectedFile] = useState<{
+    name: string;
+    content: string;
+  } | null>(null);
 
-// ── Fetch files when tab opens ──
-useEffect(() => {
-  if (activeTab !== "content") return;
-  const fetchFiles = async (): Promise<void> => {
-    setFilesLoading(true);
-    try {
-      const res = await axios.get(`http://localhost:3000/repo/${id}/files`);
-      setFiles(res.data.files || []);
-      setLatestCommitMsg(res.data.message || "");
-    } catch (err) {
-      console.error("Failed to fetch files:", err);
-    } finally {
-      setFilesLoading(false);
-    }
-  };
-  fetchFiles();
-}, [activeTab, id]);
+  // ── Fetch files when tab opens ──
+  useEffect(() => {
+    if (activeTab !== "content") return;
+    const fetchFiles = async (): Promise<void> => {
+      setFilesLoading(true);
+      try {
+        const res = await axios.get(`http://localhost:3000/repo/${id}/files`);
+        setFiles(res.data.files || []);
+        setLatestCommitMsg(res.data.message || "");
+      } catch (err) {
+        console.error("Failed to fetch files:", err);
+      } finally {
+        setFilesLoading(false);
+      }
+    };
+    fetchFiles();
+  }, [activeTab, id]);
 
 
   const userId = localStorage.getItem("userId");
@@ -279,7 +279,7 @@ useEffect(() => {
       setStarLoading(false);
     }
   };
-  const handleDeleteRepo = async():Promise<void>=>{
+  const handleDeleteRepo = async (): Promise<void> => {
     try {
       await axios.delete(`http://localhost:3000/repo/delete/${id}`);
       navigate("/");
@@ -302,7 +302,7 @@ useEffect(() => {
   // ── Open issues count ──
   const openIssues = repo?.issues.filter((i) => i.status !== "closed").length ?? 0;
 
-const isOwner: boolean = !!(repo && typeof repo.owner === "object" && repo.owner._id === userId);
+  const isOwner: boolean = !!(repo && typeof repo.owner === "object" && repo.owner._id === userId);
   // ─── Loading state ──────────────────────────────────────────────────────────
   if (loading) {
     return (
@@ -424,9 +424,9 @@ const isOwner: boolean = !!(repo && typeof repo.owner === "object" && repo.owner
                   <span className={`flex items-center gap-1 font-plex text-[9px] px-2 py-0.5
                                     rounded border uppercase tracking-widest
                                     ${repo.visibility
-                                      ? "text-[#00FFA3] bg-[#00FFA3]/[0.07] border-[#00FFA3]/20"
-                                      : "text-[#A78BFA] bg-[#A78BFA]/[0.07] border-[#A78BFA]/20"
-                                    }`}>
+                      ? "text-[#00FFA3] bg-[#00FFA3]/[0.07] border-[#00FFA3]/20"
+                      : "text-[#A78BFA] bg-[#A78BFA]/[0.07] border-[#A78BFA]/20"
+                    }`}>
                     {repo.visibility ? <GlobeIcon /> : <LockIcon />}
                     {repo.visibility ? "public" : "private"}
                   </span>
@@ -439,7 +439,7 @@ const isOwner: boolean = !!(repo && typeof repo.owner === "object" && repo.owner
                 )}
               </div>
 
-           
+
               <button
                 onClick={handleStar}
                 disabled={!userId || starLoading}
@@ -447,9 +447,9 @@ const isOwner: boolean = !!(repo && typeof repo.owner === "object" && repo.owner
                             font-plex text-[11px] tracking-wider transition-all duration-200
                             disabled:opacity-40 disabled:cursor-not-allowed
                             ${starred
-                              ? "text-[#00FFA3] bg-[#00FFA3]/[0.08] border-[#00FFA3]/25 hover:bg-[#00FFA3]/[0.14]"
-                              : "text-gray-400 bg-white/[0.02] border-white/[0.07] hover:border-white/[0.12] hover:text-white"
-                            }`}
+                    ? "text-[#00FFA3] bg-[#00FFA3]/[0.08] border-[#00FFA3]/25 hover:bg-[#00FFA3]/[0.14]"
+                    : "text-gray-400 bg-white/[0.02] border-white/[0.07] hover:border-white/[0.12] hover:text-white"
+                  }`}
               >
                 <span className={starred ? "star-pop text-[#00FFA3]" : ""}>
                   <StarIcon filled={starred} />
@@ -517,8 +517,8 @@ const isOwner: boolean = !!(repo && typeof repo.owner === "object" && repo.owner
           >
             {(
               [
-                { key: "content" as RepoTab, label: "Content",  icon: <TerminalIcon /> },
-                { key: "issues"  as RepoTab, label: `Issues`,   icon: <IssueIcon /> },
+                { key: "content" as RepoTab, label: "Content", icon: <TerminalIcon /> },
+                { key: "issues" as RepoTab, label: `Issues`, icon: <IssueIcon /> },
                 { key: "commits" as RepoTab, label: "Commits", icon: <CommitIcon /> },
                 isOwner && { key: "delete" as RepoTab, label: `Delete`, icon: <TrashIcon /> },
 
@@ -550,205 +550,205 @@ const isOwner: boolean = !!(repo && typeof repo.owner === "object" && repo.owner
           <div className="fade-up" style={{ animationDelay: "140ms" }}>
 
             {/* ── CONTENT TAB ── */}
-{activeTab === "content" && (
-  <div className="relative rounded-2xl border border-white/[0.07]
+            {activeTab === "content" && (
+              <div className="relative rounded-2xl border border-white/[0.07]
                   bg-[#060611] overflow-hidden scanlines">
 
-    {/* Terminal top bar */}
-    <div className="flex items-center justify-between px-4 py-2.5
+                {/* Terminal top bar */}
+                <div className="flex items-center justify-between px-4 py-2.5
                     border-b border-white/[0.05] bg-white/[0.02]">
-      <div className="flex items-center gap-1.5">
-        {["#FF6B4A", "#F59E0B", "#00FFA3"].map((c) => (
-          <span key={c} className="w-2.5 h-2.5 rounded-full opacity-60"
-            style={{ backgroundColor: c }} />
-        ))}
-      </div>
-      <span className="font-plex text-[10px] text-gray-700">
-        {repo.name}
-        {latestCommitMsg && (
-          <span className="text-gray-800 ml-2">— {latestCommitMsg}</span>
-        )}
-      </span>
-      {/* Back button when file is open */}
-      {selectedFile ? (
-        <button
-          onClick={() => setSelectedFile(null)}
-          className="font-plex text-[10px] text-[#00FFA3]/60
+                  <div className="flex items-center gap-1.5">
+                    {["#FF6B4A", "#F59E0B", "#00FFA3"].map((c) => (
+                      <span key={c} className="w-2.5 h-2.5 rounded-full opacity-60"
+                        style={{ backgroundColor: c }} />
+                    ))}
+                  </div>
+                  <span className="font-plex text-[10px] text-gray-700">
+                    {repo.name}
+                    {latestCommitMsg && (
+                      <span className="text-gray-800 ml-2">— {latestCommitMsg}</span>
+                    )}
+                  </span>
+                  {/* Back button when file is open */}
+                  {selectedFile ? (
+                    <button
+                      onClick={() => setSelectedFile(null)}
+                      className="font-plex text-[10px] text-[#00FFA3]/60
                      hover:text-[#00FFA3] transition-colors"
-        >
-          ← back
-        </button>
-      ) : (
-        <span className="font-plex text-[10px] text-[#00FFA3]/40">
-          {files.length} file{files.length !== 1 ? "s" : ""}
-        </span>
-      )}
-    </div>
+                    >
+                      ← back
+                    </button>
+                  ) : (
+                    <span className="font-plex text-[10px] text-[#00FFA3]/40">
+                      {files.length} file{files.length !== 1 ? "s" : ""}
+                    </span>
+                  )}
+                </div>
 
-    {filesLoading ? (
-      <div className="space-y-2 p-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i}
-            className="h-10 rounded-lg bg-white/[0.03] animate-pulse" />
-        ))}
-      </div>
-    ) : selectedFile ? (
-      /* ── File content viewer ── */
-      <div>
-        {/* File name bar */}
-        <div className="flex items-center gap-2 px-4 py-2
+                {filesLoading ? (
+                  <div className="space-y-2 p-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i}
+                        className="h-10 rounded-lg bg-white/[0.03] animate-pulse" />
+                    ))}
+                  </div>
+                ) : selectedFile ? (
+                  /* ── File content viewer ── */
+                  <div>
+                    {/* File name bar */}
+                    <div className="flex items-center gap-2 px-4 py-2
                         border-b border-white/[0.04] bg-white/[0.02]">
-          <svg className="w-3 h-3 text-[#A78BFA]" fill="none"
-            viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <span className="font-plex text-[11px] text-[#A78BFA]">
-            {selectedFile.name}
-          </span>
-        </div>
-        {/* Line-by-line content */}
-        <div className="divide-y divide-white/[0.03]">
-          {selectedFile.content.split("\n").map((line, i) => (
-            <div key={i}
-              className="content-line group flex items-start
+                      <svg className="w-3 h-3 text-[#A78BFA]" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <span className="font-plex text-[11px] text-[#A78BFA]">
+                        {selectedFile.name}
+                      </span>
+                    </div>
+                    {/* Line-by-line content */}
+                    <div className="divide-y divide-white/[0.03]">
+                      {selectedFile.content.split("\n").map((line, i) => (
+                        <div key={i}
+                          className="content-line group flex items-start
                          hover:bg-[#00FFA3]/[0.03] transition-colors duration-150">
-              <span className="shrink-0 w-12 py-2.5 text-center font-plex
+                          <span className="shrink-0 w-12 py-2.5 text-center font-plex
                                text-[11px] text-gray-800 select-none
                                border-r border-white/[0.04]">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="flex-1 px-5 py-2.5 font-plex text-[12px]
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          <span className="flex-1 px-5 py-2.5 font-plex text-[12px]
                                text-gray-300 leading-relaxed break-all">
-                {line || " "}
-              </span>
-              <button
-                onClick={() => handleCopyLine(line, i)}
-                className="copy-btn shrink-0 mr-3 mt-2 px-2 py-1 rounded
+                            {line || " "}
+                          </span>
+                          <button
+                            onClick={() => handleCopyLine(line, i)}
+                            className="copy-btn shrink-0 mr-3 mt-2 px-2 py-1 rounded
                            font-plex text-[9px] border transition-all duration-150
                            border-white/[0.07] text-gray-600 hover:text-[#00FFA3]
                            hover:border-[#00FFA3]/20 bg-white/[0.02]"
-              >
-                {copiedLine === i ? "copied!" : "copy"}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    ) : files.length === 0 ? (
-      /* ── Empty state with CLI instructions ── */
-      <div className="px-6 py-16 flex flex-col items-center gap-4">
-        <p className="font-plex text-[11px] text-gray-700">
-          no files pushed yet
-        </p>
-        <div className="w-full max-w-sm rounded-xl border border-white/[0.06]
+                          >
+                            {copiedLine === i ? "copied!" : "copy"}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : files.length === 0 ? (
+                  /* ── Empty state with CLI instructions ── */
+                  <div className="px-6 py-16 flex flex-col items-center gap-4">
+                    <p className="font-plex text-[11px] text-gray-700">
+                      no files pushed yet
+                    </p>
+                    <div className="w-full max-w-sm rounded-xl border border-white/[0.06]
                         bg-[#060611] overflow-hidden">
-          <div className="flex items-center gap-1.5 px-4 py-2
+                      <div className="flex items-center gap-1.5 px-4 py-2
                           border-b border-white/[0.05]">
-            {["#FF6B4A","#F59E0B","#00FFA3"].map((c) => (
-              <span key={c} className="w-2 h-2 rounded-full opacity-50"
-                style={{ backgroundColor: c }} />
-            ))}
-            <span className="font-plex text-[10px] text-gray-700 ml-1">
-              terminal
-            </span>
-          </div>
-          <div className="px-4 py-3 space-y-1.5 font-plex text-[11px]">
-            {[
-              { cmd: `node index.js init --repoId ${id}`, comment: "# link to this repo" },
-              { cmd: "node index.js add yourfile.js",     comment: "# stage a file" },
-              { cmd: 'node index.js commit "message"',    comment: "# snapshot" },
-              { cmd: "node index.js push",                comment: "# sync here" },
-            ].map(({ cmd, comment }) => (
-              <div key={cmd}>
-                <span className="text-[#00FFA3]/80">{cmd}</span>
-                <span className="text-gray-700 ml-2">{comment}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    ) : (
-      /* ── File list ── */
-      <ul className="divide-y divide-white/[0.03]">
-        {files.map((file) => (
-          <li
-            key={file.name}
-            onClick={() => {
-              if (file.content) {
-                setSelectedFile({ name: file.name, content: file.content });
-              } else if (file.url) {
-                window.open(file.url, "_blank");
-              }
-            }}
-            className="group flex items-center gap-4 px-5 py-3.5
+                        {["#FF6B4A", "#F59E0B", "#00FFA3"].map((c) => (
+                          <span key={c} className="w-2 h-2 rounded-full opacity-50"
+                            style={{ backgroundColor: c }} />
+                        ))}
+                        <span className="font-plex text-[10px] text-gray-700 ml-1">
+                          terminal
+                        </span>
+                      </div>
+                      <div className="px-4 py-3 space-y-1.5 font-plex text-[11px]">
+                        {[
+                          { cmd: `node index.js init --repoId ${id}`, comment: "# link to this repo" },
+                          { cmd: "node index.js add yourfile.js", comment: "# stage a file" },
+                          { cmd: 'node index.js commit "message"', comment: "# snapshot" },
+                          { cmd: "node index.js push", comment: "# sync here" },
+                        ].map(({ cmd, comment }) => (
+                          <div key={cmd}>
+                            <span className="text-[#00FFA3]/80">{cmd}</span>
+                            <span className="text-gray-700 ml-2">{comment}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* ── File list ── */
+                  <ul className="divide-y divide-white/[0.03]">
+                    {files.map((file) => (
+                      <li
+                        key={file.name}
+                        onClick={() => {
+                          if (file.content) {
+                            setSelectedFile({ name: file.name, content: file.content });
+                          } else if (file.url) {
+                            window.open(file.url, "_blank");
+                          }
+                        }}
+                        className="group flex items-center gap-4 px-5 py-3.5
                        hover:bg-[#00FFA3]/[0.03] transition-colors
                        duration-150 cursor-pointer"
-          >
-            {/* File icon */}
-            <svg className="w-3.5 h-3.5 text-[#A78BFA]/60 shrink-0"
-              fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
+                      >
+                        {/* File icon */}
+                        <svg className="w-3.5 h-3.5 text-[#A78BFA]/60 shrink-0"
+                          fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
 
-            {/* File name */}
-            <span className="flex-1 font-plex text-[12px] text-gray-400
+                        {/* File name */}
+                        <span className="flex-1 font-plex text-[12px] text-gray-400
                              group-hover:text-white transition-colors">
-              {file.name}
-            </span>
+                          {file.name}
+                        </span>
 
-            {/* Source badge */}
-            <span className={`font-plex text-[9px] px-1.5 py-0.5 rounded border
+                        {/* Source badge */}
+                        <span className={`font-plex text-[9px] px-1.5 py-0.5 rounded border
                               ${file.source === "s3"
-                                ? "text-[#00FFA3]/50 border-[#00FFA3]/15"
-                                : "text-[#A78BFA]/50 border-[#A78BFA]/15"
-                              }`}>
-              {file.source}
-            </span>
+                            ? "text-[#00FFA3]/50 border-[#00FFA3]/15"
+                            : "text-[#A78BFA]/50 border-[#A78BFA]/15"
+                          }`}>
+                          {file.source}
+                        </span>
 
-            {/* Chevron */}
-            <svg className="w-3.5 h-3.5 text-gray-700
+                        {/* Chevron */}
+                        <svg className="w-3.5 h-3.5 text-gray-700
                              group-hover:text-[#00FFA3] transition-colors"
-              fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round"
-                strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
-)}
+                          fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round"
+                            strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
 
             {/* ── ISSUES TAB ── */}
             {activeTab === "issues" && (
-                <div className="relative rounded-2xl border border-white/[0.07]
+              <div className="relative rounded-2xl border border-white/[0.07]
                   bg-white/[0.02] overflow-hidden p-5">
-                  <div className="absolute inset-x-0 top-0 h-px
+                <div className="absolute inset-x-0 top-0 h-px
                                   bg-gradient-to-r from-transparent via-[#FF6B4A]/20 to-transparent" />
-                  <IssueList repoId={id!} isOwner={isOwner} />
-                </div>
+                <IssueList repoId={id!} isOwner={isOwner} />
+              </div>
             )}
-                    {activeTab === "commits" && (
-                 <div className="relative rounded-2xl border border-white/[0.07]
+            {activeTab === "commits" && (
+              <div className="relative rounded-2xl border border-white/[0.07]
                   bg-white/[0.02] overflow-hidden p-5">
-                  <div className="absolute inset-x-0 top-0 h-px
+                <div className="absolute inset-x-0 top-0 h-px
                                   bg-gradient-to-r from-transparent via-[#FF6B4A]/20 to-transparent" />
-            <CommitHistory repoId={id!} />
-          </div>
-        )}
+                <CommitHistory repoId={id!} />
+              </div>
+            )}
 
 
-          {
-      /* ── DELETE TAB ── */
-           isOwner && activeTab === "delete" && (
-            <DeleteTabPanel
-              repoName={repo.name}
-              onDelete={handleDeleteRepo}
-            />
-          )
-        }
+            {
+              /* ── DELETE TAB ── */
+              isOwner && activeTab === "delete" && (
+                <DeleteTabPanel
+                  repoName={repo.name}
+                  onDelete={handleDeleteRepo}
+                />
+              )
+            }
 
 
           </div>
