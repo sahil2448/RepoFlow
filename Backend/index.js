@@ -97,6 +97,15 @@ let user = "userXYZ";
 
 async function startServer() {
   const app = express();
+
+  app.use(
+    cors({
+      origin: "*",
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    }),
+  );
+
   app.use(bodyParser.json());
   app.use(express.json());
 
@@ -111,13 +120,6 @@ async function startServer() {
     console.error("Error connecting to MongoDB:", error);
   }
 
-  app.use(
-    cors({
-      origin: "*",
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-    }),
-  );
   app.use("/", mainRouter);
 
   app.get("/", (req, res) => {
