@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import axios from "axios";
+import api from "../../config/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -63,8 +63,8 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
 
     setChecking(true);
     try {
-      const res = await axios.post(
-        `http://localhost:3000/issue/check-duplicate/${repoId}`,
+      const res = await api.post(
+        `/issue/check-duplicate/${repoId}`,
         { title: t, description: d }
       );
       setDuplicateCheck(res.data);
@@ -121,7 +121,7 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
     const userId = localStorage.getItem("userId");
     setLoading(true);
     try {
-      await axios.post(`http://localhost:3000/issue/create/${repoId}`, {
+      await api.post(`/issue/create/${repoId}`, {
         title: title.trim(),
         description: description.trim(),
         userId,

@@ -1,6 +1,6 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../config/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -61,8 +61,7 @@ const StarredRepo: React.FC = () => {
       const userId = localStorage.getItem("userId");
       if (!userId) { setLoading(false); return; }
       try {
-        // TODO: replace with your real endpoint
-        const response = await axios.get(`http://localhost:3000/getStarredRepos/${userId}`);
+        const response = await api.get(`/getStarredRepos/${userId}`);
         setStarred(response.data.repositories);
       } catch (err) {
         console.error("Failed to fetch starred repos:", err);

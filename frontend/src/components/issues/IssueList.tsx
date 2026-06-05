@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useCallback, useEffect, useState } from "react";
+import api from "../../config/api";
 import CreateIssue from "./CreateIssue.tsx";
 import IssueDetail from "./IssueDetail.tsx";
 
@@ -50,18 +50,24 @@ const IssueList: React.FC<IssueListProps> = ({ repoId, isOwner }) => {
   const [showCreate, setShowCreate]   = useState<boolean>(false);
   const [selectedId, setSelectedId]   = useState<string | null>(null);
 
-  const fetchIssues = async (): Promise<void> => {
+  const fetchIssues = useCallback(async (): Promise<void> => {
     try {
-      const res = await axios.get(`http://localhost:3000/issue/all/${repoId}`);
+      const res = await api.get(`/issue/all/${repoId}`);
       setIssues(res.data.issues || []);
     } catch (err) {
       console.error("Failed to fetch issues:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [repoId]);
 
-  useEffect(() => { fetchIssues(); }, [repoId]);
+  useEffect(() => {
+    const loadIssues = async (): Promise<void> => {
+      await fetchIssues();
+    };
+
+    void loadIssues();
+  }, [fetchIssues]);
 
   const filtered = issues.filter((i) => {
     if (filter === "all")    return true;

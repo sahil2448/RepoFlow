@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useParams } from "react-router-dom";
-import { useAuth } from "../../authContext";
+import { useAuth } from "../../auth";
 import HeatMapProfile from "./HeatMap";
 import StarredRepo from "./StarredRepo";
 import AboutUser from "./AboutUser"
+import api from "../../config/api";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface UserDetails {
@@ -20,6 +20,32 @@ interface UserDetails {
 }
 
 type ProfileTab = "overview" | "starred";
+
+type EditableProfile = {
+  username: string;
+  email: string;
+  bio: string;
+  location: string;
+  website: string;
+  avatar: string;
+};
+
+type ApiErrorResponse = {
+  response?: {
+    data?: {
+      error?: string;
+    };
+  };
+};
+
+const toEditableProfile = (userDetails: UserDetails): EditableProfile => ({
+  username: userDetails.username ?? "",
+  email: userDetails.email ?? "",
+  bio: userDetails.bio ?? "",
+  location: userDetails.location ?? "",
+  website: userDetails.website ?? "",
+  avatar: userDetails.avatar ?? "",
+});
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -60,26 +86,8 @@ const isOwnProfile    = currentUserId === id;
   const [followLoading, setFollowLoading] = useState<boolean>(false);
 
   const [isEditing, setIsEditing] = useState(false);
-const [editData, setEditData] = useState({
-  username: "",
-  email: "",
-  bio: "",
-  location: "",
-  website: "",
-  avatar: "",
-});
+const [editData, setEditData] = useState<EditableProfile>(() => toEditableProfile(userDetails));
 const [saveLoading, setSaveLoading] = useState(false);
-
-useEffect(() => {
-  setEditData({
-    username: userDetails.username ?? "",
-    email: userDetails.email ?? "",
-    bio: userDetails.bio ?? "",
-    location: userDetails.location ?? "",
-    website: userDetails.website ?? "",
-    avatar: userDetails.avatar ?? "",
-  });
-}, [userDetails]);
 
 
 const handleEditChange = (
@@ -94,7 +102,7 @@ const handleSaveProfile = async () => {
 
   setSaveLoading(true);
   try {
-    const response = await axios.put(`http://localhost:3000/updateProfile/${id}`, editData);
+    const response = await api.put(`/updateProfile/${id}`, editData);
     setUserDetails((prev) => ({
   ...prev,
   ...response.data,
@@ -102,8 +110,9 @@ const handleSaveProfile = async () => {
   email:    response.data.email    ?? prev.email,
 }));
     setIsEditing(false);
-  } catch (error: any) {
-    console.error("Profile update failed:", error?.response?.data?.error ?? error);
+  } catch (error: unknown) {
+    const apiError = error as ApiErrorResponse;
+    console.error("Profile update failed:", apiError.response?.data?.error ?? error);
   } finally {
     setSaveLoading(false);
   }
@@ -114,7 +123,7 @@ const handleSaveProfile = async () => {
     if (!id) return;
     const fetchUserDetails = async (): Promise<void> => {
       try {
-        const response = await axios.get(`http://localhost:3000/userProfile/${id}`);
+        const response = await api.get(`/userProfile/${id}`);
         setUserDetails(response.data);
       } catch (err) {
         console.error("Cannot fetch user details:", err);
@@ -129,8 +138,7 @@ const handleSaveProfile = async () => {
 
     setFollowLoading(true);
     try {
-     await axios.post(`http://localhost:3000/followUser/${id}`, { currentUserId });
-      setIsFollowing((prev) => !prev);
+     await api.post(`/followUser/${id}`, { currentUserId });
       const nextFollowing = !isFollowing;
 setIsFollowing(nextFollowing);
 
@@ -140,8 +148,9 @@ setUserDetails((prev) => ({
     ? (prev.followers ?? 0) + 1
     : (prev.followers ?? 0) - 1,
 }));
-    } catch (error: any) {
-      console.error("Follow failed:", error?.response?.data?.error ?? error);
+    } catch (error: unknown) {
+      const apiError = error as ApiErrorResponse;
+      console.error("Follow failed:", apiError.response?.data?.error ?? error);
     } finally {
       setFollowLoading(false);
     }
@@ -237,7 +246,14 @@ setUserDetails((prev) => ({
 
               {isOwnProfile && (
                 <button
-                  onClick={() => setIsEditing((prev) => !prev)}
+                  onClick={() => {
+                    if (isEditing) {
+                      setIsEditing(false);
+                    } else {
+                      setEditData(toEditableProfile(userDetails));
+                      setIsEditing(true);
+                    }
+                  }}
                   className="w-full py-2 mb-4 rounded-lg font-plex text-[11px] tracking-widest uppercase
                             border transition-all duration-200 bg-white/[0.03] border-white/[0.07]
                             text-gray-400 hover:bg-[#00FFA3]/[0.07] hover:border-[#00FFA3]/25 hover:text-[#00FFA3]"

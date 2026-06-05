@@ -1,6 +1,12 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../../config/api";
+
+type ApiErrorResponse = {
+  response?: {
+    status?: number;
+  };
+};
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -90,7 +96,7 @@ const CreateRepo: React.FC = () => {
 
     try {
       setLoading(true);
-      await axios.post("http://localhost:3000/repo/create", {
+      await api.post("/repo/create", {
         name:        form.name.trim(),
         description: form.description.trim(),
         visibility:  form.visibility,
@@ -99,8 +105,9 @@ const CreateRepo: React.FC = () => {
 
       setSuccess(true);
       setTimeout(() => navigate("/"), 1200);
-    } catch (err: any) {
-      if (err.response?.status === 409) {
+    } catch (err: unknown) {
+      const apiError = err as ApiErrorResponse;
+      if (apiError.response?.status === 409) {
         setErrors({ name: "A repository with this name already exists." });
       } else {
         setErrors({ name: "Something went wrong. Please try again." });

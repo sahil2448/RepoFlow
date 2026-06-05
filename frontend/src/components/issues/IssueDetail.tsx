@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../config/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -37,7 +37,7 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
   useEffect(() => {
     const fetch = async (): Promise<void> => {
       try {
-        const res = await axios.get(`http://localhost:3000/issue/${issueId}`);
+        const res = await api.get(`/issue/${issueId}`);
         const data: Issue = res.data.issue;
         setIssue(data);
         setEditTitle(data.title);
@@ -55,7 +55,7 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
   const handleSave = async (): Promise<void> => {
     setSaving(true);
     try {
-      const res = await axios.put(`http://localhost:3000/issue/update/${issueId}`, {
+      const res = await api.put(`/issue/update/${issueId}`, {
         title:       editTitle,
         description: editDescription,
         status:      editStatus,
@@ -73,7 +73,7 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
     if (!window.confirm("Delete this issue? This cannot be undone.")) return;
     setDeleting(true);
     try {
-      await axios.delete(`http://localhost:3000/issue/delete/${issueId}`);
+      await api.delete(`/issue/delete/${issueId}`);
       onDeleted();
     } catch (err) {
       console.error("Failed to delete issue:", err);
@@ -85,7 +85,7 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
     if (!issue) return;
     const newStatus = issue.status === "open" ? "closed" : "open";
     try {
-      const res = await axios.put(`http://localhost:3000/issue/update/${issueId}`, {
+      const res = await api.put(`/issue/update/${issueId}`, {
         title:       issue.title,
         description: issue.description,
         status:      newStatus,

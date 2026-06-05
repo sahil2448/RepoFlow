@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../config/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -80,7 +80,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
   useEffect(() => {
     const fetchCommits = async (): Promise<void> => {
       try {
-        const res = await axios.get(`http://localhost:3000/repo/${repoId}/commits`);
+        const res = await api.get(`/repo/${repoId}/commits`);
         setCommits(res.data.commits || []);
       } catch (err) {
         console.error("Failed to fetch commits:", err);
@@ -104,7 +104,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
 
     setRevertLoading(commit.commitId);
     try {
-      const res = await axios.post(`http://localhost:3000/repo/${repoId}/revert/${commit.commitId}`);
+      const res = await api.post(`/repo/${repoId}/revert/${commit.commitId}`);
       setRevertData((prev) => ({
         ...prev,
         [commit.commitId]: res.data.fileUrls || [],

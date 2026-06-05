@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useAuth } from "../../authContext";
+import { useAuth } from "../../auth";
 import logo from "../../assets/RepoFlowLogo2.png";
 import { Link } from "react-router-dom";
+import api from "../../config/api";
 
 const Login: React.FC = () => {
   const [email, setEmail]       = useState<string>("");
@@ -15,7 +15,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:3000/login", { email, password });
+      const res = await api.post("/login", { email, password });
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.userId);
       setCurrentUser(res.data.userId);

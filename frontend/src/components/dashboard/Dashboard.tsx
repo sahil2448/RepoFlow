@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../config/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -63,7 +64,6 @@ const Dashboard = () => {
   const [repositories, setRepositories]               = useState<Repository[]>([]);
   const [searchQuery, setSearchQuery]                 = useState<string>("");
   const [suggestedRepositories, setSuggestedRepositories] = useState<Repository[]>([]);
-  const [searchResults, setSearchResults]             = useState<Repository[]>([]);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -72,19 +72,15 @@ const Dashboard = () => {
 
     const fetchRepositories = async (): Promise<void> => {
       try {
-        const response = await fetch(`http://localhost:3000/repo/user/${userId}`);
-        const data = await response.json();
-        if (!response.ok) { console.error(data); return; }
-        setRepositories(data.repositories || []);
+        const response = await api.get(`/repo/user/${userId}`);
+        setRepositories(response.data.repositories || []);
       } catch (error) { console.error("Error fetching repositories:", error); }
     };
 
     const fetchSuggestedRepositories = async (): Promise<void> => {
       try {
-        const response = await fetch(`http://localhost:3000/repo/all`);
-        const data = await response.json();
-        if (!response.ok) { console.error(data); return; }
-        const allPublic: Repository[] = data.repositories.filter((repo: Repository) => repo.visibility === true);
+        const response = await api.get("/repo/all");
+        const allPublic: Repository[] = response.data.repositories.filter((repo: Repository) => repo.visibility === true);
         setSuggestedRepositories(allPublic || []);
       } catch (error) { console.error("Error fetching suggested repositories:", error); }
     };
@@ -93,17 +89,11 @@ const Dashboard = () => {
     fetchSuggestedRepositories();
   }, []);
 
-  useEffect(() => {
-    if (searchQuery === "") {
-      setSearchResults(repositories);
-    } else {
-      setSearchResults(
-        repositories.filter((repo) =>
-          repo.name.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+  const searchResults = searchQuery === ""
+    ? repositories
+    : repositories.filter((repo) =>
+        repo.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
-    }
-  }, [searchQuery, repositories]);
 
   return (
     <>

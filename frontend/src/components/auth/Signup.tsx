@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useAuth } from "../../authContext";
+import { useAuth } from "../../auth";
 import logo from "../../assets/RepoFlowLogo2.png";
 import { Link } from "react-router-dom";
+import api from "../../config/api";
 
 const Signup: React.FC = () => {
   const [email, setEmail]       = useState<string>("");
@@ -16,7 +16,7 @@ const Signup: React.FC = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:3000/signup", { email, password, username });
+      const res = await api.post("/signup", { email, password, username });
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.userId);
       setCurrentUser(res.data.userId);

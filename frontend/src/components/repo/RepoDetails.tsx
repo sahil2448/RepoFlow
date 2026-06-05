@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import IssueList from "../issues/IssueList";
 import CommitHistory from "./CommitHistory";
+import api from "../../config/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -229,7 +229,7 @@ const RepositoryDetails: React.FC = () => {
     const fetchFiles = async (): Promise<void> => {
       setFilesLoading(true);
       try {
-        const res = await axios.get(`http://localhost:3000/repo/${id}/files`);
+        const res = await api.get(`/repo/${id}/files`);
         setFiles(res.data.files || []);
         setLatestCommitMsg(res.data.message || "");
       } catch (err) {
@@ -249,7 +249,7 @@ const RepositoryDetails: React.FC = () => {
     if (!id) return;
     const fetch = async (): Promise<void> => {
       try {
-        const res = await axios.get(`http://localhost:3000/repo/${id}`);
+        const res = await api.get(`/repo/${id}`);
         const data = res.data;
         setRepo(data.repository);
         setStarCount(data.repository.stars);
@@ -270,7 +270,7 @@ const RepositoryDetails: React.FC = () => {
     if (!userId || !id || starLoading) return;
     setStarLoading(true);
     try {
-      const res = await axios.post(`http://localhost:3000/repo/star/${id}`, { userId });
+      const res = await api.post(`/repo/star/${id}`, { userId });
       setStarCount(res.data.stars);
       setStarred((prev) => !prev);
     } catch (err) {
@@ -281,7 +281,7 @@ const RepositoryDetails: React.FC = () => {
   };
   const handleDeleteRepo = async (): Promise<void> => {
     try {
-      await axios.delete(`http://localhost:3000/repo/delete/${id}`);
+      await api.delete(`/repo/delete/${id}`);
       navigate("/");
     } catch (error) {
       console.error("Failed to delete repository:", error);
