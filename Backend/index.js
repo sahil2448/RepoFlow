@@ -111,7 +111,13 @@ async function startServer() {
     console.error("Error connecting to MongoDB:", error);
   }
 
-  app.use(cors({ origin: "*" }));
+  app.use(
+    cors({
+      origin: "*",
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    }),
+  );
   app.use("/", mainRouter);
 
   app.get("/", (req, res) => {
