@@ -14,6 +14,7 @@ import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import mainRouter from "./routes/main.router.js";
+import { setIO } from "./helpers/socketInstance.js";
 
 dotenv.config();
 
@@ -127,6 +128,15 @@ async function startServer() {
   });
 
   const httpServer = http.createServer(app);
+  // const io = new Server(httpServer, {
+  //   cors: {
+  //     origin: "*",
+  //     methods: ["GET", "POST"],
+  //   },
+  // });
+
+  const userSocketMap = new Map();
+
   const io = new Server(httpServer, {
     cors: {
       origin: "*",
@@ -134,13 +144,27 @@ async function startServer() {
     },
   });
 
+  // ✅ Register it so controllers can access it
+  setIO(io);
   io.on("connection", (socket) => {
-    socket.on("joinRoom", (userID) => {
-      user = userID; // ✅ now works — let allows reassignment
-      console.log("=====");
-      console.log(user);
-      console.log("=====");
-      socket.join(userID);
+    console.log("Socket connected:", socket.id);
+
+    // Client emits this right after connecting with their userId
+    socket.on("join", (userId) => {
+      if (!userId) return;
+      socket.join(userId);
+      userSocketMap.set(userId, socket.id);
+      console.log(`  User ${userId} joined room`);
+    });
+
+    socket.on("disconnect", () => {
+      // Clean up map on disconnect
+      for (const [userId, socketId] of userSocketMap.entries()) {
+        if (socketId === socket.id) {
+          userSocketMap.delete(userId);
+          break;
+        }
+      }
     });
   });
 

@@ -3,7 +3,10 @@ import bcrypt from "bcryptjs";
 import { MongoClient, ReturnDocument } from "mongodb";
 import { configDotenv } from "dotenv";
 import { ObjectId } from "mongodb";
+import { notifyUser } from "../helpers/notifyUser.js";
+import { getIO } from "../helpers/socketInstance.js";
 configDotenv();
+
 // Note --> In this file we have used mongo queries using MongoDB ...not Mongoose -> in the repositories we have used Mongoose
 
 const URI = process.env.MONGO_URI;
@@ -311,7 +314,13 @@ const followUser = async (req, res) => {
       { _id: new ObjectId(currentUserId) },
       { $addToSet: { followingUsers: id } },
     );
-
+    await notifyUser(getIO(), {
+      recipientId: id, // person being followed
+      senderId: currentUserId,
+      type: "new_follower",
+      message: `started following you`,
+      link: `/profile/${currentUserId}`,
+    });
     return res
       .status(200)
       .json({ message: `You are now following ${targetUser.name}` });

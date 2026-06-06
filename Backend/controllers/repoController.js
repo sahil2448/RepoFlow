@@ -3,6 +3,9 @@ import Issue from "../model/issueModel.js";
 import User from "../model/userModel.js";
 import Repository from "../model/repoModel.js";
 
+import { getIO } from "../helpers/socketInstance.js";
+import { notifyUser } from "../helpers/notifyUser.js";
+
 import { ObjectId } from "mongodb";
 import logContribution from "../helpers/logContribution.js";
 // as we are using mongoose here....we don't need to always setup our databse connection and also don't need to get collection....we can do queries directly on model
@@ -244,6 +247,14 @@ async function starRepository(req, res) {
       await user.save();
 
       await logContribution(userId, "repo_starred");
+
+      await notifyUser(getIO(), {
+        recipientId: repository.owner, // repo owner gets notified
+        senderId: userId,
+        type: "repo_starred",
+        message: `starred your repository ${repository.name}`,
+        link: `/repo/${repository._id}`,
+      });
 
       return res.status(200).json({
         message: "Repository starred successfully",
