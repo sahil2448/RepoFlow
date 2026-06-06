@@ -39,7 +39,6 @@ const Navbar: React.FC = () => {
   const [unreadCount, setUnreadCount]     = useState<number>(0);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [bellOpen, setBellOpen]           = useState<boolean>(false);
-  const [bellLoading, setBellLoading]     = useState<boolean>(false);
   const bellRef = useRef<HTMLDivElement>(null);
 
   // ── Scroll effect ──
