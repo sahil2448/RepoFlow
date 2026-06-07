@@ -31,10 +31,10 @@ export async function generateEmbedding(text) {
 }
 
 /**
- * Weighted embedding — title repeated twice so model
- * pays 2x attention to it over description
- * Both search queries AND indexed issues must use this
- * same function so vectors live in the same space
+Weighted embedding — title repeated twice so model
+pays 2x attention to it over description
+Both search queries AND indexed issues must use this
+same function so vectors live in the same space
  */
 export async function generateWeightedEmbedding(title, description) {
   const weightedText = `${title}. ${title}. ${description}`;

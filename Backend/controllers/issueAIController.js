@@ -4,7 +4,7 @@ import {
   searchSimilarIssues,
 } from "../helpers/vectorStore.js";
 
-// ✅ Raised from 0.75 to 0.82
+// Raised from 0.75 to 0.82
 // Real duplicates score 0.85+ with text-embedding-004
 // Generic overlap (like "description" matching) stays below 0.82
 const DUPLICATE_THRESHOLD = 0.82;
@@ -17,7 +17,7 @@ export const checkDuplicateIssue = async (req, res) => {
   const { repoId } = req.params;
   const { title, description } = req.body;
 
-  // ✅ Quality gate — don't check until user has typed enough
+  // Quality gate — don't check until user has typed enough
   if (
     !title?.trim() ||
     !description?.trim() ||
@@ -33,7 +33,7 @@ export const checkDuplicateIssue = async (req, res) => {
   }
 
   try {
-    // ✅ Use weighted embedding — title gets 2x importance
+    // Use weighted embedding — title gets 2x importance
     const userEmbedding = await generateWeightedEmbedding(
       title.trim(),
       description.trim(),
@@ -58,7 +58,7 @@ export const checkDuplicateIssue = async (req, res) => {
       });
     }
 
-    // ✅ Only include results that actually cross the threshold
+    // Only include results that actually cross the threshold
     const relevantMatches = matches.filter(
       (m) => m.score >= DUPLICATE_THRESHOLD,
     );
@@ -98,7 +98,7 @@ export const embedAndIndexIssue = async (
   description,
 ) => {
   try {
-    // ✅ Must use same weighted approach for consistency
+    // Must use same weighted approach for consistency
     // If search uses weighted, indexing must also use weighted
     const embedding = await generateWeightedEmbedding(title, description);
     if (!embedding) return;

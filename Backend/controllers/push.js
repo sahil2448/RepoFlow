@@ -38,7 +38,7 @@ export async function pushRepo() {
   // ── Connect MongoDB ──
   if (mongoose.connection.readyState === 0) {
     try {
-      // ✅ Add dbName to match what the server uses
+      // Add dbName to match what the server uses
       await mongoose.connect(process.env.MONGO_URI, {
         dbName: process.env.DB_NAME,
       });
@@ -64,7 +64,7 @@ export async function pushRepo() {
       const stat = await fs.stat(commitDirPath);
       if (!stat.isDirectory()) continue;
 
-      // ✅ Skip if already saved by either storage method
+      // Skip if already saved by either storage method
       const alreadyPushed = await Commit.findOne({
         commitId: commitDir,
         $or: [{ s3Synced: true }, { storageType: "mongodb" }],
@@ -156,7 +156,7 @@ export async function pushRepo() {
 
       console.log("\nPush complete.");
 
-      // ✅ Update repo.content with latest file snapshot
+      // Update repo.content with latest file snapshot
       await Repository.findByIdAndUpdate(repoId, {
         $set: { content: filesToUpload },
       });

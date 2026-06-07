@@ -1,9 +1,9 @@
-import fs from "fs/promises"; // ✅ use fs/promises like every other controller
+import fs from "fs/promises"; // use fs/promises like every other controller
 import path from "path";
-// ✅ removed unused s3 and S3_BUCKET import
+//  removed unused s3 and S3_BUCKET import
 
 export async function revertRepo(commitID) {
-  // ✅ path.resolve and path.join are sync — no await needed
+  //  path.resolve and path.join are sync — no await needed
   const repoPath = path.resolve(process.cwd(), ".repoFlowGit");
   const commitsPath = path.join(repoPath, "commits");
 
@@ -12,7 +12,7 @@ export async function revertRepo(commitID) {
     const files = await fs.readdir(commitDir);
     const parentDir = path.resolve(repoPath, "..");
 
-    // ✅ Skip commit.json — it's metadata, not a user file
+    // Skip commit.json — it's metadata, not a user file
     const userFiles = files.filter((f) => f !== "commit.json");
 
     if (userFiles.length === 0) {

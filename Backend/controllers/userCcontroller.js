@@ -101,62 +101,6 @@ async function getAllUsers(req, res) {
   }
 }
 
-// async function getUserProfile(req, res) {
-//   const currentId = req.params.id;
-
-//   try {
-//     await connectToClient();
-//     const db = client.db(DB_NAME);
-//     const userCollection = db.collection("users");
-
-//     const user = await userCollection.findOne({
-//       _id: new ObjectId(currentId),
-//     });
-
-//     if (!user) {
-//       return res.status(404).send("User not found");
-//     }
-//     res.json(user).status(200);
-//     console.log("User profile fetched successfully");
-//   } catch (error) {
-//     res.status(500).send("Server Error");
-//   }
-// }
-
-// const updateUserProfile = async (req, res) => {
-//   const currentId = req.params.id;
-//   const { email, password } = req.body;
-
-//   try {
-//     await connectToClient();
-//     const db = client.db(DB_NAME);
-//     const userCollection = db.collection("users");
-
-//     const updateFields = {};
-//     if (email) updateFields.email = email;
-
-//     if (password) {
-//       const salt = await bcrypt.genSalt(10);
-//       const hashedPassword = await bcrypt.hash(password, salt);
-//       updateFields.password = hashedPassword;
-//     }
-
-//     const result = await userCollection.findOneAndUpdate(
-//       { _id: new ObjectId(currentId) },
-//       { $set: updateFields },
-//       { returnDocument: "after" },
-//     );
-
-//     if (!result.value) {
-//       return res.status(404).send("User not found!");
-//     }
-
-//     return res.status(200).json(result.value);
-//   } catch (error) {
-//     return res.status(500).send("Server Error");
-//   }
-// };
-
 // GET /userProfile/:id
 const getUserProfile = async (req, res) => {
   const { id } = req.params;
@@ -167,7 +111,7 @@ const getUserProfile = async (req, res) => {
       { _id: new ObjectId(id) },
       {
         projection: {
-          password: 0, // ✅ exclusion only — return everything EXCEPT password
+          password: 0, // exclusion only — return everything EXCEPT password
         },
       },
     );
@@ -188,7 +132,7 @@ const getUserProfile = async (req, res) => {
 // PUT /userProfile/:id  (was /updateProfile/:id — check your router)
 const updateUserProfile = async (req, res) => {
   const { id } = req.params;
-  // ✅ only allow safe fields — never let caller update password/followers here
+  // only allow safe fields — never let caller update password/followers here
   const { username, email, bio, location, website, avatar } = req.body;
 
   try {

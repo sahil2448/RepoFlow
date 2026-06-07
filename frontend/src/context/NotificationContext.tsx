@@ -6,7 +6,6 @@ import React, {
 import socket from "../config/socket";
 import api    from "../config/api";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface NotificationItem {
   _id:       string;
@@ -25,7 +24,6 @@ interface NotificationContextValue {
   markAllRead:    () => Promise<void>;
 }
 
-// ─── Context ─────────────────────────────────────────────────────────────────
 
 const NotificationContext = createContext<NotificationContextValue>({
   notifications: [],
@@ -36,18 +34,15 @@ const NotificationContext = createContext<NotificationContextValue>({
 
 export const useNotifications = () => useContext(NotificationContext);
 
-// ─── Provider ────────────────────────────────────────────────────────────────
 
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount,   setUnreadCount]   = useState<number>(0);
 
-  // Track if initial fetch already ran — prevents double fetch on StrictMode
   const fetchedRef = useRef<boolean>(false);
 
   const userId = localStorage.getItem("userId");
 
-  // ── Initial fetch ──
   useEffect(() => {
     if (!userId || fetchedRef.current) return;
     fetchedRef.current = true;
@@ -65,7 +60,6 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     fetchNotifications();
   }, [userId]);
 
-  // ── Socket connection ──
   useEffect(() => {
     if (!userId) return;
 
@@ -83,22 +77,18 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     };
   }, [userId]);
 
-  // ── Mark single notification as read ──
   const markOneRead = useCallback(async (notif: NotificationItem): Promise<void> => {
     if (notif.read) return;
 
-    // ✅ Optimistic update — happens before API call and before navigation
     setUnreadCount((prev) => Math.max(0, prev - 1));
     setNotifications((prev) =>
       prev.map((n) => n._id === notif._id ? { ...n, read: true } : n)
     );
 
-    // Persist in DB — fire and forget
     try {
       await api.patch(`/notifications/read-one/${notif._id}`);
     } catch (err) {
       console.error("Failed to mark as read:", err);
-      // Revert on failure
       setUnreadCount((prev) => prev + 1);
       setNotifications((prev) =>
         prev.map((n) => n._id === notif._id ? { ...n, read: false } : n)
@@ -106,7 +96,6 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
   }, []);
 
-  // ── Mark all as read ──
   const markAllRead = useCallback(async (): Promise<void> => {
     if (!userId || unreadCount === 0) return;
 

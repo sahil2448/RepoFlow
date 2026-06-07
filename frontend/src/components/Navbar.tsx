@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate }      from "react-router-dom";
 import { useNotifications }                    from "../store/useNotifications";
 import { notificationStore }                   from "../store/notificationStore";
 import api                                     from "../config/api";
+import RepoFlowLogo2 from "../assets/RepoFlowLogo2.png";
 
 interface NotificationItem {
   _id:       string;
@@ -30,7 +31,7 @@ const Navbar: React.FC = () => {
   const navigate  = useNavigate();
   const userId    = localStorage.getItem("userId");
 
-  // ✅ Reads directly from module store — never resets on navigation
+  // Reads directly from module store — never resets on navigation
   const { notifications, unreadCount } = useNotifications();
 
   const [scrolled, setScrolled] = useState<boolean>(false);
@@ -54,7 +55,7 @@ const Navbar: React.FC = () => {
   }, []);
 
   const handleNotifClick = async (notif: NotificationItem): Promise<void> => {
-    // ✅ Update module store FIRST — synchronous, survives navigation
+    // Update module store FIRST — synchronous, survives navigation
     if (!notif.read) {
       notificationStore.markOneRead(notif._id);
       // Fire and forget — DB update in background
@@ -96,13 +97,14 @@ const Navbar: React.FC = () => {
                          ? "border-b border-white/[0.05] shadow-[0_1px_30px_rgba(0,0,0,0.4)]"
                          : "border-b border-transparent"}`}>
 
-        {/* ── Brand ── */}
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-7 h-7 rounded-lg border border-white/[0.08] bg-white/[0.03]
                           flex items-center justify-center
                           group-hover:border-[#00FFA3]/30 group-hover:bg-[#00FFA3]/[0.06]
                           transition-all duration-200">
-            <span className="font-plex text-[11px] font-medium text-[#00FFA3]">//</span>
+            <span className="font-plex text-[11px] font-medium text-[#00FFA3]">
+              <img src={RepoFlowLogo2} alt="RepoFlow Logo" />
+            </span>
           </div>
           <span className="font-syne text-[15px] font-bold text-gray-200
                            group-hover:text-white transition-colors duration-200 tracking-tight">
@@ -127,7 +129,6 @@ const Navbar: React.FC = () => {
 
           <span className="mx-1 w-px h-4 bg-white/[0.07]" />
 
-          {/* ── Bell ── */}
           <div ref={bellRef} className="relative">
             <button
               onClick={() => setBellOpen((prev) => !prev)}

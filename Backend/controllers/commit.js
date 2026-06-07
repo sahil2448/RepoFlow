@@ -36,7 +36,7 @@ export async function commitRepo(message) {
         {
           message,
           date: new Date().toISOString(),
-          files: files.filter((f) => f !== "commit.json"), // ✅ clean list
+          files: files.filter((f) => f !== "commit.json"), // clean list
         },
         null,
         2,
@@ -48,7 +48,7 @@ export async function commitRepo(message) {
       await fs.unlink(path.join(stagingAreaPath, file));
     }
 
-    // ✅ Single log — removed the duplicate
+    // Single log — removed the duplicate
     console.log(`Commit ${commitID} created with message: "${message}"`);
     console.log(`Files committed: ${files.join(", ")}`);
   } catch (error) {

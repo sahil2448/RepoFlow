@@ -11,7 +11,6 @@ const NotificationInit: React.FC = () => {
     if (!userId || initialized.current) return;
     initialized.current = true;
 
-    // ── Initial fetch ──
     const fetchNotifications = async () => {
       try {
         const res = await api.get(`/notifications/${userId}`);
@@ -26,7 +25,6 @@ const NotificationInit: React.FC = () => {
 
     fetchNotifications();
 
-    // ── Socket ──
     socket.connect();
     socket.emit("join", userId);
 
@@ -40,7 +38,7 @@ const NotificationInit: React.FC = () => {
     };
   }, [userId]);
 
-  return null; // renders nothing
+  return null;
 };
 
 export default NotificationInit;
