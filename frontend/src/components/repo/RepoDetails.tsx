@@ -107,7 +107,8 @@ interface DeleteTabPanelProps {
   onDelete: () => void;
 }
 
-const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({ repoName, onDelete }) => {
+const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({ 
+  repoName, onDelete }) => {
   const [inputValue, setInputValue] = useState<string>("");
   const matches = inputValue === repoName;
 

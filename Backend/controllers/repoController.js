@@ -253,7 +253,7 @@ async function starRepository(req, res) {
         senderId: userId,
         type: "repo_starred",
         message: `starred your repository ${repository.name}`,
-        link: `/repo/${repository._id}`,
+        link: `/repo/${repository.name}/${repository._id}`,
       });
 
       return res.status(200).json({

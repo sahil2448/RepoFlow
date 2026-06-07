@@ -105,7 +105,7 @@ const StarredRepo: React.FC = () => {
       {starred.map((repo, i) => (
         <li
           key={repo._id}
-          onClick={() => navigate(`/repo/${repo._id}`)}
+          onClick={() => navigate(`/repo/${repo.name}/${repo._id}`)}
           className="group relative flex items-center gap-4 px-5 py-4 rounded-xl
                      border border-white/[0.05] bg-white/[0.02]
                      hover:bg-white/[0.04] hover:border-white/[0.09]
