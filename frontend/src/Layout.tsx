@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar.tsx";
+import NotificationInit from "./store/NotificationInit.tsx";
 
 const Layout: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const Layout: React.FC = () => {
       `}</style>
 
       <div className="dot-grid min-h-screen">
+         <NotificationInit /> {/* Initializes notifications on app load */}
         <Navbar />
         <Outlet />   {/* ← every child route renders here */}
       </div>

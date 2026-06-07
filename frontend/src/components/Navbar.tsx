@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useLocation }                  from "react-router-dom";
-import socket                                  from "../config/socket";
+import { Link, useLocation, useNavigate }      from "react-router-dom";
+import { useNotifications }                    from "../store/useNotifications";
+import { notificationStore }                   from "../store/notificationStore";
 import api                                     from "../config/api";
-
-// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface NotificationItem {
   _id:       string;
@@ -15,13 +14,10 @@ interface NotificationItem {
   sender?:   { username: string };
 }
 
-// ─── Icon ────────────────────────────────────────────────────────────────────
-
 const BellIcon: React.FC<{ hasUnread: boolean }> = ({ hasUnread }) => (
   <svg
-    className={`w-4 h-4 transition-colors ${
-      hasUnread ? "text-[#00FFA3]" : "text-gray-500"
-    }`}
+    className={`w-4 h-4 transition-colors
+                ${hasUnread ? "text-[#00FFA3]" : "text-gray-500"}`}
     fill="none" viewBox="0 0 24 24" stroke="currentColor"
   >
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
@@ -29,61 +25,24 @@ const BellIcon: React.FC<{ hasUnread: boolean }> = ({ hasUnread }) => (
   </svg>
 );
 
-// ─── Navbar ──────────────────────────────────────────────────────────────────
-
 const Navbar: React.FC = () => {
-  const location = useLocation();
-  const userId   = localStorage.getItem("userId");
+  const location  = useLocation();
+  const navigate  = useNavigate();
+  const userId    = localStorage.getItem("userId");
 
-  const [scrolled, setScrolled]           = useState<boolean>(false);
-  const [unreadCount, setUnreadCount]     = useState<number>(0);
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [bellOpen, setBellOpen]           = useState<boolean>(false);
+  // ✅ Reads directly from module store — never resets on navigation
+  const { notifications, unreadCount } = useNotifications();
+
+  const [scrolled, setScrolled] = useState<boolean>(false);
+  const [bellOpen, setBellOpen] = useState<boolean>(false);
   const bellRef = useRef<HTMLDivElement>(null);
 
-  // ── Scroll effect ──
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // ── Socket connection + room join ──
-  useEffect(() => {
-    if (!userId) return;
-
-    // Connect and join personal room
-    socket.connect();
-    socket.emit("join", userId);
-
-    // Listen for incoming notifications
-    socket.on("notification", (data: NotificationItem) => {
-      setNotifications((prev) => [data, ...prev]);
-      setUnreadCount((prev) => prev + 1);
-    });
-
-    return () => {
-      socket.off("notification");
-      socket.disconnect();
-    };
-  }, [userId]);
-
-  // ── Fetch existing notifications on mount ──
-  useEffect(() => {
-    if (!userId) return;
-    const fetchNotifications = async () => {
-      try {
-        const res = await api.get(`/notifications/${userId}`);
-        setNotifications(res.data.notifications || []);
-        setUnreadCount(res.data.unreadCount     || 0);
-      } catch (err) {
-        console.error("Failed to fetch notifications:", err);
-      }
-    };
-    fetchNotifications();
-  }, [userId]);
-
-  // ── Close bell dropdown when clicking outside ──
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (bellRef.current && !bellRef.current.contains(e.target as Node)) {
@@ -94,21 +53,17 @@ const Navbar: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ── Open bell — mark all read ──
-  const handleBellOpen = async () => {
-    setBellOpen((prev) => !prev);
-    if (!bellOpen && unreadCount > 0 && userId) {
-      try {
-        await api.patch(`/notifications/read/${userId}`);
-        setUnreadCount(0);
-        setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-      } catch (err) {
-        console.error("Failed to mark read:", err);
-      }
+  const handleNotifClick = async (notif: NotificationItem): Promise<void> => {
+    // ✅ Update module store FIRST — synchronous, survives navigation
+    if (!notif.read) {
+      notificationStore.markOneRead(notif._id);
+      // Fire and forget — DB update in background
+      api.patch(`/notifications/read-one/${notif._id}`).catch(console.error);
     }
+    setBellOpen(false);
+    navigate(notif.link);
   };
 
-  // ── Time formatter ──
   const timeAgo = (iso: string): string => {
     const diff = Date.now() - new Date(iso).getTime();
     const mins = Math.floor(diff / 60000);
@@ -155,10 +110,8 @@ const Navbar: React.FC = () => {
           </span>
         </Link>
 
-        {/* ── Right side ── */}
         <div className="flex items-center gap-1">
 
-          {/* New repo */}
           <Link
             to="/repo/create"
             className={`flex items-center gap-1.5 font-plex text-[11px] px-3.5 py-1.5
@@ -177,14 +130,13 @@ const Navbar: React.FC = () => {
           {/* ── Bell ── */}
           <div ref={bellRef} className="relative">
             <button
-              onClick={handleBellOpen}
+              onClick={() => setBellOpen((prev) => !prev)}
               className="relative flex items-center justify-center w-8 h-8
                          rounded-lg border border-transparent
                          hover:bg-white/[0.04] hover:border-white/[0.06]
                          transition-all duration-200"
             >
               <BellIcon hasUnread={unreadCount > 0} />
-              {/* Unread badge */}
               {unreadCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 w-4 h-4
                                  rounded-full bg-[#00FFA3] flex items-center justify-center
@@ -194,14 +146,12 @@ const Navbar: React.FC = () => {
               )}
             </button>
 
-            {/* ── Dropdown ── */}
             {bellOpen && (
               <div className="absolute right-0 top-10 w-80 rounded-2xl
                               border border-white/[0.07] bg-[#060611]
                               shadow-[0_8px_32px_rgba(0,0,0,0.6)]
                               overflow-hidden z-50">
 
-                {/* Header */}
                 <div className="flex items-center justify-between px-4 py-3
                                 border-b border-white/[0.05]">
                   <span className="font-plex text-[11px] uppercase
@@ -215,7 +165,6 @@ const Navbar: React.FC = () => {
                   )}
                 </div>
 
-                {/* List */}
                 {notifications.length === 0 ? (
                   <div className="px-4 py-10 text-center">
                     <p className="font-plex text-[11px] text-gray-700">
@@ -223,17 +172,17 @@ const Navbar: React.FC = () => {
                     </p>
                   </div>
                 ) : (
-                  <ul className="max-h-80 overflow-y-auto divide-y divide-white/[0.04]">
+                  <ul className="max-h-80 overflow-y-auto
+                                 divide-y divide-white/[0.04]">
                     {notifications.map((notif) => (
                       <li key={notif._id}>
-                        <Link
-                          to={notif.link}
-                          onClick={() => setBellOpen(false)}
-                          className={`flex items-start gap-3 px-4 py-3
-                                      hover:bg-white/[0.03] transition-colors
+                        <button
+                          onClick={() => handleNotifClick(notif)}
+                          className={`w-full flex items-start gap-3 px-4 py-3
+                                      text-left hover:bg-white/[0.03]
+                                      transition-colors duration-150
                                       ${!notif.read ? "bg-white/[0.02]" : ""}`}
                         >
-                          {/* Type dot */}
                           <span className={`shrink-0 w-2 h-2 rounded-full mt-1.5
                                             ${typeColor(notif.type)}`} />
 
@@ -247,17 +196,17 @@ const Navbar: React.FC = () => {
                             <span className="font-dm text-xs text-gray-400">
                               {notif.message}
                             </span>
-                            <p className="font-plex text-[10px] text-gray-700 mt-0.5">
+                            <p className="font-plex text-[10px]
+                                          text-gray-700 mt-0.5">
                               {timeAgo(notif.createdAt)}
                             </p>
                           </div>
 
-                          {/* Unread indicator */}
                           {!notif.read && (
                             <span className="shrink-0 w-1.5 h-1.5 rounded-full
                                              bg-[#00FFA3] mt-2" />
                           )}
-                        </Link>
+                        </button>
                       </li>
                     ))}
                   </ul>
@@ -268,7 +217,6 @@ const Navbar: React.FC = () => {
 
           <span className="mx-1 w-px h-4 bg-white/[0.07]" />
 
-          {/* Profile */}
           <Link
             to={`/profile/${userId}`}
             className={`flex items-center gap-2.5 font-dm text-sm px-3 py-1.5

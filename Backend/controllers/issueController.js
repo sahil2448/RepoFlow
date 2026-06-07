@@ -24,7 +24,7 @@ const createIssue = async (req, res) => {
       repository: id,
     });
 
-    await createdIssue.save(); // ❌ was: await createIssue.save() — called itself recursively
+    await createdIssue.save();
 
     // Push issue ref into repository
     repository.issues.push(createdIssue._id);
@@ -39,7 +39,7 @@ const createIssue = async (req, res) => {
       senderId: userId,
       type: "issue_created",
       message: `opened an issue on ${repository.name}: ${title}`,
-      link: `/repo/${id}`,
+      link: `/repo/${repository.name}/${id}`,
     });
 
     res

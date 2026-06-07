@@ -64,6 +64,15 @@ const Dashboard = () => {
   const [repositories, setRepositories]               = useState<Repository[]>([]);
   const [searchQuery, setSearchQuery]                 = useState<string>("");
   const [suggestedRepositories, setSuggestedRepositories] = useState<Repository[]>([]);
+  const [globalSearch, setGlobalSearch] = useState<string>("");
+
+  const globalResults = globalSearch === ""
+  ? suggestedRepositories
+  : suggestedRepositories.filter((repo) =>
+      repo.name.toLowerCase().includes(globalSearch.toLowerCase()) ||
+      repo.description?.toLowerCase().includes(globalSearch.toLowerCase())
+    );
+
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -141,37 +150,82 @@ const Dashboard = () => {
         <div className="relative z-10 max-w-[1380px] mx-auto px-6 py-10 flex gap-6">
 
           {/* ── Left Sidebar: Suggested Repos ── */}
-          <aside className="w-[240px] shrink-0">
-            <div className="flex items-center gap-2 mb-6">
-              <span className="block w-1.5 h-4 rounded-full bg-[#00FFA3]" />
-              <h3 className="font-syne text-[10px] tracking-[0.22em] uppercase text-gray-500">
-                Suggested
-              </h3>
-            </div>
+          {/* ── Left Sidebar: Global Repositories ── */}
+<aside className="w-[240px] shrink-0">
+  <div className="flex items-center gap-2 mb-4">
+    <span className="block w-1.5 h-4 rounded-full bg-[#00FFA3]" />
+    <h3 className="font-syne text-[10px] tracking-[0.22em] uppercase text-gray-500">
+      Global Repositories
+    </h3>
+  </div>
 
-            <ul className="space-y-2">
-              {suggestedRepositories.map((repo) => (
-                <li
-                  key={repo._id}
-                            onClick={() => navigate(`/repo/${repo.name}/${repo._id}`)}
+  {/* ── Search for global repos ── */}
+  <div className="relative mb-4 group">
+    <div className="relative flex items-center gap-2 px-3 py-2 rounded-lg
+                    border border-white/[0.07] bg-white/[0.03]
+                    focus-within:border-[#00FFA3]/30 transition-colors duration-300">
+      <SearchIcon />
+      <input
+        type="text"
+        value={globalSearch}
+        placeholder="Search global…"
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setGlobalSearch(e.target.value)
+        }
+        className="flex-1 bg-transparent font-plex text-[11px] text-gray-200
+                   placeholder-gray-700 outline-none"
+      />
+      {globalSearch && (
+        <button
+          onClick={() => setGlobalSearch("")}
+          className="font-plex text-[10px] text-gray-700 hover:text-gray-400
+                     transition-colors"
+        >
+          ✕
+        </button>
+      )}
+    </div>
+  </div>
 
-                  className="group p-3.5 rounded-lg border border-white/[0.05] bg-white/[0.02]
-                             hover:bg-[#00FFA3]/[0.04] hover:border-[#00FFA3]/20
-                             transition-all duration-250 cursor-pointer"
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <FolderIcon />
-                    <span className="font-plex text-[11px] text-gray-300 truncate group-hover:text-white transition-colors">
-                      {repo.name}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-gray-600 leading-relaxed line-clamp-2 pl-[1.35rem]">
-                    {repo.description}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </aside>
+  {/* ── Results count ── */}
+  {globalSearch && (
+    <p className="font-plex text-[10px] text-gray-700 mb-3">
+      {globalResults.length} found
+    </p>
+  )}
+
+  {/* ── Repo list ── */}
+  {globalResults.length === 0 && globalSearch !== "" ? (
+    <p className="font-plex text-[10px] text-gray-800 text-center py-6">
+      no match for{" "}
+      <span className="text-[#00FFA3]/50">"{globalSearch}"</span>
+    </p>
+  ) : (
+    <ul className="space-y-2">
+      {globalResults.map((repo) => (
+        <li
+          key={repo._id}
+          onClick={() => navigate(`/repo/${repo.name}/${repo._id}`)}
+          className="group p-3.5 rounded-lg border border-white/[0.05] bg-white/[0.02]
+                     hover:bg-[#00FFA3]/[0.04] hover:border-[#00FFA3]/20
+                     transition-all duration-250 cursor-pointer"
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <FolderIcon />
+            <span className="font-plex text-[11px] text-gray-300 truncate
+                             group-hover:text-white transition-colors">
+              {repo.name}
+            </span>
+          </div>
+          <p className="text-[11px] text-gray-600 leading-relaxed
+                        line-clamp-2 pl-[1.35rem]">
+            {repo.description}
+          </p>
+        </li>
+      ))}
+    </ul>
+  )}
+</aside>
 
           {/* ── Main: Your Repos ── */}
           <main className="flex-1 min-w-0">
