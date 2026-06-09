@@ -21,7 +21,6 @@ dotenv.config();
 yargs(hideBin(process.argv))
   .command("start", "Start the server", {}, startServer)
 
-  
   .command(
     "init",
     "Initialize the new repository",
@@ -69,7 +68,6 @@ yargs(hideBin(process.argv))
     },
   )
 
-  
   .command("push", "Push commits to S3 and MongoDB", {}, (argv) => {
     pushRepo(argv);
   })
@@ -92,7 +90,6 @@ yargs(hideBin(process.argv))
 
   .demandCommand(1, "Please specify a command")
   .help().argv;
-
 
 let user = "userXYZ";
 
@@ -128,28 +125,22 @@ async function startServer() {
   });
 
   const httpServer = http.createServer(app);
-  
-  
-  
-  
-  
-  
 
   const userSocketMap = new Map();
 
   const io = new Server(httpServer, {
     cors: {
       origin: "*",
-      methods: ["GET", "POST"],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"], // Allow custom headers
+      credentials: true,
     },
   });
 
-  
   setIO(io);
   io.on("connection", (socket) => {
     console.log("Socket connected:", socket.id);
 
-    
     socket.on("join", (userId) => {
       if (!userId) return;
       socket.join(userId);
@@ -158,7 +149,6 @@ async function startServer() {
     });
 
     socket.on("disconnect", () => {
-      
       for (const [userId, socketId] of userSocketMap.entries()) {
         if (socketId === socket.id) {
           userSocketMap.delete(userId);
