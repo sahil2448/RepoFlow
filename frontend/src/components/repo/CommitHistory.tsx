@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/api";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 interface CommitFile {
   file: string;
@@ -22,7 +22,7 @@ interface CommitHistoryProps {
   repoId: string;
 }
 
-// ─── Icons ───────────────────────────────────────────────────────────────────
+
 
 const CommitIcon: React.FC = () => (
   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -68,7 +68,7 @@ const ChevronIcon: React.FC<{ open: boolean }> = ({ open }) => (
   </svg>
 );
 
-// ─── Component ────────────────────────────────────────────────────────────────
+
 
 const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
   const [commits, setCommits] = useState<Commit[]>([]);
@@ -92,14 +92,14 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
   }, [repoId]);
 
   const handleExpand = async (commit: Commit): Promise<void> => {
-    // Toggle collapse
+    
     if (expandedId === commit.commitId) {
       setExpandedId(null);
       return;
     }
     setExpandedId(commit.commitId);
 
-    // Already fetched
+    
     if (revertData[commit.commitId]) return;
 
     setRevertLoading(commit.commitId);
@@ -125,7 +125,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
       minute: "2-digit",
     });
 
-  // ── Loading ──
+  
   if (loading) {
     return (
       <div className="space-y-2">
@@ -136,7 +136,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
     );
   }
 
-  // ── Empty ──
+  
   if (commits.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-4">
@@ -151,7 +151,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
           <p className="font-plex text-[10px] text-gray-800 mt-1">run these commands locally:</p>
         </div>
 
-        {/* CLI cheatsheet */}
+        
         <div className="w-full max-w-sm rounded-xl border border-white/[0.06] bg-[#060611] overflow-hidden">
           <div className="flex items-center gap-1.5 px-4 py-2 border-b border-white/[0.05]">
             {["#FF6B4A", "#F59E0B", "#00FFA3"].map((c) => (
@@ -181,7 +181,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
     );
   }
 
-  // ── Commit list ──
+  
   return (
     <>
       <style>{`
@@ -190,7 +190,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
         .font-dm   { font-family: 'DM Sans', sans-serif; }
       `}</style>
 
-      {/* Header */}
+      
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="block w-1 h-3 rounded-full bg-[#A78BFA]/60" />
@@ -200,9 +200,9 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
         </div>
       </div>
 
-      {/* Timeline list */}
+      
       <div className="relative">
-        {/* Vertical timeline line */}
+        
         <div className="absolute left-[19px] top-4 bottom-4 w-px bg-white/[0.05]" />
 
         <ul className="space-y-2">
@@ -213,12 +213,12 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
 
             return (
               <li key={commit._id}>
-                {/* ── Commit row ── */}
+                
                 <div
                   onClick={() => handleExpand(commit)}
                   className="group relative flex items-start gap-4 cursor-pointer"
                 >
-                  {/* Timeline dot */}
+                  
                   <div
                     className={`shrink-0 w-10 h-10 rounded-xl border flex items-center justify-center z-10
                                    transition-all duration-200
@@ -231,7 +231,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
                     <CommitIcon />
                   </div>
 
-                  {/* Content */}
+                  
                   <div
                     className={`flex-1 min-w-0 p-4 rounded-xl border transition-all duration-200
                                    ${
@@ -246,7 +246,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
                           {commit.message}
                         </p>
                         <div className="flex items-center gap-3 mt-1.5">
-                          {/* Short hash */}
+                          
                           <span className="font-plex text-[10px] text-[#A78BFA]/60">
                             {commit.commitId.slice(0, 7)}
                           </span>
@@ -258,12 +258,12 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
                           <span className="font-plex text-[10px] text-gray-700">
                             {formatDate(commit.createdAt)}
                           </span>
-                          {/* Files count */}
+                          
                           <span className="flex items-center gap-1 font-plex text-[10px] text-gray-700">
                             <FileIcon />
                             {commit.files.length} file{commit.files.length !== 1 ? "s" : ""}
                           </span>
-                          {/* S3 badge */}
+                          
                           {commit.s3Synced && (
                             <span className="font-plex text-[9px] px-1.5 py-0.5 rounded border text-[#00FFA3]/60 border-[#00FFA3]/15 bg-[#00FFA3]/[0.05]">
                               S3
@@ -283,10 +283,10 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
                   </div>
                 </div>
 
-                {/* ── Expanded: file download panel ── */}
+                
                 {isExpanded && (
                   <div className="ml-14 mt-1.5 rounded-xl border border-white/[0.05] bg-[#060611] overflow-hidden">
-                    {/* Terminal bar */}
+                    
                     <div className="flex items-center gap-1.5 px-4 py-2 border-b border-white/[0.04]">
                       {["#FF6B4A", "#F59E0B", "#00FFA3"].map((c) => (
                         <span
@@ -300,7 +300,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
                       </span>
                     </div>
 
-                    {/* Files */}
+                    
                     {isLoading ? (
                       <div className="px-4 py-4 space-y-2">
                         {[1, 2].map((n) => (

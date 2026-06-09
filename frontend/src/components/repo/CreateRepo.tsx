@@ -8,12 +8,12 @@ type ApiErrorResponse = {
   };
 };
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 interface CreateRepoForm {
   name: string;
   description: string;
-  visibility: boolean; // true = public, false = private
+  visibility: boolean; 
 }
 
 interface FormErrors {
@@ -21,7 +21,7 @@ interface FormErrors {
   description?: string;
 }
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
+
 
 const LockIcon: React.FC = () => (
   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,7 +50,7 @@ const CheckIcon: React.FC = () => (
   </svg>
 );
 
-// ─── Component ────────────────────────────────────────────────────────────────
+
 
 const CreateRepo: React.FC = () => {
   const navigate = useNavigate();
@@ -58,14 +58,14 @@ const CreateRepo: React.FC = () => {
   const [form, setForm] = useState<CreateRepoForm>({
     name:        "",
     description: "",
-    visibility:  true, // default: public
+    visibility:  true, 
   });
 
   const [errors, setErrors]   = useState<FormErrors>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
 
-  // ── Validation ──────────────────────────────────────────────────────────────
+  
 
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
@@ -80,7 +80,7 @@ const CreateRepo: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ── Submit ──────────────────────────────────────────────────────────────────
+  
 
   const handleSubmit = async (
     e: React.MouseEvent<HTMLButtonElement>
@@ -117,16 +117,16 @@ const CreateRepo: React.FC = () => {
     }
   };
 
-  // ── Helpers ─────────────────────────────────────────────────────────────────
+  
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    // auto-replace spaces with hyphens as the user types
+    
     const value = e.target.value.replace(/\s+/g, "-");
     setForm((prev) => ({ ...prev, name: value }));
     if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
   };
 
-  // ─── Render ─────────────────────────────────────────────────────────────────
+  
 
   return (
     <>
@@ -167,14 +167,14 @@ const CreateRepo: React.FC = () => {
         }
       `}</style>
 
-      {/* Ambient blob */}
+      
       <div className="glow-teal pointer-events-none fixed -top-24 left-1/2
                       -translate-x-1/2 w-[700px] h-[400px] z-0" />
 
       <div className="font-dm relative z-10 min-h-[calc(100vh-56px)] text-white
                       flex flex-col items-center justify-center px-4 py-14">
 
-        {/* ── Page heading ── */}
+        
         <div className="fade-up w-full max-w-[560px] mb-7" style={{ animationDelay: "0ms" }}>
           <div className="flex items-center gap-3 mb-1">
             <div className="w-8 h-8 rounded-lg border border-white/[0.08] bg-white/[0.03]
@@ -190,19 +190,19 @@ const CreateRepo: React.FC = () => {
           </p>
         </div>
 
-        {/* ── Card ── */}
+        
         <div
           className="fade-up relative w-full max-w-[560px] rounded-2xl
                      border border-white/[0.07] bg-white/[0.02] backdrop-blur-sm p-7"
           style={{ animationDelay: "60ms" }}
         >
-          {/* Top-edge shimmer */}
+          
           <div className="absolute inset-x-0 top-0 h-px rounded-t-2xl
                           bg-gradient-to-r from-transparent via-[#00FFA3]/20 to-transparent" />
 
           <div className="flex flex-col gap-6">
 
-            {/* ── Repo name ── */}
+            
             <div className="flex flex-col gap-1.5">
               <label className="font-plex text-[11px] text-gray-500 uppercase tracking-widest">
                 Repository name <span className="text-[#FF6B4A]">*</span>
@@ -218,13 +218,13 @@ const CreateRepo: React.FC = () => {
                            transition-all duration-200 font-plex
                            ${errors.name ? "error" : ""}`}
               />
-              {/* Inline error */}
+              
               {errors.name && (
                 <p className="font-plex text-[10px] text-[#FF6B4A] mt-0.5">
                   {errors.name}
                 </p>
               )}
-              {/* Live slug preview */}
+              
               {form.name && !errors.name && (
                 <p className="font-plex text-[10px] text-gray-700 mt-0.5">
                   will be created as{" "}
@@ -233,10 +233,10 @@ const CreateRepo: React.FC = () => {
               )}
             </div>
 
-            {/* ── Divider ── */}
+            
             <div className="border-t border-white/[0.04]" />
 
-            {/* ── Description ── */}
+            
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
                 <label className="font-plex text-[11px] text-gray-500 uppercase tracking-widest">
@@ -256,7 +256,7 @@ const CreateRepo: React.FC = () => {
                            text-sm text-gray-200 placeholder-gray-700
                            transition-all duration-200 font-dm leading-relaxed"
               />
-              {/* Character count */}
+              
               <p className={`font-plex text-[10px] text-right transition-colors ${
                 form.description.length > 200 ? "text-[#FF6B4A]" : "text-gray-700"
               }`}>
@@ -264,17 +264,17 @@ const CreateRepo: React.FC = () => {
               </p>
             </div>
 
-            {/* ── Divider ── */}
+            
             <div className="border-t border-white/[0.04]" />
 
-            {/* ── Visibility toggle ── */}
+            
             <div className="flex flex-col gap-3">
               <label className="font-plex text-[11px] text-gray-500 uppercase tracking-widest">
                 Visibility
               </label>
 
               <div className="flex flex-col gap-2">
-                {/* Public */}
+                
                 <button
                   onClick={() => setForm((prev) => ({ ...prev, visibility: true }))}
                   className={`flex items-center gap-4 p-4 rounded-xl border
@@ -284,7 +284,7 @@ const CreateRepo: React.FC = () => {
                                 : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]"
                               }`}
                 >
-                  {/* Radio dot */}
+                  
                   <span className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0
                                     transition-all duration-200
                                     ${form.visibility
@@ -311,7 +311,7 @@ const CreateRepo: React.FC = () => {
                   </div>
                 </button>
 
-                {/* Private */}
+                
                 <button
                   onClick={() => setForm((prev) => ({ ...prev, visibility: false }))}
                   className={`flex items-center gap-4 p-4 rounded-xl border
@@ -349,10 +349,10 @@ const CreateRepo: React.FC = () => {
               </div>
             </div>
 
-            {/* ── Divider ── */}
+            
             <div className="border-t border-white/[0.04]" />
 
-            {/* ── Actions ── */}
+            
             <div className="flex items-center justify-between gap-3">
               <button
                 onClick={() => navigate("/")}
@@ -374,7 +374,7 @@ const CreateRepo: React.FC = () => {
                              : 'bg-[#00FFA3]/10 border-[#00FFA3]/25 text-[#00FFA3] hover:bg-[#00FFA3]/[0.16] hover:border-[#00FFA3]/40'
                            }"
               >
-                {/* Sweep shimmer on hover */}
+                
                 <span className="shimmer-inner absolute inset-0
                                  bg-gradient-to-r from-transparent via-[#00FFA3]/10 to-transparent
                                  -translate-x-full" />
@@ -387,7 +387,7 @@ const CreateRepo: React.FC = () => {
                     </>
                   ) : loading ? (
                     <>
-                      {/* Spinner */}
+                      
                       <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10"
                           stroke="currentColor" strokeWidth="4" />

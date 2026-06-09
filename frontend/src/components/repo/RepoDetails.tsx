@@ -4,7 +4,7 @@ import IssueList from "../issues/IssueList";
 import CommitHistory from "./CommitHistory";
 import api from "../../config/api";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 interface Issue {
   _id: string;
@@ -28,7 +28,7 @@ interface Repository {
 type RepoTab = "content" | "issues" | "delete" | "commits";
 
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
+
 
 const StarIcon: React.FC<{ filled?: boolean }> = ({ filled }) => (
   <svg className="w-3.5 h-3.5" fill={filled ? "currentColor" : "none"}
@@ -92,7 +92,7 @@ const UserIcon: React.FC = () => (
   </svg>
 );
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
+
 
 const Skeleton: React.FC<{ className?: string }> = ({ className = "" }) => (
   <div className={`rounded-lg bg-white/[0.04] animate-pulse ${className}`} />
@@ -100,7 +100,7 @@ const Skeleton: React.FC<{ className?: string }> = ({ className = "" }) => (
 
 
 
-// ─── Delete Tab Panel ─────────────────────────────────────────────────────────
+
 
 interface DeleteTabPanelProps {
   repoName: string;
@@ -119,19 +119,19 @@ const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({
 
   return (
     <div className="relative rounded-2xl border border-[#FF6B4A]/20 bg-[#FF6B4A]/[0.02] overflow-hidden">
-      {/* Top accent line */}
+      
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#FF6B4A]/30 to-transparent" />
 
       <div className="px-8 py-12 flex flex-col items-center gap-6 max-w-md mx-auto">
 
-        {/* Icon */}
+        
         <div className="w-12 h-12 rounded-xl border border-[#FF6B4A]/20
                         bg-[#FF6B4A]/[0.06] flex items-center justify-center
                         text-[#FF6B4A]/70">
           <TrashIcon />
         </div>
 
-        {/* Warning header */}
+        
         <div className="text-center space-y-1.5">
           <p className="font-syne text-base font-bold text-white">
             Delete this repository?
@@ -145,16 +145,14 @@ const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({
           </p>
         </div>
 
-        {/* Confirmation box */}
+        
         <div className="w-full rounded-xl border border-white/[0.07] bg-white/[0.02] p-4 space-y-3">
-          {/* <p className="font-plex text-[10px] text-gray-600 uppercase tracking-widest">
-            Type the repository name to confirm
-          </p> */}
+          
 
-          {/* Repo name hint */}
+          
 
 
-          {/* Input */}
+          
           <input
             type="text"
             value={inputValue}
@@ -174,7 +172,7 @@ const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({
 
         </div>
 
-        {/* Delete button */}
+        
         <button
           onClick={handleConfirm}
           disabled={!matches}
@@ -195,7 +193,7 @@ const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({
     </div>
   );
 };
-// ─── Component ────────────────────────────────────────────────────────────────
+
 
 const RepositoryDetails: React.FC = () => {
 
@@ -210,7 +208,7 @@ const RepositoryDetails: React.FC = () => {
   const [starCount, setStarCount] = useState<number>(0);
   const [starLoading, setStarLoading] = useState<boolean>(false);
   const [copiedLine, setCopiedLine] = useState<number | null>(null);
-  // ── Add new state at top of component ──
+  
   const [files, setFiles] = useState<{
     name: string;
     content: string | null;
@@ -224,7 +222,7 @@ const RepositoryDetails: React.FC = () => {
     content: string;
   } | null>(null);
 
-  // ── Fetch files when tab opens ──
+  
   useEffect(() => {
     if (activeTab !== "content") return;
     const fetchFiles = async (): Promise<void> => {
@@ -245,7 +243,7 @@ const RepositoryDetails: React.FC = () => {
 
   const userId = localStorage.getItem("userId");
 
-  // ── Fetch repo ──
+  
   useEffect(() => {
     if (!id) return;
     const fetch = async (): Promise<void> => {
@@ -266,7 +264,7 @@ const RepositoryDetails: React.FC = () => {
     fetch();
   }, [id, userId]);
 
-  // ── Star toggle ──
+  
   const handleStar = async (): Promise<void> => {
     if (!userId || !id || starLoading) return;
     setStarLoading(true);
@@ -289,22 +287,22 @@ const RepositoryDetails: React.FC = () => {
     }
   }
 
-  // ── Copy line to clipboard ──
+  
   const handleCopyLine = (line: string, index: number): void => {
     navigator.clipboard.writeText(line);
     setCopiedLine(index);
     setTimeout(() => setCopiedLine(null), 1500);
   };
 
-  // ── Owner display ──
+  
   const ownerName =
     typeof repo?.owner === "object" ? repo.owner.username : "unknown";
 
-  // ── Open issues count ──
+  
   const openIssues = repo?.issues.filter((i) => i.status !== "closed").length ?? 0;
 
   const isOwner: boolean = !!(repo && typeof repo.owner === "object" && repo.owner._id === userId);
-  // ─── Loading state ──────────────────────────────────────────────────────────
+  
   if (loading) {
     return (
       <div className="font-dm max-w-[1380px] mx-auto px-6 py-10 space-y-6">
@@ -332,7 +330,7 @@ const RepositoryDetails: React.FC = () => {
     );
   }
 
-  // ─── Render ─────────────────────────────────────────────────────────────────
+  
   return (
     <>
       <style>{`
@@ -385,14 +383,14 @@ const RepositoryDetails: React.FC = () => {
         .copy-btn { opacity: 0; transition: opacity 0.15s; }
       `}</style>
 
-      {/* Ambient blobs */}
+      
       <div className="glow-teal  pointer-events-none fixed -top-24 left-0      w-[600px] h-[400px] z-0" />
       <div className="glow-coral pointer-events-none fixed bottom-0  right-0   w-[400px] h-[400px] z-0" />
 
       <div className="font-dm relative z-10 min-h-[calc(100vh-56px)] text-white">
         <div className="max-w-[1380px] mx-auto px-6 py-10">
 
-          {/* ── Back breadcrumb ── */}
+          
           <button
             onClick={() => navigate("/")}
             className="fade-up flex items-center gap-2 font-plex text-[11px] text-gray-700
@@ -405,13 +403,13 @@ const RepositoryDetails: React.FC = () => {
             dashboard
           </button>
 
-          {/* ── Repo header ── */}
+          
           <div className="fade-up mb-8" style={{ animationDelay: "40ms" }}>
             <div className="flex items-start justify-between gap-6 flex-wrap">
 
-              {/* Left: name + meta */}
+              
               <div>
-                {/* Owner / name breadcrumb */}
+                
                 <div className="flex items-center gap-2 mb-2">
                   <span className="flex items-center gap-1.5 font-plex text-[11px] text-gray-600">
                     <UserIcon />
@@ -421,7 +419,7 @@ const RepositoryDetails: React.FC = () => {
                   <h1 className="font-syne text-2xl font-bold text-white tracking-tight leading-none">
                     {repo.name}
                   </h1>
-                  {/* Visibility badge */}
+                  
                   <span className={`flex items-center gap-1 font-plex text-[9px] px-2 py-0.5
                                     rounded border uppercase tracking-widest
                                     ${repo.visibility
@@ -464,7 +462,7 @@ const RepositoryDetails: React.FC = () => {
             </div>
           </div>
 
-          {/* ── Stat pills ── */}
+          
           <div
             className="fade-up grid grid-cols-3 gap-3 mb-8"
             style={{ animationDelay: "80ms" }}
@@ -493,7 +491,7 @@ const RepositoryDetails: React.FC = () => {
                 key={label}
                 className="relative rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 overflow-hidden"
               >
-                {/* Faint corner glow */}
+                
                 <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full blur-xl opacity-20"
                   style={{ backgroundColor: accent }} />
                 <div className="relative flex items-start justify-between">
@@ -511,7 +509,7 @@ const RepositoryDetails: React.FC = () => {
             ))}
           </div>
 
-          {/* ── Tab bar ── */}
+          
           <div
             className="fade-up border-b border-white/[0.05] mb-6"
             style={{ animationDelay: "110ms" }}
@@ -547,15 +545,15 @@ const RepositoryDetails: React.FC = () => {
             ))}
           </div>
 
-          {/* ── Tab panels ── */}
+          
           <div className="fade-up" style={{ animationDelay: "140ms" }}>
 
-            {/* ── CONTENT TAB ── */}
+            
             {activeTab === "content" && (
               <div className="relative rounded-2xl border border-white/[0.07]
                   bg-[#060611] overflow-hidden scanlines">
 
-                {/* Terminal top bar */}
+                
                 <div className="flex items-center justify-between px-4 py-2.5
                     border-b border-white/[0.05] bg-white/[0.02]">
                   <div className="flex items-center gap-1.5">
@@ -570,7 +568,7 @@ const RepositoryDetails: React.FC = () => {
                       <span className="text-gray-800 ml-2">— {latestCommitMsg}</span>
                     )}
                   </span>
-                  {/* Back button when file is open */}
+                  
                   {selectedFile ? (
                     <button
                       onClick={() => setSelectedFile(null)}
@@ -594,9 +592,9 @@ const RepositoryDetails: React.FC = () => {
                     ))}
                   </div>
                 ) : selectedFile ? (
-                  /* ── File content viewer ── */
+                  
                   <div>
-                    {/* File name bar */}
+                    
                     <div className="flex items-center gap-2 px-4 py-2
                         border-b border-white/[0.04] bg-white/[0.02]">
                       <svg className="w-3 h-3 text-[#A78BFA]" fill="none"
@@ -608,7 +606,7 @@ const RepositoryDetails: React.FC = () => {
                         {selectedFile.name}
                       </span>
                     </div>
-                    {/* Line-by-line content */}
+                    
                     <div className="divide-y divide-white/[0.03]">
                       {selectedFile.content.split("\n").map((line, i) => (
                         <div key={i}
@@ -637,7 +635,7 @@ const RepositoryDetails: React.FC = () => {
                     </div>
                   </div>
                 ) : files.length === 0 ? (
-                  /* ── Empty state with CLI instructions ── */
+                  
                   <div className="px-6 py-16 flex flex-col items-center gap-4">
                     <p className="font-plex text-[11px] text-gray-700">
                       no files pushed yet
@@ -670,7 +668,7 @@ const RepositoryDetails: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  /* ── File list ── */
+                  
                   <ul className="divide-y divide-white/[0.03]">
                     {files.map((file) => (
                       <li
@@ -686,20 +684,20 @@ const RepositoryDetails: React.FC = () => {
                        hover:bg-[#00FFA3]/[0.03] transition-colors
                        duration-150 cursor-pointer"
                       >
-                        {/* File icon */}
+                        
                         <svg className="w-3.5 h-3.5 text-[#A78BFA]/60 shrink-0"
                           fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
 
-                        {/* File name */}
+                        
                         <span className="flex-1 font-plex text-[12px] text-gray-400
                              group-hover:text-white transition-colors">
                           {file.name}
                         </span>
 
-                        {/* Source badge */}
+                        
                         <span className={`font-plex text-[9px] px-1.5 py-0.5 rounded border
                               ${file.source === "s3"
                             ? "text-[#00FFA3]/50 border-[#00FFA3]/15"
@@ -708,7 +706,7 @@ const RepositoryDetails: React.FC = () => {
                           {file.source}
                         </span>
 
-                        {/* Chevron */}
+                        
                         <svg className="w-3.5 h-3.5 text-gray-700
                              group-hover:text-[#00FFA3] transition-colors"
                           fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -722,7 +720,7 @@ const RepositoryDetails: React.FC = () => {
               </div>
             )}
 
-            {/* ── ISSUES TAB ── */}
+            
             {activeTab === "issues" && (
               <div className="relative rounded-2xl border border-white/[0.07]
                   bg-white/[0.02] overflow-hidden p-5">
@@ -742,7 +740,7 @@ const RepositoryDetails: React.FC = () => {
 
 
             {
-              /* ── DELETE TAB ── */
+              
               isOwner && activeTab === "delete" && (
                 <DeleteTabPanel
                   repoName={repo.name}

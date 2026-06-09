@@ -21,7 +21,7 @@ dotenv.config();
 yargs(hideBin(process.argv))
   .command("start", "Start the server", {}, startServer)
 
-  // ✅ Fix 2: added builder for --repoId and --userId, pass argv to initRepo
+  
   .command(
     "init",
     "Initialize the new repository",
@@ -69,7 +69,7 @@ yargs(hideBin(process.argv))
     },
   )
 
-  // ✅ Fix 3: pass argv to pushRepo so it can read flags if needed
+  
   .command("push", "Push commits to S3 and MongoDB", {}, (argv) => {
     pushRepo(argv);
   })
@@ -93,7 +93,7 @@ yargs(hideBin(process.argv))
   .demandCommand(1, "Please specify a command")
   .help().argv;
 
-// ✅ Fix 1: let instead of const — socket.io reassigns this
+
 let user = "userXYZ";
 
 async function startServer() {
@@ -128,12 +128,12 @@ async function startServer() {
   });
 
   const httpServer = http.createServer(app);
-  // const io = new Server(httpServer, {
-  //   cors: {
-  //     origin: "*",
-  //     methods: ["GET", "POST"],
-  //   },
-  // });
+  
+  
+  
+  
+  
+  
 
   const userSocketMap = new Map();
 
@@ -144,12 +144,12 @@ async function startServer() {
     },
   });
 
-  // ✅ Register it so controllers can access it
+  
   setIO(io);
   io.on("connection", (socket) => {
     console.log("Socket connected:", socket.id);
 
-    // Client emits this right after connecting with their userId
+    
     socket.on("join", (userId) => {
       if (!userId) return;
       socket.join(userId);
@@ -158,7 +158,7 @@ async function startServer() {
     });
 
     socket.on("disconnect", () => {
-      // Clean up map on disconnect
+      
       for (const [userId, socketId] of userSocketMap.entries()) {
         if (socketId === socket.id) {
           userSocketMap.delete(userId);

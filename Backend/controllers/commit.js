@@ -20,7 +20,7 @@ export async function commitRepo(message) {
       return;
     }
 
-    // Copy staged files into the commit folder
+    
     for (const file of files) {
       await fs.copyFile(
         path.join(stagingAreaPath, file),
@@ -28,27 +28,27 @@ export async function commitRepo(message) {
       );
     }
 
-    // Write metadata — filter commit.json out of files[] so it
-    // doesn't appear as a user file in CommitHistory
+    
+    
     await fs.writeFile(
       path.join(commitDir, "commit.json"),
       JSON.stringify(
         {
           message,
           date: new Date().toISOString(),
-          files: files.filter((f) => f !== "commit.json"), // clean list
+          files: files.filter((f) => f !== "commit.json"), 
         },
         null,
         2,
       ),
     );
 
-    // Clear staging after commit (like real git)
+    
     for (const file of files) {
       await fs.unlink(path.join(stagingAreaPath, file));
     }
 
-    // Single log — removed the duplicate
+    
     console.log(`Commit ${commitID} created with message: "${message}"`);
     console.log(`Files committed: ${files.join(", ")}`);
   } catch (error) {
@@ -56,13 +56,13 @@ export async function commitRepo(message) {
   }
 }
 
-// GET /repo/:id/files
-// Returns files from the latest commit with content for viewing
+
+
 export const getLatestFiles = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Get most recent commit for this repo
+    
     const latestCommit = await Commit.findOne({ repoId: id })
       .sort({ createdAt: -1 })
       .lean();
@@ -74,7 +74,7 @@ export const getLatestFiles = async (req, res) => {
       });
     }
 
-    // ── MongoDB storage — return base64 decoded content ──
+    
     if (
       latestCommit.storageType === "mongodb" &&
       latestCommit.fileContents?.length > 0
@@ -92,7 +92,7 @@ export const getLatestFiles = async (req, res) => {
       });
     }
 
-    // ── S3 storage — return presigned URLs ──
+    
     if (latestCommit.storageType === "s3" && latestCommit.s3Synced) {
       try {
         const files = await Promise.all(
@@ -117,7 +117,7 @@ export const getLatestFiles = async (req, res) => {
       }
     }
 
-    // ── Fallback — just return file names, no content ──
+    
     return res.status(200).json({
       files: latestCommit.files.map((name) => ({ name, content: null })),
       commitId: latestCommit.commitId,

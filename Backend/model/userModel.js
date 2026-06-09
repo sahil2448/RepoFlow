@@ -6,7 +6,7 @@ const UserSchema = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
 
-    // ✅ New profile fields
+    
     bio: { type: String, default: "" },
     location: { type: String, default: "" },
     website: { type: String, default: "" },

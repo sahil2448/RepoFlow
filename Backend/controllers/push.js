@@ -13,7 +13,7 @@ export async function pushRepo() {
   const commitsPath = path.join(repoPath, "commits");
   const configPath = path.join(repoPath, "config.json");
 
-  // ── Read config ──
+  
   let config = {};
   try {
     const raw = await fs.readFile(configPath, "utf-8");
@@ -34,11 +34,11 @@ export async function pushRepo() {
     return;
   }
 
-  // ── Connect MongoDB ──
-  // ── Connect MongoDB ──
+  
+  
   if (mongoose.connection.readyState === 0) {
     try {
-      // Add dbName to match what the server uses
+      
       await mongoose.connect(process.env.MONGO_URI, {
         dbName: process.env.DB_NAME,
       });
@@ -60,11 +60,11 @@ export async function pushRepo() {
     for (const commitDir of commitDirs) {
       const commitDirPath = path.join(commitsPath, commitDir);
 
-      // Skip if not a directory
+      
       const stat = await fs.stat(commitDirPath);
       if (!stat.isDirectory()) continue;
 
-      // Skip if already saved by either storage method
+      
       const alreadyPushed = await Commit.findOne({
         commitId: commitDir,
         $or: [{ s3Synced: true }, { storageType: "mongodb" }],
@@ -76,7 +76,7 @@ export async function pushRepo() {
         continue;
       }
 
-      // Read commit.json metadata
+      
       let message = "no message";
       let fileNames = [];
       try {
@@ -86,18 +86,18 @@ export async function pushRepo() {
         message = meta.message || "no message";
         fileNames = meta.files || [];
       } catch {
-        // commit.json missing — scan directory
+        
       }
 
       const allFiles = await fs.readdir(commitDirPath);
       const filesToUpload = allFiles.filter((f) => f !== "commit.json");
 
-      // ── Try S3 first ──
+      
       let s3Success = true;
       let storageType = "s3";
 
       try {
-        // Quick check if S3 is reachable before looping all files
+        
         await s3.headBucket({ Bucket: S3_BUCKET }).promise();
 
         for (const file of filesToUpload) {
@@ -112,7 +112,7 @@ export async function pushRepo() {
           console.log(`  ↑ S3 uploaded: ${file}`);
         }
       } catch (s3Err) {
-        // ── S3 failed — fall back to MongoDB ──
+        
         s3Success = false;
         storageType = "mongodb";
         console.warn(
@@ -120,20 +120,20 @@ export async function pushRepo() {
         );
       }
 
-      // ── Read file contents for MongoDB fallback ──
+      
       let fileContents = [];
       if (!s3Success) {
         for (const file of filesToUpload) {
           const rawContent = await fs.readFile(path.join(commitDirPath, file));
           fileContents.push({
             name: file,
-            content: rawContent.toString("base64"), // base64 so binary files are safe
+            content: rawContent.toString("base64"), 
           });
         }
         console.log(`  ✓ ${filesToUpload.length} file(s) stored in MongoDB`);
       }
 
-      // ── Save commit to MongoDB ──
+      
       await Commit.findOneAndUpdate(
         { commitId: commitDir },
         {
@@ -141,7 +141,7 @@ export async function pushRepo() {
           repoId,
           message,
           files: filesToUpload,
-          fileContents: fileContents, // empty array when S3 worked
+          fileContents: fileContents, 
           author: userId || null,
           s3Synced: s3Success,
           storageType,
@@ -156,7 +156,7 @@ export async function pushRepo() {
 
       console.log("\nPush complete.");
 
-      // Update repo.content with latest file snapshot
+      
       await Repository.findByIdAndUpdate(repoId, {
         $set: { content: filesToUpload },
       });

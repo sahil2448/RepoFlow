@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import HeatMap from "@uiw/react-heat-map";
 import api from "../../config/api";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 interface ActivityEntry {
   date: string;
@@ -11,13 +11,13 @@ interface ActivityEntry {
 
 type PanelColors = Record<number, string>;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 
 const getPanelColors = (maxCount: number): PanelColors => {
   const colors: PanelColors = { 0: "rgba(255,255,255,0.04)" };
 
-  // ✅ Fix 1: never compress the scale below 10
-  // Without this, 1 contribution out of maxCount=2 gets t=0.5 → looks bright
+  
+  
   const scale = Math.max(maxCount, 10);
 
   for (let i = 1; i <= scale; i++) {
@@ -28,7 +28,7 @@ const getPanelColors = (maxCount: number): PanelColors => {
   return colors;
 };
 
-// ─── Component ────────────────────────────────────────────────────────────────
+
 
 
 const HeatMapProfile: React.FC = () => {
@@ -96,7 +96,7 @@ const HeatMapProfile: React.FC = () => {
         }
       `}</style>
 
-      {/* ── Stat row ── */}
+      
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="block w-1 h-3 rounded-full bg-[#00FFA3]/60" />
@@ -120,17 +120,17 @@ const HeatMapProfile: React.FC = () => {
         </div>
       </div>
 
-      {/* ── Heatmap ── */}
+      
       <div className="heatmap-themed w-full">
         <HeatMap
           value={activityData}
           startDate={new Date(`${year}-01-01`)}
           endDate={new Date(`${year}-12-31`)}
 
-          // ✅ Fix 2: label all 7 days so Saturday is no longer an
-          // unlabeled mystery row. Hide Sun/Tue/Thu/Sat with empty
-          // strings but keep the slot — OR show named labels for all.
-          // Showing "Sat" means the row is identifiable, not floating.
+          
+          
+          
+          
           weekLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
 
           monthLabels={["Jan","Feb","Mar","Apr","May","Jun",
@@ -148,8 +148,7 @@ const HeatMapProfile: React.FC = () => {
         />
       </div>
 
-      {/* ✅ Fix 3: legend removed — it was causing confusion and
-           the mint color gradient is self-explanatory */}
+      
        <div className="flex items-center justify-end gap-2 mt-3">
         <span className="font-plex text-[9px] text-gray-700">Less</span>
         {[0.04, 0.2, 0.4, 0.65, 1].map((opacity, i) => (

@@ -1,5 +1,4 @@
-// Lives completely outside React — navigation, remounts, re-renders
-// cannot touch this
+
 
 interface NotificationItem {
   _id:       string;
@@ -11,21 +10,19 @@ interface NotificationItem {
   sender?:   { username: string };
 }
 
-// ── Module level state ──
 let notifications: NotificationItem[] = [];
 let unreadCount   = 0;
 let listeners:    (() => void)[]      = [];
 
-// ── Notify all subscribers when state changes ──
 const emit = () => listeners.forEach((fn) => fn());
 
 export const notificationStore = {
 
-  // Read
+  
   getNotifications: () => notifications,
   getUnreadCount:   () => unreadCount,
 
-  // Write
+  
   setAll: (data: NotificationItem[], count: number) => {
     notifications = data;
     unreadCount   = count;
@@ -43,10 +40,9 @@ export const notificationStore = {
       n._id === id ? { ...n, read: true } : n
     );
     unreadCount = Math.max(0, unreadCount - 1);
-    emit();   // ← subscribers re-render immediately
+    emit();
   },
 
-  // Subscribe / unsubscribe
   subscribe: (fn: () => void) => {
     listeners.push(fn);
     return () => {

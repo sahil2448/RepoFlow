@@ -1,6 +1,3 @@
-// Holds the io instance so any controller can import it
-// without circular dependency issues
-
 let io = null;
 
 export const setIO = (ioInstance) => {

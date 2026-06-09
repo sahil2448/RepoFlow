@@ -5,7 +5,7 @@ import HeatMapProfile from "./HeatMap";
 import StarredRepo from "./StarredRepo";
 import AboutUser from "./AboutUser"
 import api from "../../config/api";
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 interface UserDetails {
   _id?: string;
@@ -47,7 +47,7 @@ const toEditableProfile = (userDetails: UserDetails): EditableProfile => ({
   avatar: userDetails.avatar ?? "",
 });
 
-// ─── Icons ───────────────────────────────────────────────────────────────────
+
 
 const BookIcon: React.FC = () => (
   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -70,7 +70,7 @@ const LogoutIcon: React.FC = () => (
   </svg>
 );
 
-// ─── Component ────────────────────────────────────────────────────────────────
+
 
 const Profile: React.FC = () => {
 const { id: paramId } = useParams<{ id: string }>();
@@ -118,7 +118,7 @@ const handleSaveProfile = async () => {
   }
 };
 
-  // ── Fetch profile of the user whose id is in the URL ──
+  
   useEffect(() => {
     if (!id) return;
     const fetchUserDetails = async (): Promise<void> => {
@@ -132,7 +132,7 @@ const handleSaveProfile = async () => {
     fetchUserDetails();
   }, [id]);
 
-  // ── Follow / Unfollow ──
+  
   const handleFollowUser = async (): Promise<void> => {
     if (!currentUserId || !id || followLoading) return;
 
@@ -156,7 +156,7 @@ setUserDetails((prev) => ({
     }
   };
 
-  // ── Logout ──
+  
   const handleLogout = (): void => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
@@ -190,7 +190,7 @@ setUserDetails((prev) => ({
 
       <div className="font-dm relative z-10 min-h-[calc(100vh-56px)] text-white">
 
-        {/* ── Tab bar ── */}
+        
         <div className="border-b border-white/[0.05] px-6">
           <div className="max-w-[1380px] mx-auto flex items-center gap-1">
             {tabs.map(({ key, label, icon: Icon }) => (
@@ -215,14 +215,14 @@ setUserDetails((prev) => ({
           </div>
         </div>
 
-        {/* ── Page body ── */}
+        
         <div className="max-w-[1380px] mx-auto px-6 py-10">
           <div className="flex justify-between gap-10">
 
-            {/* ── Left: User card ── */}
+            
             <aside className="w-[260px] shrink-0 fade-up" style={{ animationDelay: "0ms" }}>
 
-              {/* Avatar */}
+              
               <div className="w-full aspect-square max-w-[260px] rounded-2xl
                               bg-gradient-to-br from-[#00FFA3]/10 to-[#A78BFA]/10
                               border border-white/[0.07] flex items-center justify-center mb-5
@@ -262,7 +262,7 @@ setUserDetails((prev) => ({
                 </button>
               )}
 
-              {/* Follow button — only shown on OTHER people's profiles */}
+              
               {!isOwnProfile && (
                 <button
                   onClick={handleFollowUser}
@@ -279,7 +279,7 @@ setUserDetails((prev) => ({
                 </button>
               )}
 
-              {/* Stats */}
+              
               <div className="flex gap-4 mb-6">
                 <div className="flex flex-col">
                   <span className="font-syne text-sm font-bold text-white">
@@ -296,7 +296,7 @@ setUserDetails((prev) => ({
                 </div>
               </div>
 
-              {/* Sign out — only on your own profile */}
+              
               {isOwnProfile && (
                 <div className="border-t border-white/[0.05] pt-5">
                   <button
@@ -311,11 +311,11 @@ setUserDetails((prev) => ({
               )}
               </div>
 
-              {/* Name + email */}
+              
 
             </aside>
 
-            {/* ── Right: Content ── */}
+            
             {isOwnProfile && isEditing && (
   <div className="relative rounded-2xl border border-white/[0.07] bg-white/[0.02] p-5 mb-6 overflow-hidden fade-up">
     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00FFA3]/15 to-transparent" />

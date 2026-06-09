@@ -21,12 +21,12 @@ const CommitSchema = new Schema(
         type: String,
       },
     ],
-    // ✅ Fallback storage when S3 is unavailable
-    // Stores [{ name: "hello.js", content: "console.log(...)" }]
+    
+    
     fileContents: [
       {
         name: { type: String },
-        content: { type: String }, // base64 encoded
+        content: { type: String }, 
       },
     ],
     author: {
@@ -37,7 +37,7 @@ const CommitSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    // ✅ Track which storage was used
+    
     storageType: {
       type: String,
       enum: ["s3", "mongodb", "none"],

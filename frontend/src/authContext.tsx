@@ -7,7 +7,7 @@ const getStoredUser = (): User => {
     return userId ? { userId } : null;
 };
 
-export const AuthProvider = ({children}:{children:ReactNode})=>{ // {children} is the component that will be wrapped by the provider
+export const AuthProvider = ({children}:{children:ReactNode})=>{
     const [currentUser,setCurrentUser] = useState<User>(getStoredUser);
 
     return( <AuthContext.Provider value={{currentUser,setCurrentUser}}>

@@ -14,14 +14,12 @@ issueRouter.get("/", (req, res) => {
   res.send("issue router");
 });
 
-// issueRouter.js
-issueRouter.post("/issue/create/:id", createIssue); // ← add :id
-issueRouter.get("/issue/all/:id", getAllIssues); // ← add :id (repo id)
+issueRouter.post("/issue/create/:id", createIssue); 
+issueRouter.get("/issue/all/:id", getAllIssues); 
 issueRouter.get("/issue/:id", getIssueById);
 issueRouter.put("/issue/update/:id", updateIssueById);
 issueRouter.delete("/issue/delete/:id", deleteIssueById);
 issueRouter.post("/issue/check-duplicate/:repoId", checkDuplicateIssue);
-// ONE TIME USE — remove after running once
 issueRouter.post("/issue/reindex/:repoId", async (req, res) => {
   const Issue = (await import("../model/issueModel.js")).default;
   const { embedAndIndexIssue } =
@@ -37,7 +35,6 @@ issueRouter.post("/issue/reindex/:repoId", async (req, res) => {
       issue.title,
       issue.description,
     );
-    // Avoid hitting Google AI rate limit (60 req/min free tier)
     await new Promise((r) => setTimeout(r, 1100));
   }
 

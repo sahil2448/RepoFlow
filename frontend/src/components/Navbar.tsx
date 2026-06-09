@@ -31,7 +31,7 @@ const Navbar: React.FC = () => {
   const navigate  = useNavigate();
   const userId    = localStorage.getItem("userId");
 
-  // Reads directly from module store — never resets on navigation
+  
   const { notifications, unreadCount } = useNotifications();
 
   const [scrolled, setScrolled] = useState<boolean>(false);
@@ -55,10 +55,10 @@ const Navbar: React.FC = () => {
   }, []);
 
   const handleNotifClick = async (notif: NotificationItem): Promise<void> => {
-    // Update module store FIRST — synchronous, survives navigation
+    
     if (!notif.read) {
       notificationStore.markOneRead(notif._id);
-      // Fire and forget — DB update in background
+      
       api.patch(`/notifications/read-one/${notif._id}`).catch(console.error);
     }
     setBellOpen(false);

@@ -7,7 +7,7 @@ import { notifyUser } from "../helpers/notifyUser.js";
 import { getIO } from "../helpers/socketInstance.js";
 configDotenv();
 
-// Note --> In this file we have used mongo queries using MongoDB ...not Mongoose -> in the repositories we have used Mongoose
+
 
 const URI = process.env.MONGO_URI;
 const DB_NAME = process.env.DB_NAME;
@@ -24,7 +24,7 @@ async function connectToClient() {
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
   try {
-    // connect to the database
+    
     await connectToClient();
     const db = client.db(DB_NAME);
     const userCollection = db.collection("users");
@@ -34,7 +34,7 @@ const signup = async (req, res) => {
       return res.status(400).send("User already exists");
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds - password encryption
+    const hashedPassword = await bcrypt.hash(password, 10); 
     const newUser = {
       username,
       email,
@@ -50,7 +50,7 @@ const signup = async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.json({ token, userId: result.insertedId }).status(200); // status code -- 200 means success
+    res.json({ token, userId: result.insertedId }).status(200); 
   } catch (error) {
     console.error("Error during signup", error);
     res.status(500).send("Server error");
@@ -76,7 +76,7 @@ const login = async (req, res) => {
       return res.status(401).send("Invalid password");
     }
 
-    // check if token is expired
+    
 
     const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
 
@@ -88,11 +88,11 @@ const login = async (req, res) => {
 
 async function getAllUsers(req, res) {
   try {
-    // connect to db
+    
     await connectToClient();
     const db = client.db(DB_NAME);
     const userCollection = db.collection("users");
-    const users = await userCollection.find({}).toArray(); // .toArray() returns a promise....written here otherwise will get error because will not be able to convert to json hence no response
+    const users = await userCollection.find({}).toArray(); 
 
     res.json(users).status(200);
   } catch (err) {
@@ -101,7 +101,7 @@ async function getAllUsers(req, res) {
   }
 }
 
-// GET /userProfile/:id
+
 const getUserProfile = async (req, res) => {
   const { id } = req.params;
   try {
@@ -111,7 +111,7 @@ const getUserProfile = async (req, res) => {
       { _id: new ObjectId(id) },
       {
         projection: {
-          password: 0, // exclusion only — return everything EXCEPT password
+          password: 0, 
         },
       },
     );
@@ -129,10 +129,10 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-// PUT /userProfile/:id  (was /updateProfile/:id — check your router)
+
 const updateUserProfile = async (req, res) => {
   const { id } = req.params;
-  // only allow safe fields — never let caller update password/followers here
+  
   const { username, email, bio, location, website, avatar } = req.body;
 
   try {
@@ -186,7 +186,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// fetch all the starred repos
+
 
 const fetchStarredRepos = async (req, res) => {
   const { id } = req.params;
@@ -259,7 +259,7 @@ const followUser = async (req, res) => {
       { $addToSet: { followingUsers: id } },
     );
     await notifyUser(getIO(), {
-      recipientId: id, // person being followed
+      recipientId: id, 
       senderId: currentUserId,
       type: "new_follower",
       message: `started following you`,

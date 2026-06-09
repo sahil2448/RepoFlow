@@ -1,7 +1,7 @@
 import Commit from "../model/commitModel.js";
 import { s3, S3_BUCKET } from "../config/aws-config.js";
 
-// GET /repo/:id/commits
+
 export const getCommitsByRepo = async (req, res) => {
   const { id } = req.params;
 
@@ -9,7 +9,7 @@ export const getCommitsByRepo = async (req, res) => {
     const commits = await Commit.find({ repoId: id })
       .sort({ createdAt: -1 })
       .populate("author", "username")
-      // Don't send fileContents in the list — too heavy
+      
       .select("-fileContents")
       .lean();
 
@@ -20,7 +20,7 @@ export const getCommitsByRepo = async (req, res) => {
   }
 };
 
-// POST /repo/:id/revert/:commitId
+
 export const revertToCommit = async (req, res) => {
   const { id, commitId } = req.params;
 
@@ -31,7 +31,7 @@ export const revertToCommit = async (req, res) => {
       return res.status(404).json({ error: "Commit not found" });
     }
 
-    // ── S3 storage: return presigned URLs ──
+    
     if (commit.storageType === "s3" && commit.s3Synced) {
       try {
         const fileUrls = await Promise.all(
@@ -53,18 +53,18 @@ export const revertToCommit = async (req, res) => {
       }
     }
 
-    // ── MongoDB fallback: return base64 content as data URLs ──
+    
     if (commit.fileContents && commit.fileContents.length > 0) {
       const fileUrls = commit.fileContents.map(({ name, content }) => ({
         file: name,
-        // data URL so the frontend <a download> still works
+        
         url: `data:application/octet-stream;base64,${content}`,
         source: "mongodb",
       }));
       return res.status(200).json({ commit, fileUrls });
     }
 
-    // ── Nothing stored ──
+    
     return res.status(200).json({
       commit,
       fileUrls: [],

@@ -15,9 +15,9 @@ const Layout: React.FC = () => {
       `}</style>
 
       <div className="dot-grid min-h-screen">
-         <NotificationInit /> {/* Initializes notifications on app load */}
+         <NotificationInit /> 
         <Navbar />
-        <Outlet />   {/* ← every child route renders here */}
+        <Outlet /> 
       </div>
     </>
   );

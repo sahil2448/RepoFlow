@@ -35,7 +35,7 @@ const ProjectRoutes: React.FC = () => {
       element: <Layout />,
       children: [
         { path: "/",             element: <Dashboard /> },
-        { path: "/profile/:id",  element: <Profile /> },  // ← updated
+        { path: "/profile/:id",  element: <Profile /> },  
         { path: "/repo/create",  element: <CreateRepo /> },
         { path: "/repo/:name/:id",     element: <RepositoryDetails /> },
       ],

@@ -8,7 +8,7 @@ import { notifyUser } from "../helpers/notifyUser.js";
 
 import { ObjectId } from "mongodb";
 import logContribution from "../helpers/logContribution.js";
-// as we are using mongoose here....we don't need to always setup our databse connection and also don't need to get collection....we can do queries directly on model
+
 
 async function createRepository(req, res) {
   const { owner, name, issues, content, description, visibility } = req.body;
@@ -42,9 +42,9 @@ async function createRepository(req, res) {
       $push: { repositories: result._id },
     });
 
-    // print user details
+    
     console.log(ownerUser);
-    await logContribution(owner, "repo_created"); // ← add this
+    await logContribution(owner, "repo_created"); 
 
     return res.status(201).json({
       message: "Repository created successfully",
@@ -59,7 +59,7 @@ async function getAllRepositories(req, res) {
   try {
     const repositories = await Repository.find({})
       .populate("owner")
-      .populate("issues"); // populate -> to fetch data from another collections like user collection and issue collection
+      .populate("issues"); 
 
     res
       .status(200)
@@ -75,7 +75,7 @@ async function fetchRepositoryById(req, res) {
 
   try {
     const repository = await Repository.findById(id)
-      .populate("owner") // Optionally only fetch specific fields
+      .populate("owner") 
       .populate("issues");
 
     if (!repository) {
@@ -87,7 +87,7 @@ async function fetchRepositoryById(req, res) {
       message: "Repository fetched successfully",
     });
   } catch (error) {
-    // If 'id' is not a valid 24-character hex string, Mongoose throws a CastError
+    
     if (error.kind === "ObjectId") {
       return res.status(400).json({ error: "Invalid Repository ID format" });
     }
@@ -169,7 +169,7 @@ async function toggleVisibility(req, res) {
 
     repository.visibility = !repository.visibility;
 
-    // Save the updated repository
+    
 
     const updatedRepository = await repository.save();
 
@@ -223,7 +223,7 @@ async function starRepository(req, res) {
     let updatedRepository;
 
     if (repository.starredUsers.includes(userId)) {
-      // ── Unstar ──
+      
       repository.stars = Math.max(0, repository.stars - 1);
       repository.starredUsers = repository.starredUsers.filter(
         (starredId) => starredId.toString() !== userId,
@@ -239,7 +239,7 @@ async function starRepository(req, res) {
         stars: updatedRepository.stars,
       });
     } else {
-      // ── Star ──
+      
       repository.stars += 1;
       repository.starredUsers.push(userId);
       user.starredRepositories.push(repository._id);
@@ -249,7 +249,7 @@ async function starRepository(req, res) {
       await logContribution(userId, "repo_starred");
 
       await notifyUser(getIO(), {
-        recipientId: repository.owner, // repo owner gets notified
+        recipientId: repository.owner, 
         senderId: userId,
         type: "repo_starred",
         message: `starred your repository ${repository.name}`,
@@ -266,7 +266,7 @@ async function starRepository(req, res) {
     return res.status(500).json({ error: "Internal server error" });
   }
 }
-// fetch all the starred repos
+
 
 export {
   createRepository,

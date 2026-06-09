@@ -1,4 +1,4 @@
-// models/Contribution.js
+
 import mongoose, { Schema } from "mongoose";
 
 const ContributionSchema = new Schema({
@@ -19,7 +19,7 @@ const ContributionSchema = new Schema({
     required: true,
   },
   date: {
-    type: String, // stored as "YYYY-MM-DD" for easy grouping
+    type: String, 
     required: true,
   },
   createdAt: {
@@ -28,7 +28,7 @@ const ContributionSchema = new Schema({
   },
 });
 
-// Index for fast per-user date-range queries
+
 ContributionSchema.index({ userId: 1, date: 1 });
 
 const Contribution = mongoose.model("Contribution", ContributionSchema);

@@ -1,6 +1,6 @@
 import React from "react";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 interface UserDetails {
   _id?:      string;
@@ -18,7 +18,7 @@ interface AboutUserProps {
   userDetails: UserDetails;
 }
 
-// ─── Icons ───────────────────────────────────────────────────────────────────
+
 
 const LocationIcon: React.FC = () => (
   <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -43,7 +43,7 @@ const UserCircleIcon: React.FC = () => (
   </svg>
 );
 
-// ─── Component ────────────────────────────────────────────────────────────────
+
 
 const AboutUser: React.FC<AboutUserProps> = ({ userDetails }) => {
   const hasBio      = !!userDetails.bio?.trim();
@@ -51,7 +51,7 @@ const AboutUser: React.FC<AboutUserProps> = ({ userDetails }) => {
   const hasWebsite  = !!userDetails.website?.trim();
   const hasAnything = hasBio || hasLocation || hasWebsite;
 
-  // Normalize website URL
+  
   const websiteUrl = userDetails.website?.startsWith("http")
     ? userDetails.website
     : `https://${userDetails.website}`;
@@ -75,18 +75,18 @@ const AboutUser: React.FC<AboutUserProps> = ({ userDetails }) => {
         </div>
       <div className="relative rounded-2xl border border-white/[0.07]
                       bg-white/[0.02] p-5 mb-6 overflow-hidden">
-        {/* Top shimmer */}
+        
         
         
         <div className="absolute inset-x-0 top-0 h-px
                         bg-gradient-to-r from-transparent via-[#A78BFA]/15 to-transparent" />
 
-        {/* Section label */}
+        
        
 
         <div className="flex flex-col gap-3">
 
-          {/* Bio */}
+          
           {hasBio && (
             <div className="flex items-start gap-2.5">
               <span className="text-[#A78BFA]/50 mt-0.5">
@@ -98,12 +98,12 @@ const AboutUser: React.FC<AboutUserProps> = ({ userDetails }) => {
             </div>
           )}
 
-          {/* Divider between bio and meta */}
+          
           {hasBio && (hasLocation || hasWebsite) && (
             <div className="border-t border-white/[0.04]" />
           )}
 
-          {/* Location */}
+          
           {hasLocation && (
             <div className="flex items-center gap-2.5">
               <span className="text-[#A78BFA]/50">
@@ -115,7 +115,7 @@ const AboutUser: React.FC<AboutUserProps> = ({ userDetails }) => {
             </div>
           )}
 
-          {/* Website */}
+          
           {hasWebsite && (
             <div className="flex items-center gap-2.5">
               <span className="text-[#A78BFA]/50">

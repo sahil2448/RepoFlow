@@ -1,7 +1,7 @@
 import AWS from "aws-sdk";
 import dotenv from "dotenv";
 dotenv.config();
-// AWS.config.update({ region: "ap-south-1" });
+
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../config/api";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 interface Repository {
   _id: string;
@@ -21,7 +21,7 @@ interface UpcomingEvent {
   type: "conference" | "meetup" | "summit";
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+
 
 const UPCOMING_EVENTS: UpcomingEvent[] = [
   { id: 1, title: "Tech Conference", date: "Dec 15", type: "conference" },
@@ -35,7 +35,7 @@ const EVENT_COLORS: Record<UpcomingEvent["type"], string> = {
   summit:     "text-[#A78BFA] bg-[#A78BFA]/10 border-[#A78BFA]/25",
 };
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+
 
 const FolderIcon = () => (
   <svg className="w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -58,7 +58,7 @@ const SearchIcon = () => (
   </svg>
 );
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+
 
 const Dashboard = () => {
   const [repositories, setRepositories]               = useState<Repository[]>([]);
@@ -106,7 +106,6 @@ const Dashboard = () => {
 
   return (
     <>
-      {/* ── Global font injection ── */}
       <style>{`
         .font-syne    { font-family: 'Syne', sans-serif; }
         .font-plex    { font-family: 'IBM Plex Mono', monospace; }
@@ -138,19 +137,15 @@ const Dashboard = () => {
         ::-webkit-scrollbar-thumb { background: #1e1e2e; border-radius: 4px; }
       `}</style>
 
-      {/* <Navbar /> */}
       <section
         id="dashboard"
         className="dot-grid font-dm min-h-screen text-white relative overflow-hidden"
       >
-        {/* Ambient glow blobs */}
         <div className="glow-teal  pointer-events-none absolute -top-32 -left-32 w-[500px] h-[500px]" />
         <div className="glow-coral pointer-events-none absolute bottom-0 right-0 w-[400px] h-[400px]" />
 
         <div className="relative z-10 max-w-[1380px] mx-auto px-6 py-10 flex gap-6">
 
-          {/* ── Left Sidebar: Suggested Repos ── */}
-          {/* ── Left Sidebar: Global Repositories ── */}
 <aside className="w-[240px] shrink-0">
   <div className="flex items-center gap-2 mb-4">
     <span className="block w-1.5 h-4 rounded-full bg-[#00FFA3]" />
@@ -159,7 +154,6 @@ const Dashboard = () => {
     </h3>
   </div>
 
-  {/* ── Search for global repos ── */}
   <div className="relative mb-4 group">
     <div className="relative flex items-center gap-2 px-3 py-2 rounded-lg
                     border border-white/[0.07] bg-white/[0.03]
@@ -187,14 +181,12 @@ const Dashboard = () => {
     </div>
   </div>
 
-  {/* ── Results count ── */}
   {globalSearch && (
     <p className="font-plex text-[10px] text-gray-700 mb-3">
       {globalResults.length} found
     </p>
   )}
 
-  {/* ── Repo list ── */}
   {globalResults.length === 0 && globalSearch !== "" ? (
     <p className="font-plex text-[10px] text-gray-800 text-center py-6">
       no match for{" "}
@@ -227,10 +219,8 @@ const Dashboard = () => {
   )}
 </aside>
 
-          {/* ── Main: Your Repos ── */}
           <main className="flex-1 min-w-0">
 
-            {/* Header */}
             <div className="mb-8 flex items-end justify-between">
               <div>
                 <h2 className="font-syne text-3xl font-bold text-white tracking-tight leading-none">
@@ -245,9 +235,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Search */}
             <div className="relative mb-5 group">
-              {/* Focus glow */}
               <div className="absolute -inset-px rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"
                 style={{ background: "linear-gradient(135deg, #00FFA320, transparent, #00FFA308)", borderRadius: "12px" }} />
 
@@ -270,7 +258,6 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Repo List */}
             <ul className="space-y-2">
               {searchResults.map((repo, i) => (
                 <li
@@ -282,14 +269,12 @@ const Dashboard = () => {
                              transition-all duration-200 cursor-pointer"
                   style={{ animationDelay: `${i * 40}ms` }}
                 >
-                  {/* Left accent bar */}
                   <span
                     className="accent-bar absolute left-0 top-1/2 -translate-y-1/2 -translate-x-px
                                w-[3px] h-0 group-hover:h-7 rounded-full bg-[#00FFA3]
                                transition-all duration-300"
                   />
 
-                  {/* Repo icon */}
                   <div className="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center
                                   bg-gradient-to-br from-[#00FFA3]/8 to-[#A78BFA]/8
                                   border border-white/[0.06] group-hover:border-[#00FFA3]/20 transition-colors">
@@ -310,7 +295,6 @@ const Dashboard = () => {
               ))}
             </ul>
 
-            {/* Empty state */}
             {searchResults.length === 0 && searchQuery !== "" && (
               <div className="py-20 text-center">
                 <p className="font-plex text-xs text-gray-700">
@@ -322,7 +306,6 @@ const Dashboard = () => {
             )}
           </main>
 
-          {/* ── Right Sidebar: Events ── */}
           <aside className="w-[210px] shrink-0">
             <div className="flex items-center gap-2 mb-6">
               <span className="block w-1.5 h-4 rounded-full bg-[#FF6B4A]" />
@@ -353,7 +336,6 @@ const Dashboard = () => {
               ))}
             </ul>
 
-            {/* Decorative divider */}
             <div className="mt-8 pt-6 border-t border-white/[0.04]">
               <p className="font-plex text-[10px] text-gray-700 leading-relaxed">
                 3 events this month

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import api from "../../config/api";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 interface CreateIssueProps {
   repoId: string;
@@ -28,7 +28,7 @@ interface DuplicateCheckResult {
   similarIssues: SimilarIssue[];
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+
 
 const CreateIssue: React.FC<CreateIssueProps> = ({
   repoId,
@@ -40,22 +40,22 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
-  // ── AI duplicate detection state ──
+  
   const [duplicateCheck, setDuplicateCheck] =
     useState<DuplicateCheckResult | null>(null);
   const [checking, setChecking] = useState<boolean>(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Cleanup debounce on unmount
+  
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, []);
 
-  // ── Duplicate check ──
+  
   const checkForDuplicates = async (t: string, d: string): Promise<void> => {
-    // Don't check until both fields have meaningful content
+    
     if (!t.trim() || !d.trim() || t.length < 5 || d.length < 10) {
       setDuplicateCheck(null);
       return;
@@ -69,7 +69,7 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
       );
       setDuplicateCheck(res.data);
     } catch (err) {
-      // AI check failed — don't block user, just clear the warning
+      
       console.error("Duplicate check failed:", err);
       setDuplicateCheck(null);
     } finally {
@@ -77,7 +77,7 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
     }
   };
 
-  // ── Debounced onChange handlers ──
+  
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const val = e.target.value;
     setTitle(val);
@@ -102,7 +102,7 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
     }, 600);
   };
 
-  // ── Validation ──
+  
   const validate = (): boolean => {
     const e: FormErrors = {};
     if (!title.trim()) e.title = "Title is required.";
@@ -111,7 +111,7 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
     return Object.keys(e).length === 0;
   };
 
-  // ── Submit ──
+  
   const handleSubmit = async (
     e: React.MouseEvent<HTMLButtonElement>
   ): Promise<void> => {
@@ -135,7 +135,7 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
     }
   };
 
-  // ── Derived ──
+  
   const hasSimilarIssues =
     (duplicateCheck?.similarIssues?.length ?? 0) > 0;
 
@@ -174,13 +174,11 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
       `}</style>
 
       <div className="relative rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6">
-        {/* Top shimmer */}
         <div
           className="absolute inset-x-0 top-0 h-px rounded-t-2xl
                         bg-gradient-to-r from-transparent via-[#FF6B4A]/20 to-transparent"
         />
 
-        {/* Header */}
         <div className="mb-6">
           <h3 className="font-syne text-lg font-bold text-white tracking-tight">
             New Issue
@@ -191,7 +189,6 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
         </div>
 
         <div className="flex flex-col gap-5">
-          {/* ── Title ── */}
           <div className="flex flex-col gap-1.5">
             <label className="font-plex text-[11px] text-gray-500 uppercase tracking-widest">
               Title <span className="text-[#FF6B4A]">*</span>
@@ -213,7 +210,6 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
             )}
           </div>
 
-          {/* ── Description ── */}
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
               <label className="font-plex text-[11px] text-gray-500 uppercase tracking-widest">
@@ -248,9 +244,7 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
             )}
           </div>
 
-          {/* ── AI Duplicate Detection Panel ── */}
 
-          {/* Checking spinner */}
           {checking && (
             <div
               className="fade-in flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg
@@ -281,13 +275,11 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
             </div>
           )}
 
-          {/* Similar issues / duplicate warning */}
           {hasSimilarIssues && !checking && (
             <div
               className="fade-in rounded-xl border border-[#FF6B4A]/25
                             bg-[#FF6B4A]/[0.05] p-4"
             >
-              {/* Header row */}
               <div className="flex items-center gap-2 mb-3">
                 <span className="w-2 h-2 rounded-full bg-[#FF6B4A] animate-pulse shrink-0" />
                 <span className="font-plex text-[11px] text-[#FF6B4A] uppercase tracking-widest">
@@ -297,7 +289,6 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
                 </span>
               </div>
 
-              {/* Similar issues list */}
               <ul className="space-y-2">
                 {duplicateCheck?.similarIssues.map((issue) => (
                   <li
@@ -315,7 +306,6 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0 mt-0.5">
-                      {/* Status badge */}
                       <span
                         className={`font-plex text-[9px] px-1.5 py-0.5
                                         rounded border uppercase tracking-wider
@@ -327,7 +317,6 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
                       >
                         {issue.status}
                       </span>
-                      {/* Similarity score */}
                       <span className="font-plex text-[10px] text-gray-600">
                         {issue.similarity}%
                       </span>
@@ -336,14 +325,12 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
                 ))}
               </ul>
 
-              {/* Footer note — don't block submission */}
               <p className="font-plex text-[10px] text-gray-700 mt-3 leading-relaxed">
                 you can still submit if this is a different problem
               </p>
             </div>
           )}
 
-          {/* All clear badge */}
           {showClearBadge && (
             <div
               className="fade-in flex items-center gap-2 px-3.5 py-2.5 rounded-lg
@@ -368,7 +355,6 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
             </div>
           )}
 
-          {/* ── Actions ── */}
           <div className="flex items-center justify-between pt-1 border-t border-white/[0.04]">
             <button
               onClick={onCancel}

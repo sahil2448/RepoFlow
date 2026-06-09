@@ -1,4 +1,4 @@
-// controllers/issueController.js
+
 import Issue from "../model/issueModel.js";
 import Repository from "../model/repoModel.js";
 import logContribution from "../helpers/logContribution.js";
@@ -10,7 +10,7 @@ import { notifyUser } from "../helpers/notifyUser.js";
 
 const createIssue = async (req, res) => {
   const { title, description, userId } = req.body;
-  const { id } = req.params; // repository id — route must be /issue/create/:id
+  const { id } = req.params; 
 
   try {
     const repository = await Repository.findById(id);
@@ -26,7 +26,7 @@ const createIssue = async (req, res) => {
 
     await createdIssue.save();
 
-    // Push issue ref into repository
+    
     repository.issues.push(createdIssue._id);
     await repository.save();
 
@@ -44,7 +44,7 @@ const createIssue = async (req, res) => {
 
     res
       .status(201)
-      .json({ message: "Issue created successfully", issue: createdIssue }); // ❌ was: issue (undefined)
+      .json({ message: "Issue created successfully", issue: createdIssue }); 
   } catch (error) {
     console.error("Error during creating issue:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -63,7 +63,7 @@ async function updateIssueById(req, res) {
     if (status) issue.status = status;
 
     await issue.save();
-    res.status(200).json({ message: "Issue updated", issue }); // ❌ was: res.json(issue, {...}) — invalid, 2 args
+    res.status(200).json({ message: "Issue updated", issue }); 
   } catch (err) {
     console.error("Error during issue update:", err.message);
     res.status(500).json({ error: "Server error" });
@@ -73,10 +73,10 @@ async function updateIssueById(req, res) {
 async function deleteIssueById(req, res) {
   const { id } = req.params;
   try {
-    const issue = await Issue.findByIdAndDelete(id); // ❌ was: missing await
+    const issue = await Issue.findByIdAndDelete(id); 
     if (!issue) return res.status(404).json({ error: "Issue not found!" });
 
-    // Remove from repository's issues array
+    
     await Repository.updateOne(
       { _id: issue.repository },
       { $pull: { issues: issue._id } },
@@ -92,9 +92,9 @@ async function deleteIssueById(req, res) {
 }
 
 async function getAllIssues(req, res) {
-  const { id } = req.params; // repository id — route must be /issue/all/:id
+  const { id } = req.params; 
   try {
-    const issues = await Issue.find({ repository: id }); // ❌ was: missing await
+    const issues = await Issue.find({ repository: id }); 
     res.status(200).json({ issues });
   } catch (err) {
     console.error("Error during issue fetching:", err.message);

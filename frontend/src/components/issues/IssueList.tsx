@@ -3,7 +3,6 @@ import api from "../../config/api";
 import CreateIssue from "./CreateIssue.tsx";
 import IssueDetail from "./IssueDetail.tsx";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Issue {
   _id: string;
@@ -18,7 +17,6 @@ interface IssueListProps {
   isOwner: boolean;
 }
 
-// ─── Icons ───────────────────────────────────────────────────────────────────
 
 const PlusIcon: React.FC = () => (
   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -39,7 +37,6 @@ const ClosedDotIcon: React.FC = () => (
   </svg>
 );
 
-// ─── Component ────────────────────────────────────────────────────────────────
 
 type IssueFilter = "all" | "open" | "closed";
 
@@ -79,7 +76,6 @@ const IssueList: React.FC<IssueListProps> = ({ repoId, isOwner }) => {
   const openCount   = issues.filter((i) => i.status === "open").length;
   const closedCount = issues.filter((i) => i.status === "closed").length;
 
-  // ── Detail view ──
   if (selectedId) {
     return (
       <IssueDetail
@@ -91,7 +87,6 @@ const IssueList: React.FC<IssueListProps> = ({ repoId, isOwner }) => {
     );
   }
 
-  // ── Create form ──
   if (showCreate) {
     return (
       <CreateIssue
@@ -110,10 +105,8 @@ const IssueList: React.FC<IssueListProps> = ({ repoId, isOwner }) => {
         .font-dm   { font-family: 'DM Sans', sans-serif; }
       `}</style>
 
-      {/* ── Toolbar ── */}
       <div className="flex items-center justify-between mb-4">
 
-        {/* Filter tabs */}
         <div className="flex items-center gap-1">
           {(["open", "closed", "all"] as IssueFilter[]).map((f) => (
             <button
@@ -133,7 +126,6 @@ const IssueList: React.FC<IssueListProps> = ({ repoId, isOwner }) => {
           ))}
         </div>
 
-        {/* New issue button */}
         <button
           onClick={() => setShowCreate(true)}
           className="flex items-center gap-1.5 font-plex text-[11px] px-3.5 py-1.5
@@ -146,7 +138,6 @@ const IssueList: React.FC<IssueListProps> = ({ repoId, isOwner }) => {
         </button>
       </div>
 
-      {/* ── List ── */}
       {loading ? (
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
@@ -176,16 +167,13 @@ const IssueList: React.FC<IssueListProps> = ({ repoId, isOwner }) => {
                            cursor-pointer"
                 style={{ animationDelay: `${i * 30}ms` }}
               >
-                {/* Severity rail */}
                 <span className={`absolute left-0 top-0 bottom-0 w-[2px]
                                   ${isOpen ? "bg-[#FF6B4A]/40" : "bg-[#00FFA3]/30"}`} />
 
-                {/* Status icon */}
                 <span className="shrink-0 mt-0.5">
                   {isOpen ? <OpenDotIcon /> : <ClosedDotIcon />}
                 </span>
 
-                {/* Info */}
                 <div className="flex-1 min-w-0">
                   <p className="font-dm text-sm text-gray-300 group-hover:text-white
                                 transition-colors truncate">
@@ -196,7 +184,6 @@ const IssueList: React.FC<IssueListProps> = ({ repoId, isOwner }) => {
                   </p>
                 </div>
 
-                {/* Badge + date */}
                 <div className="flex items-center gap-3 shrink-0">
                   {issue.createdAt && (
                     <span className="font-plex text-[10px] text-gray-700">

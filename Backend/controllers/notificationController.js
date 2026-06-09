@@ -1,7 +1,7 @@
 import Notification from "../model/notificationModel.js";
 
-// GET /notifications/:userId
-// Returns latest 20 notifications with unread count
+
+
 export const getNotifications = async (req, res) => {
   const { userId } = req.params;
   try {
@@ -21,8 +21,8 @@ export const getNotifications = async (req, res) => {
   }
 };
 
-// PATCH /notifications/read/:userId
-// Marks all notifications as read for a user
+
+
 export const markAllRead = async (req, res) => {
   const { userId } = req.params;
   try {
@@ -37,8 +37,8 @@ export const markAllRead = async (req, res) => {
   }
 };
 
-// PATCH /notifications/read-one/:id
-// Marks a single notification as read
+
+
 export const markOneRead = async (req, res) => {
   const { id } = req.params;
   try {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../config/api";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 interface Issue {
   _id: string;
@@ -18,7 +18,7 @@ interface IssueDetailProps {
   onDeleted: () => void;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+
 
 const IssueDetail: React.FC<IssueDetailProps> = ({
   issueId, isOwner, onBack, onDeleted,
@@ -29,7 +29,6 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
   const [saving, setSaving]     = useState<boolean>(false);
   const [deleting, setDeleting] = useState<boolean>(false);
 
-  // Editable fields
   const [editTitle, setEditTitle]         = useState<string>("");
   const [editDescription, setEditDescription] = useState<string>("");
   const [editStatus, setEditStatus]       = useState<"open" | "closed">("open");
@@ -135,7 +134,6 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
         }
       `}</style>
 
-      {/* Back */}
       <button onClick={onBack}
         className="flex items-center gap-1.5 font-plex text-[11px] text-gray-700
                    hover:text-gray-300 transition-colors mb-5 group">
@@ -145,12 +143,10 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
 
       <div className="relative rounded-2xl border border-white/[0.07] bg-white/[0.02] overflow-hidden">
 
-        {/* Top shimmer — coral for open, mint for closed */}
         <div className={`absolute inset-x-0 top-0 h-px
                          bg-gradient-to-r from-transparent to-transparent
                          ${isOpen ? "via-[#FF6B4A]/25" : "via-[#00FFA3]/20"}`} />
 
-        {/* ── Header ── */}
         <div className="flex items-start justify-between gap-4 p-6 border-b border-white/[0.05]">
           <div className="flex-1 min-w-0">
             {editing ? (
@@ -178,7 +174,6 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
             )}
           </div>
 
-          {/* Status badge */}
           <span className={`shrink-0 font-plex text-[9px] px-2.5 py-1 rounded border
                             uppercase tracking-widest
                             ${isOpen
@@ -189,7 +184,6 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
           </span>
         </div>
 
-        {/* ── Description ── */}
         <div className="p-6 border-b border-white/[0.05]">
           <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600 mb-3">
             Description
@@ -211,7 +205,6 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
           )}
         </div>
 
-        {/* ── Status toggle (editing) ── */}
         {editing && (
           <div className="px-6 py-4 border-b border-white/[0.05]">
             <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600 mb-3">
@@ -238,7 +231,6 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
           </div>
         )}
 
-        {/* ── Actions ── */}
         {isOwner && (
           <div className="flex items-center justify-between px-6 py-4">
 
@@ -294,7 +286,6 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
               )}
             </div>
 
-            {/* Delete */}
             {!editing && (
               <button
                 onClick={handleDelete}

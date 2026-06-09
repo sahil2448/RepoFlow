@@ -2,20 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../config/api";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
-// ✅ Updated interface to match your repo schema more closely
+
+
 interface StarredRepository {
   _id: string;
   name: string;
   description: string;
   language?: string;
   stars?: number;
-  owner?: string;        // display name — populate from userId if needed
-  userId?: string;       // raw creator ID from DB
-  createdAt?: string;    // useful for sorting later
+  owner?: string;        
+  userId?: string;       
+  createdAt?: string;    
 }
-// ─── Icons ────────────────────────────────────────────────────────────────────
+
 
 const FolderIcon: React.FC = () => (
   <svg className="w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -37,7 +37,7 @@ const ChevronIcon: React.FC = () => (
   </svg>
 );
 
-// ─── Language color dots ──────────────────────────────────────────────────────
+
 
 const LANG_COLORS: Record<string, string> = {
   TypeScript:  "#3178c6",
@@ -49,7 +49,7 @@ const LANG_COLORS: Record<string, string> = {
   HTML:        "#e34c26",
 };
 
-// ─── Component ────────────────────────────────────────────────────────────────
+
 
 const StarredRepo: React.FC = () => {
   const [starred, setStarred]   = useState<StarredRepository[]>([]);
@@ -72,7 +72,7 @@ const StarredRepo: React.FC = () => {
     fetchStarred();
   }, []);
 
-  // ── Loading skeleton ──
+  
   if (loading) {
     return (
       <div className="space-y-2">
@@ -86,7 +86,7 @@ const StarredRepo: React.FC = () => {
     );
   }
 
-  // ── Empty state ──
+  
   if (starred.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3">
@@ -99,7 +99,7 @@ const StarredRepo: React.FC = () => {
     );
   }
 
-  // ── List ──
+  
   return (
     <ul className="space-y-2">
       {starred.map((repo, i) => (
@@ -112,12 +112,12 @@ const StarredRepo: React.FC = () => {
                      transition-all duration-200 cursor-pointer"
           style={{ animationDelay: `${i * 40}ms` }}
         >
-          {/* Left accent bar */}
+          
           <span className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-px
                            w-[3px] h-0 group-hover:h-7 rounded-full bg-[#00FFA3]
                            transition-all duration-300" />
 
-          {/* Icon */}
+          
           <div className="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center
                           bg-gradient-to-br from-[#00FFA3]/8 to-[#A78BFA]/8
                           border border-white/[0.06] group-hover:border-[#00FFA3]/20
@@ -125,7 +125,7 @@ const StarredRepo: React.FC = () => {
             <FolderIcon />
           </div>
 
-          {/* Info */}
+          
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
               {repo.owner && (
@@ -142,7 +142,7 @@ const StarredRepo: React.FC = () => {
               {repo.description}
             </p>
 
-            {/* Meta row */}
+            
             {(repo.language || repo.stars !== undefined) && (
               <div className="flex items-center gap-3 mt-1.5">
                 {repo.language && (

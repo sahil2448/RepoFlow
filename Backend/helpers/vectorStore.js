@@ -1,10 +1,6 @@
 import { index } from "../config/pinecone-config.js";
 
-/**
- * Each repo gets its own namespace in Pinecone
- * Namespace: "repo-<repoId>"
- * Vector ID: "<issueId>"
- */
+
 
 export async function upsertIssueVector(issueId, repoId, embedding, metadata) {
   try {

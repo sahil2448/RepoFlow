@@ -60,10 +60,8 @@ const Login: React.FC = () => {
 
       <div className="font-dm dot-grid min-h-screen flex flex-col items-center justify-center px-4 relative overflow-hidden">
 
-        {/* Ambient blob */}
         <div className="glow-teal pointer-events-none absolute top-[-80px] left-1/2 -translate-x-1/2 w-[600px] h-[400px]" />
 
-        {/* Logo */}
         <div className="fade-up mb-7 flex flex-col items-center gap-3" style={{ animationDelay: "0ms" }}>
           <div className="w-11 h-11 rounded-full border border-white/[0.08] bg-white/[0.03]
                           flex items-center justify-center">
@@ -74,16 +72,13 @@ const Login: React.FC = () => {
           </span>
         </div>
 
-        {/* Card */}
         <div
           className="fade-up relative w-full max-w-[360px] rounded-2xl
                      border border-white/[0.07] bg-white/[0.02] backdrop-blur-sm p-7"
           style={{ animationDelay: "60ms" }}
         >
-          {/* Faint top-edge highlight */}
           <div className="absolute inset-x-0 top-0 h-px rounded-t-2xl bg-gradient-to-r from-transparent via-[#00FFA3]/20 to-transparent" />
 
-          {/* Heading */}
           <div className="mb-6">
             <h1 className="font-syne text-2xl font-bold text-white tracking-tight">
               Welcome back
@@ -93,7 +88,6 @@ const Login: React.FC = () => {
             </p>
           </div>
 
-          {/* Fields */}
           <div className="flex flex-col gap-4">
 
             <div className="flex flex-col gap-1.5">
@@ -134,7 +128,6 @@ const Login: React.FC = () => {
               />
             </div>
 
-            {/* Submit */}
             <button
               disabled={loading}
               onClick={handleLogin}
@@ -144,7 +137,6 @@ const Login: React.FC = () => {
                          disabled:opacity-40 disabled:cursor-not-allowed
                          transition-all duration-200 overflow-hidden group"
             >
-              {/* Shimmer on hover */}
               <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700
                                bg-gradient-to-r from-transparent via-[#00FFA3]/10 to-transparent" />
               <span className="relative">{loading ? "Signing in…" : "Sign In"}</span>
@@ -152,7 +144,6 @@ const Login: React.FC = () => {
           </div>
         </div>
 
-        {/* Footer */}
         <p
           className="fade-up font-dm text-xs text-gray-600 mt-5"
           style={{ animationDelay: "120ms" }}
