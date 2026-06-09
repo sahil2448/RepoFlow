@@ -23,6 +23,7 @@ const NotificationInit: React.FC = () => {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
+        console.log(res.data);
         notificationStore.setAll(
           res.data.notifications || [],
           res.data.unreadCount   || 0
