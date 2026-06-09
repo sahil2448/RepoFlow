@@ -98,9 +98,13 @@ async function startServer() {
 
   app.use(
     cors({
-      origin: "*",
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      origin: [
+        "https://main.d1zjk4pi7u9tt9.amplifyapp.com",
+        "http://localhost:3000",
+      ],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
       allowedHeaders: ["Content-Type", "Authorization"],
+      credentials: true,
     }),
   );
 
@@ -130,9 +134,12 @@ async function startServer() {
 
   const io = new Server(httpServer, {
     cors: {
-      origin: "*",
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization"], // Allow custom headers
+      origin: [
+        "https://main.d1zjk4pi7u9tt9.amplifyapp.com",
+        "http://localhost:3000",
+      ],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+      allowedHeaders: ["Content-Type", "Authorization"],
       credentials: true,
     },
   });

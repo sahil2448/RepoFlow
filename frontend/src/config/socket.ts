@@ -6,7 +6,6 @@ const socket: Socket = io(BASE_URL, {
   autoConnect:     false, 
   reconnection:    true,
   reconnectionDelay: 1000,
-  withCredentials: true,
 });
 
 export default socket;
