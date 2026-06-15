@@ -4,8 +4,7 @@ import { useAuth } from "../../auth";
 import HeatMapProfile from "./HeatMap";
 import StarredRepo from "./StarredRepo";
 import AboutUser from "./AboutUser"
-import api from "../../config/api";
-
+import api, { ec2Api } from "../../config/api";
 
 interface UserDetails {
   _id?: string;
@@ -138,7 +137,7 @@ const handleSaveProfile = async () => {
 
     setFollowLoading(true);
     try {
-     await api.post(`/followUser/${id}`, { currentUserId });
+      await ec2Api.post(`/followUser/${id}`, { currentUserId });
       const nextFollowing = !isFollowing;
 setIsFollowing(nextFollowing);
 

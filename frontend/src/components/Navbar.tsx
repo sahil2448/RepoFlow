@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate }      from "react-router-dom";
 import { useNotifications }                    from "../store/useNotifications";
 import { notificationStore }                   from "../store/notificationStore";
-import api                                     from "../config/api";
 import RepoFlowLogo2 from "../assets/RepoFlowLogo2.png";
+import { ec2Api } from "../config/api";
 
 interface NotificationItem {
   _id:       string;
@@ -59,7 +59,7 @@ const Navbar: React.FC = () => {
     if (!notif.read) {
       notificationStore.markOneRead(notif._id);
       
-      api.patch(`/notifications/read-one/${notif._id}`).catch(console.error);
+      ec2Api.patch(`/notifications/read-one/${notif._id}`).catch(console.error);
     }
     setBellOpen(false);
     navigate(notif.link);

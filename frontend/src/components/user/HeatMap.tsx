@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import HeatMap from "@uiw/react-heat-map";
-import api from "../../config/api";
+import { ec2Api } from "../../config/api";
 
 
 
@@ -44,7 +44,7 @@ const HeatMapProfile: React.FC = () => {
       if (!userId) { setLoading(false); return; }
 
       try {
-        const res = await api.get(`/contributions/${userId}`);
+        const res = await ec2Api.get(`/contributions/${userId}`);
         const data: ActivityEntry[] = res.data.contributions || [];
         const fetchedYear: number   = res.data.year ?? new Date().getFullYear();
 

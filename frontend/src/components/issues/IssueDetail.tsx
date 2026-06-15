@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../../config/api";
-
+import api, { ec2Api } from "../../config/api";
 
 
 interface Issue {
@@ -54,7 +53,7 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
   const handleSave = async (): Promise<void> => {
     setSaving(true);
     try {
-      const res = await api.put(`/issue/update/${issueId}`, {
+      const res = await ec2Api.put(`/issue/update/${issueId}`, {
         title:       editTitle,
         description: editDescription,
         status:      editStatus,
@@ -72,7 +71,7 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
     if (!window.confirm("Delete this issue? This cannot be undone.")) return;
     setDeleting(true);
     try {
-      await api.delete(`/issue/delete/${issueId}`);
+      await ec2Api.delete(`/issue/delete/${issueId}`);
       onDeleted();
     } catch (err) {
       console.error("Failed to delete issue:", err);
@@ -84,7 +83,7 @@ const IssueDetail: React.FC<IssueDetailProps> = ({
     if (!issue) return;
     const newStatus = issue.status === "open" ? "closed" : "open";
     try {
-      const res = await api.put(`/issue/update/${issueId}`, {
+      const res = await ec2Api.put(`/issue/update/${issueId}`, {
         title:       issue.title,
         description: issue.description,
         status:      newStatus,

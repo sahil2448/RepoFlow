@@ -242,10 +242,7 @@ async function starRepository(req, res) {
       repository.starredUsers.push(userId);
       user.starredRepositories.push(repository._id);
       updatedRepository = await repository.save();
-      await user.save();
-
       await logContribution(userId, "repo_starred");
-
       await notifyUser(getIO(), {
         recipientId: repository.owner,
         senderId: userId,
@@ -253,6 +250,7 @@ async function starRepository(req, res) {
         message: `starred your repository ${repository.name}`,
         link: `/repo/${repository.name}/${repository._id}`,
       });
+      await user.save();
 
       return res.status(200).json({
         message: "Repository starred successfully",

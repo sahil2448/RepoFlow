@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../config/api";
+import { ec2Api } from "../../config/api";
 
 type ApiErrorResponse = {
   response?: {
@@ -96,7 +96,7 @@ const CreateRepo: React.FC = () => {
 
     try {
       setLoading(true);
-      await api.post("/repo/create", {
+      await ec2Api.post("/repo/create", {
         name:        form.name.trim(),
         description: form.description.trim(),
         visibility:  form.visibility,

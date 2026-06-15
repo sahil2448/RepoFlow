@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import IssueList from "../issues/IssueList";
 import CommitHistory from "./CommitHistory";
-import api from "../../config/api";
-
+import api, { ec2Api } from "../../config/api";
 
 
 interface Issue {
@@ -269,7 +268,7 @@ const RepositoryDetails: React.FC = () => {
     if (!userId || !id || starLoading) return;
     setStarLoading(true);
     try {
-      const res = await api.post(`/repo/star/${id}`, { userId });
+      const res = await ec2Api.post(`/repo/star/${id}`, { userId });
       setStarCount(res.data.stars);
       setStarred((prev) => !prev);
     } catch (err) {

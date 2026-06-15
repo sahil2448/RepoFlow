@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import api from "../../config/api";
-
+import api, { ec2Api } from "../../config/api";
 
 
 interface CreateIssueProps {
@@ -121,7 +120,7 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
     const userId = localStorage.getItem("userId");
     setLoading(true);
     try {
-      await api.post(`/issue/create/${repoId}`, {
+      await ec2Api.post(`/issue/create/${repoId}`, {
         title: title.trim(),
         description: description.trim(),
         userId,

@@ -1,52 +1,94 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import socket                from "../config/socket";
-import api                   from "../config/api";
 import { notificationStore } from "./notificationStore";
-// import axios from "axios";
-
+import { ec2Api }            from "../config/api";
 
 const NotificationInit: React.FC = () => {
-
-  // const EC2_URL = import.meta.env.VITE_EC2_URL || "http://localhost:3000";
-  const initialized = useRef(false);
+  // const initialized = useRef(false);
   const userId      = localStorage.getItem("userId");
 
-  useEffect(() => {
-    if (!userId || initialized.current) return;
-    initialized.current = true;
+  // useEffect(() => {
+  //   if (!userId || initialized.current) return;
+  //   initialized.current = true;
 
-    const fetchNotifications = async () => {
-      try {
-        const res = await api.get(`/notifications/${userId}`);
-        // const res = await axios.get(`${EC2_URL}/notifications/${userId}`, {
-          // headers: {
-          //   Authorization: `Bearer ${localStorage.getItem("token")}`,
-          // },
-        // });
-        console.log(res.data);
-        notificationStore.setAll(
-          res.data.notifications || [],
-          res.data.unreadCount   || 0
-        );
-      } catch (err) {
-        console.error("Notification fetch failed:", err);
-      }
-    };
+  //   const fetchNotifications = async () => {
+  //     try {
+  //       const res = await ec2Api.get(`/notifications/${userId}`);
+  //       console.log(res.data);
+  //       notificationStore.setAll(
+  //         res.data.notifications || [],
+  //         res.data.unreadCount   || 0
+  //       );
+  //     } catch (err) {
+  //       console.error("Notification fetch failed:", err);
+  //     }
+  //   };
 
-    fetchNotifications();
+  //   fetchNotifications();
 
-    socket.connect();
+  //   socket.connect();
+  //   socket.emit("join", userId);
+
+  //   socket.on("notification", (data: any) => {
+  //     notificationStore.addOne(data);
+  //   });
+
+  //   return () => {
+  //     socket.off("notification");
+  //     socket.disconnect();
+  //   };
+  // }, [userId]);
+ useEffect(() => {
+  if (!userId) return;
+
+  const onNotification = (data: any) => {
+    notificationStore.addOne(data);
+  };
+
+  const onConnect = () => {
+    console.log("socket connected:", socket.id);
     socket.emit("join", userId);
+  };
 
-    socket.on("notification", (data: any) => {
-      notificationStore.addOne(data);
-    });
+  const onConnectError = (err: any) => {
+    console.error("socket connect_error:", err);
+  };
 
-    return () => {
-      socket.off("notification");
-      socket.disconnect();
-    };
-  }, [userId]);
+  const init = async () => {
+    try {
+      const res = await ec2Api.get(`/notifications/${userId}`);
+      notificationStore.setAll(
+        res.data.notifications || [],
+        res.data.unreadCount || 0
+      );
+
+      socket.off("notification", onNotification);
+      socket.off("connect", onConnect);
+      socket.off("connect_error", onConnectError);
+
+      socket.on("connect", onConnect);
+      socket.on("connect_error", onConnectError);
+      socket.on("notification", onNotification);
+
+      if (!socket.connected) {
+        socket.connect();
+      } else {
+        socket.emit("join", userId);
+      }
+    } catch (err) {
+      console.error("Notification init failed:", err);
+    }
+  };
+
+  init();
+
+  return () => {
+    socket.off("notification", onNotification);
+    socket.off("connect", onConnect);
+    socket.off("connect_error", onConnectError);
+    socket.disconnect();
+  };
+}, [userId]);
 
   return null;
 };

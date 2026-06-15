@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../../config/api";
+import { ec2Api } from "../../config/api";
 
 
 
@@ -80,7 +80,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
   useEffect(() => {
     const fetchCommits = async (): Promise<void> => {
       try {
-        const res = await api.get(`/repo/${repoId}/commits`);
+        const res = await ec2Api.get(`/repo/${repoId}/commits`);
         setCommits(res.data.commits || []);
       } catch (err) {
         console.error("Failed to fetch commits:", err);
@@ -104,7 +104,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
 
     setRevertLoading(commit.commitId);
     try {
-      const res = await api.post(`/repo/${repoId}/revert/${commit.commitId}`);
+      const res = await ec2Api.post(`/repo/${repoId}/revert/${commit.commitId}`);
       setRevertData((prev) => ({
         ...prev,
         [commit.commitId]: res.data.fileUrls || [],

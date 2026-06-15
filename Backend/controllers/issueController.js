@@ -27,11 +27,7 @@ const createIssue = async (req, res) => {
     await createdIssue.save();
 
     repository.issues.push(createdIssue._id);
-    await repository.save();
-
     if (userId) await logContribution(userId, "issue_created");
-
-    embedAndIndexIssue(createdIssue._id, id, title, description);
 
     await notifyUser(getIO(), {
       recipientId: repository.owner,
@@ -40,6 +36,9 @@ const createIssue = async (req, res) => {
       message: `opened an issue on ${repository.name}: ${title}`,
       link: `/repo/${repository.name}/${id}`,
     });
+    await repository.save();
+
+    embedAndIndexIssue(createdIssue._id, id, title, description);
 
     res
       .status(201)
