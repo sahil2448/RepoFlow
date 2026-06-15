@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import socket                from "../config/socket";
 import api                   from "../config/api";
 import { notificationStore } from "./notificationStore";
-import axios from "axios";
+// import axios from "axios";
 
 
 const NotificationInit: React.FC = () => {

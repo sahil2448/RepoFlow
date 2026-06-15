@@ -9,6 +9,8 @@ import {
   fetchStarredRepos,
   followUser,
 } from "../controllers/userCcontroller.js";
+import { authMiddleware } from "../Middleware/authMiddleware.js";
+import { authorizeUser } from "../Middleware/authorizeMiddleware.js";
 
 const userRouter = express.Router();
 
@@ -19,10 +21,25 @@ userRouter.get("/", (req, res) => {
 userRouter.get("/allUsers", getAllUsers);
 userRouter.post("/signup", signup);
 userRouter.post("/login", login);
-userRouter.get("/userProfile/:id", getUserProfile);
-userRouter.put("/updateProfile/:id", updateUserProfile);
-userRouter.delete("/deleteProfile/:id", deleteUser);
-userRouter.get("/getStarredRepos/:id", fetchStarredRepos);
-userRouter.post("/followUser/:id", followUser);
+userRouter.get("/userProfile/:id", authMiddleware, getUserProfile);
+userRouter.put(
+  "/updateProfile/:id",
+  authMiddleware,
+  authorizeUser("id"),
+  updateUserProfile,
+);
+userRouter.delete(
+  "/deleteProfile/:id",
+  authMiddleware,
+  authorizeUser("id"),
+  deleteUser,
+);
+userRouter.get(
+  "/getStarredRepos/:id",
+  authMiddleware,
+  authorizeUser("id"),
+  fetchStarredRepos,
+);
+userRouter.post("/followUser/:id", authMiddleware, followUser);
 
 export default userRouter;

@@ -19,7 +19,7 @@ const Signup: React.FC = () => {
       const res = await api.post("/signup", { email, password, username });
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.userId);
-      setCurrentUser(res.data.userId);
+      setCurrentUser({ userId: res.data.userId });
       setLoading(false);
       window.location.href = "/";
     } catch (err) {

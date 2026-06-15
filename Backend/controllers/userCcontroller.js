@@ -7,8 +7,6 @@ import { notifyUser } from "../helpers/notifyUser.js";
 import { getIO } from "../helpers/socketInstance.js";
 configDotenv();
 
-
-
 const URI = process.env.MONGO_URI;
 const DB_NAME = process.env.DB_NAME;
 const SECRET_KEY = process.env.JWT_SECRET || process.env.SECRET_KEY;
@@ -24,7 +22,6 @@ async function connectToClient() {
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
   try {
-    
     await connectToClient();
     const db = client.db(DB_NAME);
     const userCollection = db.collection("users");
@@ -34,7 +31,7 @@ const signup = async (req, res) => {
       return res.status(400).send("User already exists");
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10); 
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
       username,
       email,
@@ -50,7 +47,7 @@ const signup = async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.json({ token, userId: result.insertedId }).status(200); 
+    res.json({ token, userId: result.insertedId }).status(200);
   } catch (error) {
     console.error("Error during signup", error);
     res.status(500).send("Server error");
@@ -76,8 +73,6 @@ const login = async (req, res) => {
       return res.status(401).send("Invalid password");
     }
 
-    
-
     const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
 
     res.json({ token, userId: user._id }).status(200);
@@ -88,11 +83,10 @@ const login = async (req, res) => {
 
 async function getAllUsers(req, res) {
   try {
-    
     await connectToClient();
     const db = client.db(DB_NAME);
     const userCollection = db.collection("users");
-    const users = await userCollection.find({}).toArray(); 
+    const users = await userCollection.find({}).toArray();
 
     res.json(users).status(200);
   } catch (err) {
@@ -100,7 +94,6 @@ async function getAllUsers(req, res) {
     res.status(500).send("Server Error");
   }
 }
-
 
 const getUserProfile = async (req, res) => {
   const { id } = req.params;
@@ -111,7 +104,7 @@ const getUserProfile = async (req, res) => {
       { _id: new ObjectId(id) },
       {
         projection: {
-          password: 0, 
+          password: 0,
         },
       },
     );
@@ -129,10 +122,9 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-
 const updateUserProfile = async (req, res) => {
   const { id } = req.params;
-  
+
   const { username, email, bio, location, website, avatar } = req.body;
 
   try {
@@ -186,8 +178,6 @@ const deleteUser = async (req, res) => {
   }
 };
 
-
-
 const fetchStarredRepos = async (req, res) => {
   const { id } = req.params;
 
@@ -225,7 +215,11 @@ const fetchStarredRepos = async (req, res) => {
 
 const followUser = async (req, res) => {
   const { id } = req.params;
-  const { currentUserId } = req.body;
+  const currentUserId = req.userId;
+
+  if (!currentUserId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
   try {
     await connectToClient();
@@ -259,7 +253,7 @@ const followUser = async (req, res) => {
       { $addToSet: { followingUsers: id } },
     );
     await notifyUser(getIO(), {
-      recipientId: id, 
+      recipientId: id,
       senderId: currentUserId,
       type: "new_follower",
       message: `started following you`,

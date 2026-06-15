@@ -1,4 +1,3 @@
-
 import Issue from "../model/issueModel.js";
 import Repository from "../model/repoModel.js";
 import logContribution from "../helpers/logContribution.js";
@@ -9,8 +8,9 @@ import { getIO } from "../helpers/socketInstance.js";
 import { notifyUser } from "../helpers/notifyUser.js";
 
 const createIssue = async (req, res) => {
-  const { title, description, userId } = req.body;
-  const { id } = req.params; 
+  const { title, description } = req.body;
+  const userId = req.body.userId || req.userId;
+  const { id } = req.params;
 
   try {
     const repository = await Repository.findById(id);
@@ -26,7 +26,6 @@ const createIssue = async (req, res) => {
 
     await createdIssue.save();
 
-    
     repository.issues.push(createdIssue._id);
     await repository.save();
 
@@ -44,7 +43,7 @@ const createIssue = async (req, res) => {
 
     res
       .status(201)
-      .json({ message: "Issue created successfully", issue: createdIssue }); 
+      .json({ message: "Issue created successfully", issue: createdIssue });
   } catch (error) {
     console.error("Error during creating issue:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -63,7 +62,7 @@ async function updateIssueById(req, res) {
     if (status) issue.status = status;
 
     await issue.save();
-    res.status(200).json({ message: "Issue updated", issue }); 
+    res.status(200).json({ message: "Issue updated", issue });
   } catch (err) {
     console.error("Error during issue update:", err.message);
     res.status(500).json({ error: "Server error" });
@@ -73,10 +72,9 @@ async function updateIssueById(req, res) {
 async function deleteIssueById(req, res) {
   const { id } = req.params;
   try {
-    const issue = await Issue.findByIdAndDelete(id); 
+    const issue = await Issue.findByIdAndDelete(id);
     if (!issue) return res.status(404).json({ error: "Issue not found!" });
 
-    
     await Repository.updateOne(
       { _id: issue.repository },
       { $pull: { issues: issue._id } },
@@ -92,9 +90,9 @@ async function deleteIssueById(req, res) {
 }
 
 async function getAllIssues(req, res) {
-  const { id } = req.params; 
+  const { id } = req.params;
   try {
-    const issues = await Issue.find({ repository: id }); 
+    const issues = await Issue.find({ repository: id });
     res.status(200).json({ issues });
   } catch (err) {
     console.error("Error during issue fetching:", err.message);

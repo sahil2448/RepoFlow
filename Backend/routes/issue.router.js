@@ -7,6 +7,7 @@ import {
   deleteIssueById,
 } from "../controllers/issueController.js";
 import { checkDuplicateIssue } from "../controllers/issueAIController.js";
+import { authMiddleware } from "../Middleware/authMiddleware.js";
 
 const issueRouter = express.Router();
 
@@ -14,13 +15,17 @@ issueRouter.get("/", (req, res) => {
   res.send("issue router");
 });
 
-issueRouter.post("/issue/create/:id", createIssue); 
-issueRouter.get("/issue/all/:id", getAllIssues); 
-issueRouter.get("/issue/:id", getIssueById);
-issueRouter.put("/issue/update/:id", updateIssueById);
-issueRouter.delete("/issue/delete/:id", deleteIssueById);
-issueRouter.post("/issue/check-duplicate/:repoId", checkDuplicateIssue);
-issueRouter.post("/issue/reindex/:repoId", async (req, res) => {
+issueRouter.post("/issue/create/:id", authMiddleware, createIssue);
+issueRouter.get("/issue/all/:id", authMiddleware, getAllIssues);
+issueRouter.get("/issue/:id", authMiddleware, getIssueById);
+issueRouter.put("/issue/update/:id", authMiddleware, updateIssueById);
+issueRouter.delete("/issue/delete/:id", authMiddleware, deleteIssueById);
+issueRouter.post(
+  "/issue/check-duplicate/:repoId",
+  authMiddleware,
+  checkDuplicateIssue,
+);
+issueRouter.post("/issue/reindex/:repoId", authMiddleware, async (req, res) => {
   const Issue = (await import("../model/issueModel.js")).default;
   const { embedAndIndexIssue } =
     await import("../controllers/issueAIController.js");

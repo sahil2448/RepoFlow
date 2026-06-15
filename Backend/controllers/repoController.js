@@ -9,9 +9,9 @@ import { notifyUser } from "../helpers/notifyUser.js";
 import { ObjectId } from "mongodb";
 import logContribution from "../helpers/logContribution.js";
 
-
 async function createRepository(req, res) {
-  const { owner, name, issues, content, description, visibility } = req.body;
+  const { name, issues, content, description, visibility } = req.body;
+  const owner = req.body.owner || req.userId;
 
   try {
     if (!name) {
@@ -42,9 +42,8 @@ async function createRepository(req, res) {
       $push: { repositories: result._id },
     });
 
-    
     console.log(ownerUser);
-    await logContribution(owner, "repo_created"); 
+    await logContribution(owner, "repo_created");
 
     return res.status(201).json({
       message: "Repository created successfully",
@@ -59,7 +58,7 @@ async function getAllRepositories(req, res) {
   try {
     const repositories = await Repository.find({})
       .populate("owner")
-      .populate("issues"); 
+      .populate("issues");
 
     res
       .status(200)
@@ -75,7 +74,7 @@ async function fetchRepositoryById(req, res) {
 
   try {
     const repository = await Repository.findById(id)
-      .populate("owner") 
+      .populate("owner")
       .populate("issues");
 
     if (!repository) {
@@ -87,7 +86,6 @@ async function fetchRepositoryById(req, res) {
       message: "Repository fetched successfully",
     });
   } catch (error) {
-    
     if (error.kind === "ObjectId") {
       return res.status(400).json({ error: "Invalid Repository ID format" });
     }
@@ -169,8 +167,6 @@ async function toggleVisibility(req, res) {
 
     repository.visibility = !repository.visibility;
 
-    
-
     const updatedRepository = await repository.save();
 
     res.status(200).json({
@@ -206,7 +202,11 @@ async function deleteRepositoryById(req, res) {
 
 async function starRepository(req, res) {
   const { id } = req.params;
-  const { userId } = req.body;
+  const userId = req.body.userId || req.userId;
+
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
   try {
     const repository = await Repository.findById(id);
@@ -223,7 +223,6 @@ async function starRepository(req, res) {
     let updatedRepository;
 
     if (repository.starredUsers.includes(userId)) {
-      
       repository.stars = Math.max(0, repository.stars - 1);
       repository.starredUsers = repository.starredUsers.filter(
         (starredId) => starredId.toString() !== userId,
@@ -239,7 +238,6 @@ async function starRepository(req, res) {
         stars: updatedRepository.stars,
       });
     } else {
-      
       repository.stars += 1;
       repository.starredUsers.push(userId);
       user.starredRepositories.push(repository._id);
@@ -249,7 +247,7 @@ async function starRepository(req, res) {
       await logContribution(userId, "repo_starred");
 
       await notifyUser(getIO(), {
-        recipientId: repository.owner, 
+        recipientId: repository.owner,
         senderId: userId,
         type: "repo_starred",
         message: `starred your repository ${repository.name}`,
@@ -266,7 +264,6 @@ async function starRepository(req, res) {
     return res.status(500).json({ error: "Internal server error" });
   }
 }
-
 
 export {
   createRepository,

@@ -18,7 +18,7 @@ const Login: React.FC = () => {
       const res = await api.post("/login", { email, password });
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.userId);
-      setCurrentUser(res.data.userId);
+      setCurrentUser({ userId: res.data.userId });
       setLoading(false);
       window.location.href = "/";
     } catch (err) {
