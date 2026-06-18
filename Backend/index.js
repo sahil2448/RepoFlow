@@ -141,6 +141,7 @@ if (process.argv.length <= 2) {
       cors: {
         origin: [
           "https://main.d1zjk4pi7u9tt9.amplifyapp.com",
+          "https://d16mxn9cxjmykw.cloudfront.net",
           "http://localhost:3000",
           "http://localhost:5173",
         ],
