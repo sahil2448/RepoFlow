@@ -38,7 +38,7 @@ The project was built to demonstrate full-stack engineering depth across fronten
 
 ## Live Demo
 
-- Frontend: `https://main.d1zjk4pi7u9tt9.amplifyapp.com/`
+- Frontend: https://main.d1zjk4pi7u9tt9.amplifyapp.com/
 ---
 
 ## Tech Stack
