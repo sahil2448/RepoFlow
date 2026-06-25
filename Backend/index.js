@@ -15,6 +15,7 @@ import { Server } from "socket.io";
 import cors from "cors";
 import mainRouter from "./routes/main.router.js";
 import { setIO } from "./helpers/socketInstance.js";
+import { registerReviewSignaling } from "./helpers/reviewSignaling.js";
 
 dotenv.config();
 
@@ -154,6 +155,21 @@ if (process.argv.length <= 2) {
     });
 
     setIO(io);
+    // ✅ TEMPORARY — raw connection + catch-all event logger
+    io.on("connection", (socket) => {
+      console.log("🔌 RAW CONNECTION — socket id:", socket.id);
+
+      socket.onAny((eventName, ...args) => {
+        console.log(
+          "📨 SERVER RECEIVED EVENT:",
+          eventName,
+          JSON.stringify(args),
+        );
+      });
+    });
+
+    registerReviewSignaling(io);
+
     io.on("connection", (socket) => {
       console.log("Socket connected:", socket.id);
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ec2Api } from "../../config/api";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -91,6 +92,25 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
     fetchCommits();
   }, [repoId]);
 
+  const navigate = useNavigate();
+//   const handleStartReview = (commit: Commit): void => {
+//   const roomId = crypto.randomUUID();
+//   const params = new URLSearchParams({
+//     repo:   repoId,        // or repo name if you have it in scope
+//     commit: commit.message,
+//   }).toString();
+//   navigate(`/review/${roomId}?${params}`);
+// };
+
+const handleStartReview = (commit: Commit): void => {
+  const roomId = crypto.randomUUID();
+  const params = new URLSearchParams({
+    repoId:    repoId,             // actual Mongo repo _id, already in scope
+    commitId:  commit.commitId,    // actual commit UUID
+    commitMsg: commit.message,
+  }).toString();
+  navigate(`/review/${roomId}?${params}`);
+};
   const handleExpand = async (commit: Commit): Promise<void> => {
     
     if (expandedId === commit.commitId) {
@@ -240,6 +260,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
                                        : "border-white/[0.05] bg-white/[0.02] group-hover:border-white/[0.09]"
                                    }`}
                   >
+                  
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <p className="font-dm text-sm text-gray-200 truncate group-hover:text-white transition-colors">
@@ -250,6 +271,7 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
                           <span className="font-plex text-[10px] text-[#A78BFA]/60">
                             {commit.commitId.slice(0, 7)}
                           </span>
+                          
                           {commit.author && (
                             <span className="font-plex text-[10px] text-gray-700">
                               {commit.author.username}
@@ -298,6 +320,14 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
                       <span className="font-plex text-[10px] text-gray-700 ml-1">
                         {commit.commitId}
                       </span>
+                      <button
+                            onClick={() => handleStartReview(commit)}
+                            className="font-plex text-[10px] px-2.5 py-1 rounded border
+                                      border-[#A78BFA]/25 bg-[#A78BFA]/[0.08] text-[#A78BFA]
+                                      hover:bg-[#A78BFA]/[0.15] transition-all duration-150"
+                          >
+                            🎥 Start Review Call
+                          </button>
                     </div>
 
                     

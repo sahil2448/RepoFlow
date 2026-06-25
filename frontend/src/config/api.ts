@@ -12,7 +12,8 @@ const api = axios.create({
 });
 
 const ec2Api = axios.create({
-  baseURL: EC2_URL,
+  // baseURL: EC2_URL,
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
