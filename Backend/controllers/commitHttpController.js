@@ -20,26 +20,40 @@ export const getCommitsByRepo = async (req, res) => {
   }
 };
 
+// export const revertToCommit = async (req, res) => {
+//   const { id, commitId } = req.params;
+
+//   try {
+//     const repository = await Repository.findById(id).select("visibility");
+//     if (!repository)
+//       return res.status(404).json({ error: "Repository not found" });
+
+//     // ✅ Private repos still require login — public repos allow guest review
+//     if (!repository.visibility && !req.userId) {
+//       return res.status(403).json({
+//         error: "This repository is private. Login required to view code.",
+//       });
+//     }
+
+//     const commit = await Commit.findOne({ commitId, repoId: id });
+
+//     if (!commit) {
+//       return res.status(404).json({ error: "Commit not found" });
+//     }
+
 export const revertToCommit = async (req, res) => {
   const { id, commitId } = req.params;
-
   try {
     const repository = await Repository.findById(id).select("visibility");
     if (!repository)
       return res.status(404).json({ error: "Repository not found" });
-
-    // ✅ Private repos still require login — public repos allow guest review
     if (!repository.visibility && !req.userId) {
-      return res.status(403).json({
-        error: "This repository is private. Login required to view code.",
-      });
+      return res
+        .status(403)
+        .json({ error: "Private repository — login required" });
     }
-
     const commit = await Commit.findOne({ commitId, repoId: id });
-
-    if (!commit) {
-      return res.status(404).json({ error: "Commit not found" });
-    }
+    if (!commit) return res.status(404).json({ error: "Commit not found" });
 
     if (commit.storageType === "s3" && commit.s3Synced) {
       try {

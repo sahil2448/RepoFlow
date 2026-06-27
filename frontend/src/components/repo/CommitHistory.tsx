@@ -105,8 +105,8 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
 const handleStartReview = (commit: Commit): void => {
   const roomId = crypto.randomUUID();
   const params = new URLSearchParams({
-    repoId:    repoId,             // actual Mongo repo _id, already in scope
-    commitId:  commit.commitId,    // actual commit UUID
+    repoId:    repoId,          // must be the actual Mongo _id in scope
+    commitId:  commit.commitId,
     commitMsg: commit.message,
   }).toString();
   navigate(`/review/${roomId}?${params}`);

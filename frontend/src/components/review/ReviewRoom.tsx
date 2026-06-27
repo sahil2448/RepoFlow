@@ -568,16 +568,15 @@ const ReviewRoom: React.FC = () => {
   }, [storedUserId]);
 
   // ── Fetch commit's code for the review panel ──
-  useEffect(() => {
-    if (!repoId || !commitId) {
-      setFilesLoading(false);
-      setFilesError("missing repo or commit reference");
-      return;
-    }
-
-    const fetchCode = async (): Promise<void> => {
-      try {
-        const res = await api.post(`/repo/${repoId}/revert/${commitId}`);
+useEffect(() => {
+  if (!repoId || !commitId) {
+    setFilesLoading(false);
+    setFilesError(`missing reference — repoId: ${repoId || "none"}, commitId: ${commitId || "none"}`);
+    return;
+  }
+  const fetchCode = async (): Promise<void> => {
+    try {
+      const res = await api.post(`/repo/${repoId}/revert/${commitId}`);
         const fileUrls: { file: string; url: string; source: string }[] = res.data.fileUrls || [];
 
         const decoded: CodeFile[] = await Promise.all(
@@ -597,20 +596,22 @@ const ReviewRoom: React.FC = () => {
         );
 
         setFiles(decoded);
-      } catch (err: any) {
-        console.error("Failed to load commit code:", err);
-        setFilesError(
-          err?.response?.status === 403
-            ? "this repository is private — login required to view code"
-            : "could not load code for this commit"
-        );
-      } finally {
-        setFilesLoading(false);
-      }
-    };
+    }catch (err: any) {
+  // ✅ TEMPORARY — log everything raw
+  console.error("FULL ERROR OBJECT:", err);
+  console.error("STATUS:", err?.response?.status);
+  console.error("DATA:", err?.response?.data);
+  console.error("MESSAGE:", err?.message);
 
-    fetchCode();
-  }, [repoId, commitId]);
+  setFilesError(
+    `[${err?.response?.status || "no status"}] ${err?.response?.data?.error || err?.message || "unknown"}`
+  );
+} finally {
+      setFilesLoading(false);
+    }
+  };
+  fetchCode();
+}, [repoId, commitId]);
 
   // ── WebRTC setup (unchanged logic from before) ──
   const createPeerConnection = (): RTCPeerConnection => {
