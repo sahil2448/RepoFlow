@@ -3,7 +3,7 @@ const RepositorySchema = new Schema({
   name: {
     type: String,
     required: true,
-    unique: true,
+    // unique: true,
   },
   description: {
     type: String,
@@ -38,7 +38,7 @@ const RepositorySchema = new Schema({
     },
   ],
 });
-
+RepositorySchema.index({ name: 1, owner: 1 }, { unique: true });
 const Repository = mongoose.model("Repository", RepositorySchema);
 
 export default Repository;

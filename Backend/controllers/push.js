@@ -1,168 +1,253 @@
+// import fs from "fs/promises";
+// import path from "path";
+// import { s3, S3_BUCKET } from "../config/aws-config.js";
+// import mongoose from "mongoose";
+// import Commit from "../model/commitModel.js";
+// import dotenv from "dotenv";
+// import Repository from "../model/repoModel.js";
+
+// dotenv.config();
+
+// export async function pushRepo() {
+//   const repoPath = path.resolve(process.cwd(), ".repoFlowGit");
+//   const commitsPath = path.join(repoPath, "commits");
+//   const configPath = path.join(repoPath, "config.json");
+
+//   let config = {};
+//   try {
+//     const raw = await fs.readFile(configPath, "utf-8");
+//     config = JSON.parse(raw);
+//   } catch {
+//     console.error(
+//       "No config.json found. Run `node index.js init --repoId <id>` first.",
+//     );
+//     return;
+//   }
+
+//   const { repoId, userId } = config;
+
+//   if (!repoId) {
+//     console.error(
+//       "config.json is missing repoId. Re-run: node index.js init --repoId <id>",
+//     );
+//     return;
+//   }
+
+//   if (mongoose.connection.readyState === 0) {
+//     try {
+
+//       await mongoose.connect(process.env.MONGO_URI, {
+//         dbName: process.env.DB_NAME,
+//       });
+//       console.log("MongoDB connected for push");
+//     } catch (err) {
+//       console.error("MongoDB connection failed:", err.message);
+//       return;
+//     }
+//   }
+
+//   try {
+//     const commitDirs = await fs.readdir(commitsPath);
+
+//     if (commitDirs.length === 0) {
+//       console.log("Nothing to push. Make a commit first.");
+//       return;
+//     }
+
+//     for (const commitDir of commitDirs) {
+//       const commitDirPath = path.join(commitsPath, commitDir);
+
+//       const stat = await fs.stat(commitDirPath);
+//       if (!stat.isDirectory()) continue;
+
+//       const alreadyPushed = await Commit.findOne({
+//         commitId: commitDir,
+//         $or: [{ s3Synced: true }, { storageType: "mongodb" }],
+//       });
+//       if (alreadyPushed) {
+//         console.log(
+//           `  ✓ ${commitDir.slice(0, 7)}... already saved [${alreadyPushed.storageType}] — skipping`,
+//         );
+//         continue;
+//       }
+
+//       let message = "no message";
+//       let fileNames = [];
+//       try {
+//         const meta = JSON.parse(
+//           await fs.readFile(path.join(commitDirPath, "commit.json"), "utf-8"),
+//         );
+//         message = meta.message || "no message";
+//         fileNames = meta.files || [];
+//       } catch {
+
+//       }
+
+//       const allFiles = await fs.readdir(commitDirPath);
+//       const filesToUpload = allFiles.filter((f) => f !== "commit.json");
+
+//       let s3Success = true;
+//       let storageType = "s3";
+
+//       try {
+
+//         await s3.headBucket({ Bucket: S3_BUCKET }).promise();
+
+//         for (const file of filesToUpload) {
+//           const fileContent = await fs.readFile(path.join(commitDirPath, file));
+//           await s3
+//             .upload({
+//               Bucket: S3_BUCKET,
+//               Key: `commits/${commitDir}/${file}`,
+//               Body: fileContent,
+//             })
+//             .promise();
+//           console.log(`  ↑ S3 uploaded: ${file}`);
+//         }
+//       } catch (s3Err) {
+
+//         s3Success = false;
+//         storageType = "mongodb";
+//         console.warn(
+//           `  ⚠ S3 unavailable (${s3Err.code}) — storing files in MongoDB instead`,
+//         );
+//       }
+
+//       let fileContents = [];
+//       if (!s3Success) {
+//         for (const file of filesToUpload) {
+//           const rawContent = await fs.readFile(path.join(commitDirPath, file));
+//           fileContents.push({
+//             name: file,
+//             content: rawContent.toString("base64"),
+//           });
+//         }
+//         console.log(`  ✓ ${filesToUpload.length} file(s) stored in MongoDB`);
+//       }
+
+//       await Commit.findOneAndUpdate(
+//         { commitId: commitDir },
+//         {
+//           commitId: commitDir,
+//           repoId,
+//           message,
+//           files: filesToUpload,
+//           fileContents: fileContents,
+//           author: userId || null,
+//           s3Synced: s3Success,
+//           storageType,
+//         },
+//         { upsert: true, new: true },
+//       );
+
+//       const short = commitDir.slice(0, 7);
+//       console.log(
+//         `  ✓ commit saved [${storageType}]: "${message}" (${short}...)`,
+//       );
+
+//       console.log("\nPush complete.");
+
+//       await Repository.findByIdAndUpdate(repoId, {
+//         $set: { content: filesToUpload },
+//       });
+//       console.log(`  ✓ repo.content updated with: ${filesToUpload.join(", ")}`);
+//     }
+//   } catch (error) {
+//     console.error("Error during push:", error);
+//   }
+// }
+
 import fs from "fs/promises";
 import path from "path";
-import { s3, S3_BUCKET } from "../config/aws-config.js";
-import mongoose from "mongoose";
-import Commit from "../model/commitModel.js";
-import dotenv from "dotenv";
-import Repository from "../model/repoModel.js";
-
-dotenv.config();
+import {
+  loadCredentials,
+  loadLocalConfig,
+  saveLocalConfig,
+} from "../helpers/cliConfig.js";
 
 export async function pushRepo() {
-  const repoPath = path.resolve(process.cwd(), ".repoFlowGit");
-  const commitsPath = path.join(repoPath, "commits");
-  const configPath = path.join(repoPath, "config.json");
+  const creds = loadCredentials();
+  const config = loadLocalConfig();
 
-  
-  let config = {};
-  try {
-    const raw = await fs.readFile(configPath, "utf-8");
-    config = JSON.parse(raw);
-  } catch {
-    console.error(
-      "No config.json found. Run `node index.js init --repoId <id>` first.",
-    );
+  if (!creds) {
+    console.error("Run: node index.js login first.");
+    return;
+  }
+  if (!config?.repoId) {
+    console.error("Run: node index.js init <repoName> first.");
     return;
   }
 
-  const { repoId, userId } = config;
-
-  if (!repoId) {
-    console.error(
-      "config.json is missing repoId. Re-run: node index.js init --repoId <id>",
-    );
-    return;
-  }
-
-  
-  
-  if (mongoose.connection.readyState === 0) {
-    try {
-      
-      await mongoose.connect(process.env.MONGO_URI, {
-        dbName: process.env.DB_NAME,
-      });
-      console.log("MongoDB connected for push");
-    } catch (err) {
-      console.error("MongoDB connection failed:", err.message);
-      return;
-    }
-  }
+  const commitsPath = path.resolve(process.cwd(), ".repoFlowGit", "commits");
+  const pushedCommits = new Set(config.pushedCommits || []);
 
   try {
     const commitDirs = await fs.readdir(commitsPath);
-
     if (commitDirs.length === 0) {
-      console.log("Nothing to push. Make a commit first.");
+      console.log("Nothing to push.");
       return;
     }
 
-    for (const commitDir of commitDirs) {
-      const commitDirPath = path.join(commitsPath, commitDir);
+    let pushedCount = 0;
 
-      
-      const stat = await fs.stat(commitDirPath);
-      if (!stat.isDirectory()) continue;
-
-      
-      const alreadyPushed = await Commit.findOne({
-        commitId: commitDir,
-        $or: [{ s3Synced: true }, { storageType: "mongodb" }],
-      });
-      if (alreadyPushed) {
-        console.log(
-          `  ✓ ${commitDir.slice(0, 7)}... already saved [${alreadyPushed.storageType}] — skipping`,
-        );
+    for (const commitId of commitDirs) {
+      const commitDirPath = path.join(commitsPath, commitId);
+      if (!(await fs.stat(commitDirPath)).isDirectory()) continue;
+      if (pushedCommits.has(commitId)) {
+        console.log(`  ✓ ${commitId.slice(0, 7)}... already pushed`);
         continue;
       }
 
-      
       let message = "no message";
-      let fileNames = [];
       try {
-        const meta = JSON.parse(
+        message = JSON.parse(
           await fs.readFile(path.join(commitDirPath, "commit.json"), "utf-8"),
-        );
-        message = meta.message || "no message";
-        fileNames = meta.files || [];
-      } catch {
-        
-      }
+        ).message;
+      } catch {}
 
       const allFiles = await fs.readdir(commitDirPath);
-      const filesToUpload = allFiles.filter((f) => f !== "commit.json");
+      const toUpload = allFiles.filter((f) => f !== "commit.json");
+      if (toUpload.length === 0) continue;
 
-      
-      let s3Success = true;
-      let storageType = "s3";
+      const files = await Promise.all(
+        toUpload.map(async (file) => ({
+          name: file,
+          content: (await fs.readFile(path.join(commitDirPath, file))).toString(
+            "base64",
+          ),
+        })),
+      );
 
-      try {
-        
-        await s3.headBucket({ Bucket: S3_BUCKET }).promise();
-
-        for (const file of filesToUpload) {
-          const fileContent = await fs.readFile(path.join(commitDirPath, file));
-          await s3
-            .upload({
-              Bucket: S3_BUCKET,
-              Key: `commits/${commitDir}/${file}`,
-              Body: fileContent,
-            })
-            .promise();
-          console.log(`  ↑ S3 uploaded: ${file}`);
-        }
-      } catch (s3Err) {
-        
-        s3Success = false;
-        storageType = "mongodb";
-        console.warn(
-          `  ⚠ S3 unavailable (${s3Err.code}) — storing files in MongoDB instead`,
-        );
-      }
-
-      
-      let fileContents = [];
-      if (!s3Success) {
-        for (const file of filesToUpload) {
-          const rawContent = await fs.readFile(path.join(commitDirPath, file));
-          fileContents.push({
-            name: file,
-            content: rawContent.toString("base64"), 
-          });
-        }
-        console.log(`  ✓ ${filesToUpload.length} file(s) stored in MongoDB`);
-      }
-
-      
-      await Commit.findOneAndUpdate(
-        { commitId: commitDir },
+      const res = await fetch(
+        `${creds.apiUrl}/cli/repo/${config.repoId}/push`,
         {
-          commitId: commitDir,
-          repoId,
-          message,
-          files: filesToUpload,
-          fileContents: fileContents, 
-          author: userId || null,
-          s3Synced: s3Success,
-          storageType,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${creds.token}`,
+          },
+          body: JSON.stringify({ commitId, message, files }),
         },
-        { upsert: true, new: true },
       );
+      const data = await res.json();
 
-      const short = commitDir.slice(0, 7);
+      if (!res.ok) {
+        console.error(`  ✗ ${commitId.slice(0, 7)}... failed: ${data.error}`);
+        continue;
+      }
+
       console.log(
-        `  ✓ commit saved [${storageType}]: "${message}" (${short}...)`,
+        `  ✓ pushed [${data.storageType}]: "${message}" (${commitId.slice(0, 7)}...)`,
       );
-
-      console.log("\nPush complete.");
-
-      
-      await Repository.findByIdAndUpdate(repoId, {
-        $set: { content: filesToUpload },
-      });
-      console.log(`  ✓ repo.content updated with: ${filesToUpload.join(", ")}`);
+      pushedCommits.add(commitId);
+      pushedCount++;
     }
+
+    saveLocalConfig({ ...config, pushedCommits: [...pushedCommits] });
+    console.log(
+      pushedCount > 0 ? "\nPush complete." : "\nNothing new to push.",
+    );
   } catch (error) {
-    console.error("Error during push:", error);
+    console.error("Error during push:", error.message);
   }
 }

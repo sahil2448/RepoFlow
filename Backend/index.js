@@ -16,80 +16,142 @@ import cors from "cors";
 import mainRouter from "./routes/main.router.js";
 import { setIO } from "./helpers/socketInstance.js";
 import { registerReviewSignaling } from "./helpers/reviewSignaling.js";
+import { cliLogin, cliLogout, cliWhoami } from "./controllers/cliAuth.js";
 
 dotenv.config();
 
 if (process.argv.length <= 2) {
   startServer();
 } else {
+  // yargs(hideBin(process.argv))
+  //   .command("start", "Start the server", {}, startServer)
+
+  //   .command(
+  //     "init",
+  //     "Initialize the new repository",
+  //     (yargs) => {
+  //       yargs
+  //         .option("repoId", {
+  //           type: "string",
+  //           describe: "MongoDB Repository ID to link this folder to",
+  //         })
+  //         .option("userId", {
+  //           type: "string",
+  //           describe: "Your MongoDB User ID",
+  //         });
+  //     },
+  //     (argv) => {
+  //       initRepo(argv);
+  //     },
+  //   )
+
+  //   .command(
+  //     "add <file>",
+  //     "Add a new file to the repository",
+  //     (yargs) => {
+  //       yargs.positional("file", {
+  //         describe: "File to add to the staging area",
+  //         type: "string",
+  //       });
+  //     },
+  //     (argv) => {
+  //       addRepo(argv.file);
+  //     },
+  //   )
+
+  //   .command(
+  //     "commit <message>",
+  //     "Commit file to the repository",
+  //     (yargs) => {
+  //       yargs.positional("message", {
+  //         describe: "Commit message",
+  //         type: "string",
+  //       });
+  //     },
+  //     (argv) => {
+  //       commitRepo(argv.message);
+  //     },
+  //   )
+
+  //   .command("push", "Push commits to S3 and MongoDB", {}, (argv) => {
+  //     pushRepo(argv);
+  //   })
+
+  //   .command("pull", "Pull commits from S3", {}, pullRepo)
+
+  //   .command(
+  //     "revert <commitID>",
+  //     "Revert to a specific commit",
+  //     (yargs) => {
+  //       yargs.positional("commitID", {
+  //         describe: "Commit ID to revert to",
+  //         type: "string",
+  //       });
+  //     },
+  //     (argv) => {
+  //       revertRepo(argv.commitID);
+  //     },
+  //   )
+
+  //   .demandCommand(1, "Please specify a command")
+  //   .help().argv;
+
   yargs(hideBin(process.argv))
     .command("start", "Start the server", {}, startServer)
 
     .command(
-      "init",
-      "Initialize the new repository",
-      (yargs) => {
-        yargs
-          .option("repoId", {
-            type: "string",
-            describe: "MongoDB Repository ID to link this folder to",
-          })
-          .option("userId", {
-            type: "string",
-            describe: "Your MongoDB User ID",
-          });
+      "login",
+      "Log in to RepoFlow",
+      (y) => {
+        y.option("email", { type: "string" })
+          .option("password", { type: "string" })
+          .option("api", { type: "string" });
       },
-      (argv) => {
-        initRepo(argv);
+      (argv) => cliLogin(argv),
+    )
+
+    .command("logout", "Log out", {}, cliLogout)
+    .command("whoami", "Show logged-in user", {}, cliWhoami)
+
+    .command(
+      "init <repoName>",
+      "Link this folder to a repository by name",
+      (y) => {
+        y.positional("repoName", { type: "string" }).option("private", {
+          type: "boolean",
+        });
       },
+      (argv) => initRepo(argv),
     )
 
     .command(
       "add <file>",
-      "Add a new file to the repository",
-      (yargs) => {
-        yargs.positional("file", {
-          describe: "File to add to the staging area",
-          type: "string",
-        });
+      "Stage a file",
+      (y) => {
+        y.positional("file", { type: "string" });
       },
-      (argv) => {
-        addRepo(argv.file);
-      },
+      (argv) => addRepo(argv.file),
     )
 
     .command(
       "commit <message>",
-      "Commit file to the repository",
-      (yargs) => {
-        yargs.positional("message", {
-          describe: "Commit message",
-          type: "string",
-        });
+      "Commit staged files",
+      (y) => {
+        y.positional("message", { type: "string" });
       },
-      (argv) => {
-        commitRepo(argv.message);
-      },
+      (argv) => commitRepo(argv.message),
     )
 
-    .command("push", "Push commits to S3 and MongoDB", {}, (argv) => {
-      pushRepo(argv);
-    })
-
-    .command("pull", "Pull commits from S3", {}, pullRepo)
+    .command("push", "Push commits to RepoFlow", {}, () => pushRepo())
+    .command("pull", "Pull the latest commit", {}, () => pullRepo())
 
     .command(
-      "revert <commitID>",
-      "Revert to a specific commit",
-      (yargs) => {
-        yargs.positional("commitID", {
-          describe: "Commit ID to revert to",
-          type: "string",
-        });
+      "revert <commitId>",
+      "Restore files from a commit",
+      (y) => {
+        y.positional("commitId", { type: "string" });
       },
-      (argv) => {
-        revertRepo(argv.commitID);
-      },
+      (argv) => revertRepo(argv.commitId),
     )
 
     .demandCommand(1, "Please specify a command")
