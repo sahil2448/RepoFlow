@@ -1,6 +1,6 @@
 # RepoFlow
 
-A full-stack GitHub alternative built from scratch with a custom CLI version control system, AI-powered semantic duplicate issue detection, and real-time WebSocket notifications.
+A full-stack GitHub alternative(Version Control System) built from scratch with a custom CLI version control system, AI-powered semantic duplicate issue detection, realtime code review feature with WebRTC & WebSockets.
 
 ---
 
