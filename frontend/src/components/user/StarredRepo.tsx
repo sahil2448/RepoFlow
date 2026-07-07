@@ -2,9 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../config/api";
 
-
-
-
 interface StarredRepository {
   _id: string;
   name: string;
@@ -106,10 +103,10 @@ const StarredRepo: React.FC = () => {
         <li
           key={repo._id}
           onClick={() => navigate(`/repo/${repo.name}/${repo._id}`)}
-          className="group relative flex items-center gap-4 px-5 py-4 rounded-xl
-                     border border-white/[0.05] bg-white/[0.02]
-                     hover:bg-white/[0.04] hover:border-white/[0.09]
-                     transition-all duration-200 cursor-pointer"
+            className="group relative flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3 sm:py-4 rounded-xl
+             border border-white/[0.05] bg-white/[0.02]
+             hover:bg-white/[0.04] hover:border-white/[0.09]
+             transition-all duration-200 cursor-pointer"
           style={{ animationDelay: `${i * 40}ms` }}
         >
           
@@ -144,7 +141,7 @@ const StarredRepo: React.FC = () => {
 
             
             {(repo.language || repo.stars !== undefined) && (
-              <div className="flex items-center gap-3 mt-1.5">
+              <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                 {repo.language && (
                   <span className="flex items-center gap-1">
                     <span

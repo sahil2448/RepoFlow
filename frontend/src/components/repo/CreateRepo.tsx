@@ -172,16 +172,16 @@ const CreateRepo: React.FC = () => {
                       -translate-x-1/2 w-[700px] h-[400px] z-0" />
 
       <div className="font-dm relative z-10 min-h-[calc(100vh-56px)] text-white
-                      flex flex-col items-center justify-center px-4 py-14">
+                      flex flex-col items-center justify-center px-4 py-10 sm:py-14">
 
         
-        <div className="fade-up w-full max-w-[560px] mb-7" style={{ animationDelay: "0ms" }}>
+        <div className="fade-up w-full max-w-[560px] mb-6 sm:mb-7" style={{ animationDelay: "0ms" }}>
           <div className="flex items-center gap-3 mb-1">
             <div className="w-8 h-8 rounded-lg border border-white/[0.08] bg-white/[0.03]
-                            flex items-center justify-center">
+                            flex items-center justify-center shrink-0">
               <FolderPlusIcon />
             </div>
-            <h1 className="font-syne text-2xl font-bold text-white tracking-tight">
+            <h1 className="font-syne text-xl sm:text-2xl font-bold text-white tracking-tight">
               Create a repository
             </h1>
           </div>
@@ -193,14 +193,14 @@ const CreateRepo: React.FC = () => {
         
         <div
           className="fade-up relative w-full max-w-[560px] rounded-2xl
-                     border border-white/[0.07] bg-white/[0.02] backdrop-blur-sm p-7"
+                     border border-white/[0.07] bg-white/[0.02] backdrop-blur-sm p-4 sm:p-7"
           style={{ animationDelay: "60ms" }}
         >
           
           <div className="absolute inset-x-0 top-0 h-px rounded-t-2xl
                           bg-gradient-to-r from-transparent via-[#00FFA3]/20 to-transparent" />
 
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-5 sm:gap-6">
 
             
             <div className="flex flex-col gap-1.5">
@@ -226,7 +226,7 @@ const CreateRepo: React.FC = () => {
               )}
               
               {form.name && !errors.name && (
-                <p className="font-plex text-[10px] text-gray-700 mt-0.5">
+                <p className="font-plex text-[10px] text-gray-700 mt-0.5 break-all">
                   will be created as{" "}
                   <span className="text-[#00FFA3]/60">{form.name}</span>
                 </p>
@@ -277,7 +277,7 @@ const CreateRepo: React.FC = () => {
                 
                 <button
                   onClick={() => setForm((prev) => ({ ...prev, visibility: true }))}
-                  className={`flex items-center gap-4 p-4 rounded-xl border
+                  className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border
                               transition-all duration-200 text-left
                               ${form.visibility
                                 ? "border-[#00FFA3]/25 bg-[#00FFA3]/[0.05]"
@@ -296,11 +296,11 @@ const CreateRepo: React.FC = () => {
                     )}
                   </span>
 
-                  <div className={`flex items-center gap-2.5 transition-colors ${
+                  <div className={`flex items-center gap-2.5 min-w-0 transition-colors ${
                     form.visibility ? "text-white" : "text-gray-500"
                   }`}>
-                    <GlobeIcon />
-                    <div>
+                    <span className="shrink-0"><GlobeIcon /></span>
+                    <div className="min-w-0">
                       <p className="font-plex text-[12px] font-medium leading-none mb-1">
                         Public
                       </p>
@@ -314,7 +314,7 @@ const CreateRepo: React.FC = () => {
                 
                 <button
                   onClick={() => setForm((prev) => ({ ...prev, visibility: false }))}
-                  className={`flex items-center gap-4 p-4 rounded-xl border
+                  className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border
                               transition-all duration-200 text-left
                               ${!form.visibility
                                 ? "border-[#A78BFA]/25 bg-[#A78BFA]/[0.05]"
@@ -332,11 +332,11 @@ const CreateRepo: React.FC = () => {
                     )}
                   </span>
 
-                  <div className={`flex items-center gap-2.5 transition-colors ${
+                  <div className={`flex items-center gap-2.5 min-w-0 transition-colors ${
                     !form.visibility ? "text-white" : "text-gray-500"
                   }`}>
-                    <LockIcon />
-                    <div>
+                    <span className="shrink-0"><LockIcon /></span>
+                    <div className="min-w-0">
                       <p className="font-plex text-[12px] font-medium leading-none mb-1">
                         Private
                       </p>
@@ -353,11 +353,11 @@ const CreateRepo: React.FC = () => {
             <div className="border-t border-white/[0.04]" />
 
             
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <button
                 onClick={() => navigate("/")}
                 className="font-plex text-[11px] text-gray-600 hover:text-gray-300
-                           transition-colors duration-200"
+                           transition-colors duration-200 text-center sm:text-left py-2 sm:py-0"
               >
                 ← Cancel
               </button>
@@ -365,14 +365,14 @@ const CreateRepo: React.FC = () => {
               <button
                 onClick={handleSubmit}
                 disabled={loading || success}
-                className="btn-shimmer relative flex items-center gap-2 px-6 py-2.5
+                className={`btn-shimmer relative flex items-center justify-center gap-2 px-6 py-2.5
                            rounded-lg font-plex text-[12px] tracking-widest uppercase overflow-hidden
                            transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
-                           border
+                           border w-full sm:w-auto
                            ${success
                              ? 'bg-[#00FFA3]/10 border-[#00FFA3]/30 text-[#00FFA3]'
                              : 'bg-[#00FFA3]/10 border-[#00FFA3]/25 text-[#00FFA3] hover:bg-[#00FFA3]/[0.16] hover:border-[#00FFA3]/40'
-                           }"
+                           }`}
               >
                 
                 <span className="shimmer-inner absolute inset-0

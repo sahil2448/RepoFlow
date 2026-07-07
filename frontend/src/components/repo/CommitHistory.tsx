@@ -26,7 +26,7 @@ interface CommitHistoryProps {
 
 
 const CommitIcon: React.FC = () => (
-  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -93,15 +93,6 @@ const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
   }, [repoId]);
 
   const navigate = useNavigate();
-//   const handleStartReview = (commit: Commit): void => {
-//   const roomId = crypto.randomUUID();
-//   const params = new URLSearchParams({
-//     repo:   repoId,        // or repo name if you have it in scope
-//     commit: commit.message,
-//   }).toString();
-//   navigate(`/review/${roomId}?${params}`);
-// };
-
 const handleStartReview = (commit: Commit): void => {
   const roomId = crypto.randomUUID();
   const params = new URLSearchParams({
@@ -159,7 +150,7 @@ const handleStartReview = (commit: Commit): void => {
   
   if (commits.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4">
+      <div className="flex flex-col items-center justify-center gap-4 px-4">
         <div
           className="w-10 h-10 rounded-xl border border-white/[0.07] bg-white/[0.02]
                         flex items-center justify-center text-gray-700"
@@ -183,14 +174,14 @@ const handleStartReview = (commit: Commit): void => {
             ))}
             <span className="font-plex text-[10px] text-gray-700 ml-1">terminal</span>
           </div>
-          <div className="px-4 py-3 space-y-1.5 font-plex text-[11px]">
+          <div className="px-4 py-3 space-y-1.5 font-plex text-[11px] overflow-x-auto">
             {[
               { cmd: `node index.js init --repoId ${repoId}`, comment: "# link to this repo" },
               { cmd: "node index.js add yourfile.js", comment: "# stage a file" },
               { cmd: 'node index.js commit "your message"', comment: "# snapshot" },
               { cmd: "node index.js push", comment: "# sync to S3 + DB" },
             ].map(({ cmd, comment }) => (
-              <div key={cmd}>
+              <div key={cmd} className="whitespace-nowrap">
                 <span className="text-[#00FFA3]/80">{cmd}</span>
                 <span className="text-gray-700 ml-2">{comment}</span>
               </div>
@@ -208,6 +199,12 @@ const handleStartReview = (commit: Commit): void => {
         .font-plex { font-family: 'IBM Plex Mono', monospace; }
         .font-syne { font-family: 'Syne', sans-serif; }
         .font-dm   { font-family: 'DM Sans', sans-serif; }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
       `}</style>
 
       
@@ -223,7 +220,7 @@ const handleStartReview = (commit: Commit): void => {
       
       <div className="relative">
         
-        <div className="absolute left-[19px] top-4 bottom-4 w-px bg-white/[0.05]" />
+        <div className="absolute left-[15px] sm:left-[19px] top-4 bottom-4 w-px bg-white/[0.05]" />
 
         <ul className="space-y-2">
           {commits.map((commit) => {
@@ -236,11 +233,11 @@ const handleStartReview = (commit: Commit): void => {
                 
                 <div
                   onClick={() => handleExpand(commit)}
-                  className="group relative flex items-start gap-4 cursor-pointer"
+                  className="group relative flex items-start gap-3 sm:gap-4 cursor-pointer"
                 >
                   
                   <div
-                    className={`shrink-0 w-10 h-10 rounded-xl border flex items-center justify-center z-10
+                    className={`shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-xl border flex items-center justify-center z-10
                                    transition-all duration-200
                                    ${
                                      isExpanded
@@ -253,7 +250,7 @@ const handleStartReview = (commit: Commit): void => {
 
                   
                   <div
-                    className={`flex-1 min-w-0 p-4 rounded-xl border transition-all duration-200
+                    className={`flex-1 min-w-0 p-3 sm:p-4 rounded-xl border transition-all duration-200
                                    ${
                                      isExpanded
                                        ? "border-[#A78BFA]/20 bg-[#A78BFA]/[0.04]"
@@ -261,33 +258,33 @@ const handleStartReview = (commit: Commit): void => {
                                    }`}
                   >
                   
-                    <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start justify-between gap-2 sm:gap-3">
                       <div className="flex-1 min-w-0">
                         <p className="font-dm text-sm text-gray-200 truncate group-hover:text-white transition-colors">
                           {commit.message}
                         </p>
-                        <div className="flex items-center gap-3 mt-1.5">
+                        <div className="flex items-center gap-2 sm:gap-3 mt-1.5 overflow-x-auto scrollbar-hide whitespace-nowrap">
                           
-                          <span className="font-plex text-[10px] text-[#A78BFA]/60">
+                          <span className="font-plex text-[10px] text-[#A78BFA]/60 shrink-0">
                             {commit.commitId.slice(0, 7)}
                           </span>
                           
                           {commit.author && (
-                            <span className="font-plex text-[10px] text-gray-700">
+                            <span className="font-plex text-[10px] text-gray-700 shrink-0">
                               {commit.author.username}
                             </span>
                           )}
-                          <span className="font-plex text-[10px] text-gray-700">
+                          <span className="font-plex text-[10px] text-gray-700 shrink-0">
                             {formatDate(commit.createdAt)}
                           </span>
                           
-                          <span className="flex items-center gap-1 font-plex text-[10px] text-gray-700">
+                          <span className="flex items-center gap-1 font-plex text-[10px] text-gray-700 shrink-0">
                             <FileIcon />
                             {commit.files.length} file{commit.files.length !== 1 ? "s" : ""}
                           </span>
                           
                           {commit.s3Synced && (
-                            <span className="font-plex text-[9px] px-1.5 py-0.5 rounded border text-[#00FFA3]/60 border-[#00FFA3]/15 bg-[#00FFA3]/[0.05]">
+                            <span className="font-plex text-[9px] px-1.5 py-0.5 rounded border text-[#00FFA3]/60 border-[#00FFA3]/15 bg-[#00FFA3]/[0.05] shrink-0">
                               S3
                             </span>
                           )}
@@ -307,24 +304,27 @@ const handleStartReview = (commit: Commit): void => {
 
                 
                 {isExpanded && (
-                  <div className="ml-14 mt-1.5 rounded-xl border border-white/[0.05] bg-[#060611] overflow-hidden">
+                  <div className="ml-11 sm:ml-14 mt-1.5 rounded-xl border border-white/[0.05] bg-[#060611] overflow-hidden">
                     
-                    <div className="flex items-center gap-1.5 px-4 py-2 border-b border-white/[0.04]">
-                      {["#FF6B4A", "#F59E0B", "#00FFA3"].map((c) => (
-                        <span
-                          key={c}
-                          className="w-1.5 h-1.5 rounded-full opacity-50"
-                          style={{ backgroundColor: c }}
-                        />
-                      ))}
-                      <span className="font-plex text-[10px] text-gray-700 ml-1">
+                    <div className="flex items-center gap-2 flex-wrap px-3 sm:px-4 py-2 border-b border-white/[0.04]">
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {["#FF6B4A", "#F59E0B", "#00FFA3"].map((c) => (
+                          <span
+                            key={c}
+                            className="w-1.5 h-1.5 rounded-full opacity-50"
+                            style={{ backgroundColor: c }}
+                          />
+                        ))}
+                      </div>
+                      <span className="font-plex text-[10px] text-gray-700 truncate min-w-0 flex-1">
                         {commit.commitId}
                       </span>
                       <button
                             onClick={() => handleStartReview(commit)}
-                            className="font-plex text-[10px] px-2.5 py-1 rounded border
+                            className="font-plex text-[10px] px-2.5 py-1 rounded border shrink-0
                                       border-[#A78BFA]/25 bg-[#A78BFA]/[0.08] text-[#A78BFA]
-                                      hover:bg-[#A78BFA]/[0.15] transition-all duration-150"
+                                      hover:bg-[#A78BFA]/[0.15] transition-all duration-150
+                                      whitespace-nowrap"
                           >
                             🎥 Start Review Call
                           </button>
@@ -332,7 +332,7 @@ const handleStartReview = (commit: Commit): void => {
 
                     
                     {isLoading ? (
-                      <div className="px-4 py-4 space-y-2">
+                      <div className="px-3 sm:px-4 py-4 space-y-2">
                         {[1, 2].map((n) => (
                           <div key={n} className="h-8 rounded bg-white/[0.03] animate-pulse" />
                         ))}
@@ -340,28 +340,27 @@ const handleStartReview = (commit: Commit): void => {
                     ) : files.length > 0 ? (
                       <ul className="divide-y divide-white/[0.03]">
                         {files.map(({ file, url }) => (
-                          <li key={file} className="flex items-center justify-between px-4 py-2.5">
-                            <span className="flex items-center gap-2 font-plex text-[11px] text-gray-400">
-                              <span className="text-[#A78BFA]/50">
+                          <li key={file} className="flex items-center justify-between gap-3 px-3 sm:px-4 py-2.5">
+                            <span className="flex items-center gap-2 font-plex text-[11px] text-gray-400 min-w-0">
+                              <span className="text-[#A78BFA]/50 shrink-0">
                                 <FileIcon />
                               </span>
-                              {file}
+                              <span className="truncate">{file}</span>
                             </span>
-
-                            <a
+                            <a                            
                               href={url}
                               download={file}
                               onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-1.5 font-plex text-[10px] text-gray-700 hover:text-[#00FFA3] transition-colors"
+                              className="flex items-center gap-1.5 font-plex text-[10px] text-gray-700 hover:text-[#00FFA3] transition-colors shrink-0"
                             >
                               <DownloadIcon />
-                              download
+                              <span className="hidden sm:inline">download</span>
                             </a>
                           </li>
                         ))}
                       </ul>
                     ) : (
-                      <p className="px-4 py-4 font-plex text-[11px] text-gray-700">
+                      <p className="px-3 sm:px-4 py-4 font-plex text-[11px] text-gray-700">
                         no files found in S3 for this commit
                       </p>
                     )}

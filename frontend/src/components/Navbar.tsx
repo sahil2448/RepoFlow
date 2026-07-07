@@ -92,31 +92,32 @@ const Navbar: React.FC = () => {
       `}</style>
 
       <nav className={`font-dm sticky top-0 z-50 w-full flex items-center
-                       justify-between px-6 h-14 bg-[#060611] transition-all duration-300
-                       ${scrolled
-                         ? "border-b border-white/[0.05] shadow-[0_1px_30px_rgba(0,0,0,0.4)]"
-                         : "border-b border-transparent"}`}>
+                 justify-between px-3 sm:px-6 h-14 bg-[#060611] transition-all duration-300
+                 ${scrolled
+                   ? "border-b border-white/[0.05] shadow-[0_1px_30px_rgba(0,0,0,0.4)]"
+                   : "border-b border-transparent"}`}>
 
-        <Link to="/" className="flex items-center gap-3 group">
+        <Link to="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
           <div className="w-7 h-7 rounded-lg border border-white/[0.08] bg-white/[0.03]
-                          flex items-center justify-center
+                          flex items-center justify-center shrink-0
                           group-hover:border-[#00FFA3]/30 group-hover:bg-[#00FFA3]/[0.06]
                           transition-all duration-200">
             <span className="font-plex text-[11px] font-medium text-[#00FFA3]">
               <img src={RepoFlowLogo2} alt="RepoFlow Logo" />
             </span>
           </div>
-          <span className="font-syne text-[15px] font-bold text-gray-200
-                           group-hover:text-white transition-colors duration-200 tracking-tight">
+          <span className="font-syne text-[14px] sm:text-[15px] font-bold text-gray-200
+                          group-hover:text-white transition-colors duration-200 tracking-tight
+                          whitespace-nowrap">
             RepoFlow
           </span>
         </Link>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 sm:gap-1">
 
           <Link
             to="/repo/create"
-            className={`flex items-center gap-1.5 font-plex text-[11px] px-3.5 py-1.5
+            className={`flex items-center gap-1.5 font-plex text-[11px] px-2.5 sm:px-3.5 py-1.5
                         rounded-lg border transition-all duration-200
                         ${location.pathname === "/repo/create"
                           ? "text-[#00FFA3] bg-[#00FFA3]/[0.07] border-[#00FFA3]/20"
@@ -124,10 +125,10 @@ const Navbar: React.FC = () => {
                         }`}
           >
             <span className="text-base leading-none -mt-px">+</span>
-            New Repo
+            <span className="hidden sm:inline">New Repo</span>
           </Link>
 
-          <span className="mx-1 w-px h-4 bg-white/[0.07]" />
+          <span className="mx-1 w-px h-4 bg-white/[0.07] hidden xs:block sm:block" />
 
           <div ref={bellRef} className="relative">
             <button
@@ -147,11 +148,12 @@ const Navbar: React.FC = () => {
               )}
             </button>
 
-            {bellOpen && (
-              <div className="absolute right-0 top-10 w-80 rounded-2xl
-                              border border-white/[0.07] bg-[#060611]
-                              shadow-[0_8px_32px_rgba(0,0,0,0.6)]
-                              overflow-hidden z-50">
+           {bellOpen && (
+  <div className="absolute right-0 top-10 w-[calc(100vw-1.5rem)] max-w-80
+                  -mr-2 sm:mr-0 sm:w-80 rounded-2xl
+                  border border-white/[0.07] bg-[#060611]
+                  shadow-[0_8px_32px_rgba(0,0,0,0.6)]
+                  overflow-hidden z-50">
 
                 <div className="flex items-center justify-between px-4 py-3
                                 border-b border-white/[0.05]">
@@ -189,12 +191,11 @@ const Navbar: React.FC = () => {
 
                           <div className="flex-1 min-w-0">
                             {notif.sender?.username && (
-                              <span className="font-plex text-[11px]
-                                               text-[#00FFA3]/80 mr-1">
+                              <span className="font-plex text-[11px] text-[#00FFA3]/80 mr-1">
                                 {notif.sender.username}
                               </span>
                             )}
-                            <span className="font-dm text-xs text-gray-400">
+                            <span className="font-dm text-xs text-gray-400 break-words">
                               {notif.message}
                             </span>
                             <p className="font-plex text-[10px]
@@ -220,7 +221,7 @@ const Navbar: React.FC = () => {
 
           <Link
             to={`/profile/${userId}`}
-            className={`flex items-center gap-2.5 font-dm text-sm px-3 py-1.5
+            className={`flex items-center gap-0 sm:gap-2.5 font-dm text-sm px-2 sm:px-3 py-1.5
                         rounded-lg border transition-all duration-200
                         ${location.pathname.startsWith("/profile")
                           ? "text-white bg-white/[0.05] border-white/[0.09]"
@@ -228,11 +229,11 @@ const Navbar: React.FC = () => {
                         }`}
           >
             <span className="w-5 h-5 rounded-full flex items-center justify-center
-                             bg-gradient-to-br from-[#00FFA3]/20 to-[#A78BFA]/20
-                             border border-white/[0.08] font-plex text-[9px] text-gray-300">
+                            bg-gradient-to-br from-[#00FFA3]/20 to-[#A78BFA]/20
+                            border border-white/[0.08] font-plex text-[9px] text-gray-300">
               U
             </span>
-            <span>Profile</span>
+            <span className="hidden sm:inline">Profile</span>
           </Link>
 
         </div>

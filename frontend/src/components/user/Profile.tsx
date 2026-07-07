@@ -182,7 +182,13 @@ setUserDetails((prev) => ({
           to   { opacity: 1; transform: translateY(0); }
         }
         .fade-up { animation: fade-up 0.35s ease both; }
-      `}</style>
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+`}</style>
 
       <div className="glow-teal pointer-events-none fixed -top-24 left-1/2
                       -translate-x-1/2 w-[700px] h-[400px] z-0" />
@@ -190,19 +196,16 @@ setUserDetails((prev) => ({
       <div className="font-dm relative z-10 min-h-[calc(100vh-56px)] text-white">
 
         
-        <div className="border-b border-white/[0.05] px-6">
-          <div className="max-w-[1380px] mx-auto flex items-center gap-1">
-            {tabs.map(({ key, label, icon: Icon }) => (
-              <button
-                key={key}
-                onClick={() => setActiveTab(key)}
-                className={`relative flex items-center gap-2 font-plex text-[11px] px-4 py-3.5
-                            transition-colors duration-200
-                            ${activeTab === key
-                              ? "text-white"
-                              : "text-gray-600 hover:text-gray-300"
-                            }`}
-              >
+    <div className="border-b border-white/[0.05] px-4 sm:px-6">
+  <div className="max-w-[1380px] mx-auto flex items-center gap-1 overflow-x-auto scrollbar-hide">
+    {tabs.map(({ key, label, icon: Icon }) => (
+      <button
+        key={key}
+        onClick={() => setActiveTab(key)}
+        className={`relative flex items-center gap-2 font-plex text-[11px] px-3 sm:px-4 py-3 sm:py-3.5
+                    whitespace-nowrap transition-colors duration-200
+                    ${activeTab === key ? "text-white" : "text-gray-600 hover:text-gray-300"}`}
+      >
                 <Icon />
                 {label}
                 {activeTab === key && (
@@ -215,24 +218,23 @@ setUserDetails((prev) => ({
         </div>
 
         
-        <div className="max-w-[1380px] mx-auto px-6 py-10">
-          <div className="flex justify-between gap-10">
+<div className="max-w-[1380px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+<div className="flex flex-col lg:flex-row justify-between gap-8 lg:gap-10">
 
-            
-            <aside className="w-[260px] shrink-0 fade-up" style={{ animationDelay: "0ms" }}>
+  <aside className="w-full lg:w-[260px] lg:shrink-0 fade-up" style={{ animationDelay: "0ms" }}>
 
               
-              <div className="w-full aspect-square max-w-[260px] rounded-2xl
-                              bg-gradient-to-br from-[#00FFA3]/10 to-[#A78BFA]/10
-                              border border-white/[0.07] flex items-center justify-center mb-5
-                              relative overflow-hidden">
+<div className="w-full aspect-square max-w-[200px] sm:max-w-[260px] mx-auto lg:mx-0 rounded-2xl
+                bg-gradient-to-br from-[#00FFA3]/10 to-[#A78BFA]/10
+                border border-white/[0.07] flex items-center justify-center mb-5
+                relative overflow-hidden">
                 <div className="absolute inset-x-0 top-0 h-px
                                 bg-gradient-to-r from-transparent via-[#00FFA3]/20 to-transparent" />
                 <span className="font-syne text-6xl font-bold text-white/10 select-none">
                   {userDetails.username?.[0]?.toUpperCase() ?? "U"}
                 </span>
               </div>
-              <div className="flex flex-col px-2">
+              <div className="flex flex-col items-center text-center lg:items-start lg:text-left px-2">
 
               <h2 className="font-syne text-xl font-bold text-white tracking-tight mb-0.5">
                 {userDetails.username}
@@ -279,7 +281,7 @@ setUserDetails((prev) => ({
               )}
 
               
-              <div className="flex gap-4 mb-6">
+              <div className="flex gap-4 mb-6 justify-center lg:justify-start">
                 <div className="flex flex-col">
                   <span className="font-syne text-sm font-bold text-white">
                     {userDetails.followers ?? 0}
@@ -315,101 +317,123 @@ setUserDetails((prev) => ({
             </aside>
 
             
-            {isOwnProfile && isEditing && (
-  <div className="relative rounded-2xl border border-white/[0.07] bg-white/[0.02] p-5 mb-6 overflow-hidden fade-up">
-    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00FFA3]/15 to-transparent" />
+{isOwnProfile && isEditing && (
+  <div
+    className="fixed inset-0 z-[100] flex items-center justify-center p-4
+               bg-black/60 backdrop-blur-sm fade-up"
+    onClick={() => setIsEditing(false)}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto
+                 rounded-2xl border border-white/[0.08] bg-[#0A0A16]
+                 p-5 sm:p-6 shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
+    >
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00FFA3]/25 to-transparent" />
 
-    <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600 mb-4">
-      Edit Profile
-    </p>
-
-    <div className="grid gap-4 sm:grid-cols-2">
-      <div>
-        <label className="mb-2 block text-[11px] text-gray-500">Username</label>
-        <input
-          name="username"
-          value={editData.username}
-          onChange={handleEditChange}
-          className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
-                     text-sm text-white outline-none focus:border-[#00FFA3]/40"
-        />
+      <div className="flex items-center justify-between mb-5">
+        <p className="font-plex text-[10px] uppercase tracking-widest text-gray-500">
+          Edit Profile
+        </p>
+        <button
+          onClick={() => setIsEditing(false)}
+          className="w-7 h-7 rounded-lg flex items-center justify-center
+                     text-gray-500 hover:text-white hover:bg-white/[0.06]
+                     transition-colors duration-150"
+          aria-label="Close"
+        >
+          ✕
+        </button>
       </div>
 
-      <div>
-        <label className="mb-2 block text-[11px] text-gray-500">Email</label>
-        <input
-          name="email"
-          value={editData.email}
-          onChange={handleEditChange}
-          className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
-                     text-sm text-white outline-none focus:border-[#00FFA3]/40"
-        />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-2 block text-[11px] text-gray-500">Username</label>
+          <input
+            name="username"
+            value={editData.username}
+            onChange={handleEditChange}
+            className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
+                       text-sm text-white outline-none focus:border-[#00FFA3]/40"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-[11px] text-gray-500">Email</label>
+          <input
+            name="email"
+            value={editData.email}
+            onChange={handleEditChange}
+            className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
+                       text-sm text-white outline-none focus:border-[#00FFA3]/40"
+          />
+        </div>
+
+        <div className="sm:col-span-2">
+          <label className="mb-2 block text-[11px] text-gray-500">Bio</label>
+          <textarea
+            name="bio"
+            rows={4}
+            value={editData.bio}
+            onChange={handleEditChange}
+            className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
+                       text-sm text-white outline-none focus:border-[#00FFA3]/40"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-[11px] text-gray-500">Location</label>
+          <input
+            name="location"
+            value={editData.location}
+            onChange={handleEditChange}
+            className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
+                       text-sm text-white outline-none focus:border-[#00FFA3]/40"
+          />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-[11px] text-gray-500">Website</label>
+          <input
+            name="website"
+            value={editData.website}
+            onChange={handleEditChange}
+            className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
+                       text-sm text-white outline-none focus:border-[#00FFA3]/40"
+          />
+        </div>
+
+        <div className="sm:col-span-2">
+          <label className="mb-2 block text-[11px] text-gray-500">Avatar URL</label>
+          <input
+            name="avatar"
+            value={editData.avatar}
+            onChange={handleEditChange}
+            className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
+                       text-sm text-white outline-none focus:border-[#00FFA3]/40"
+          />
+        </div>
       </div>
 
-      <div className="sm:col-span-2">
-        <label className="mb-2 block text-[11px] text-gray-500">Bio</label>
-        <textarea
-          name="bio"
-          rows={4}
-          value={editData.bio}
-          onChange={handleEditChange}
-          className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
-                     text-sm text-white outline-none focus:border-[#00FFA3]/40"
-        />
+      <div className="flex gap-3 mt-5">
+        <button
+          onClick={handleSaveProfile}
+          disabled={saveLoading}
+          className="rounded-lg border border-[#00FFA3]/25 bg-[#00FFA3]/[0.08] px-4 py-2
+                     text-[11px] uppercase tracking-widest text-[#00FFA3] hover:bg-[#00FFA3]/[0.12]
+                     disabled:opacity-50"
+        >
+          {saveLoading ? "Saving..." : "Save Changes"}
+        </button>
+
+        <button
+          onClick={() => setIsEditing(false)}
+          className="rounded-lg border border-white/[0.07] bg-white/[0.03] px-4 py-2
+                     text-[11px] uppercase tracking-widest text-gray-400 hover:text-white"
+        >
+          Cancel
+        </button>
       </div>
-
-      <div>
-        <label className="mb-2 block text-[11px] text-gray-500">Location</label>
-        <input
-          name="location"
-          value={editData.location}
-          onChange={handleEditChange}
-          className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
-                     text-sm text-white outline-none focus:border-[#00FFA3]/40"
-        />
-      </div>
-
-      <div>
-        <label className="mb-2 block text-[11px] text-gray-500">Website</label>
-        <input
-          name="website"
-          value={editData.website}
-          onChange={handleEditChange}
-          className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
-                     text-sm text-white outline-none focus:border-[#00FFA3]/40"
-        />
-      </div>
-
-      <div className="sm:col-span-2">
-        <label className="mb-2 block text-[11px] text-gray-500">Avatar URL</label>
-        <input
-          name="avatar"
-          value={editData.avatar}
-          onChange={handleEditChange}
-          className="w-full rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3
-                     text-sm text-white outline-none focus:border-[#00FFA3]/40"
-        />
-      </div>
-    </div>
-
-    <div className="flex gap-3 mt-5">
-      <button
-        onClick={handleSaveProfile}
-        disabled={saveLoading}
-        className="rounded-lg border border-[#00FFA3]/25 bg-[#00FFA3]/[0.08] px-4 py-2
-                   text-[11px] uppercase tracking-widest text-[#00FFA3] hover:bg-[#00FFA3]/[0.12]
-                   disabled:opacity-50"
-      >
-        {saveLoading ? "Saving..." : "Save Changes"}
-      </button>
-
-      <button
-        onClick={() => setIsEditing(false)}
-        className="rounded-lg border border-white/[0.07] bg-white/[0.03] px-4 py-2
-                   text-[11px] uppercase tracking-widest text-gray-400 hover:text-white"
-      >
-        Cancel
-      </button>
     </div>
   </div>
 )}

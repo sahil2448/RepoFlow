@@ -11,7 +11,7 @@ interface Repository {
   language?: string;
   stars?: number;
   updatedAt?: string;
-  visibility: true | false;
+  visibility: boolean;
 }
 
 interface UpcomingEvent {
@@ -38,21 +38,21 @@ const EVENT_COLORS: Record<UpcomingEvent["type"], string> = {
 
 
 const FolderIcon = () => (
-  <svg className="w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <svg className="w-3.5 h-3.5 text-gray-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
       d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
   </svg>
 );
 
 const ChevronIcon = () => (
-  <svg className="w-3.5 h-3.5 text-gray-700 group-hover:text-[#00FFA3] group-hover:translate-x-0.5 transition-all duration-200"
+  <svg className="w-3.5 h-3.5 text-gray-700 group-hover:text-[#00FFA3] group-hover:translate-x-0.5 transition-all duration-200 shrink-0"
     fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
   </svg>
 );
 
 const SearchIcon = () => (
-  <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <svg className="w-4 h-4 text-gray-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
       d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
   </svg>
@@ -115,7 +115,10 @@ const Dashboard = () => {
         .dot-grid {
           background-color: #060611;
           background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);
-          background-size: 28px 28px;
+          background-size: 22px 22px;
+        }
+        @media (min-width: 640px) {
+          .dot-grid { background-size: 28px 28px; }
         }
 
         /* Ambient glow blobs */
@@ -132,105 +135,114 @@ const Dashboard = () => {
         }
 
         /* Subtle scrollbar */
-        ::-webkit-scrollbar       { width: 4px; }
+        ::-webkit-scrollbar       { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1e1e2e; border-radius: 4px; }
+
+        /* Snap scrolling for mobile events row */
+        .events-scroll {
+          scroll-snap-type: x mandatory;
+          -webkit-overflow-scrolling: touch;
+        }
+        .events-scroll > li { scroll-snap-align: start; }
       `}</style>
 
       <section
         id="dashboard"
         className="dot-grid font-dm min-h-screen text-white relative overflow-hidden"
       >
-        <div className="glow-teal  pointer-events-none absolute -top-32 -left-32 w-[500px] h-[500px]" />
-        <div className="glow-coral pointer-events-none absolute bottom-0 right-0 w-[400px] h-[400px]" />
+        <div className="glow-teal  pointer-events-none absolute -top-20 -left-20 w-[260px] h-[260px] sm:w-[400px] sm:h-[400px] lg:-top-32 lg:-left-32 lg:w-[500px] lg:h-[500px]" />
+        <div className="glow-coral pointer-events-none absolute bottom-0 right-0 w-[220px] h-[220px] sm:w-[320px] sm:h-[320px] lg:w-[400px] lg:h-[400px]" />
 
-        <div className="relative z-10 max-w-[1380px] mx-auto px-6 py-10 flex gap-6">
+        <div className="relative z-10 max-w-[1380px] mx-auto px-4 sm:px-6 py-6 sm:py-10 flex flex-col lg:flex-row gap-6 lg:gap-6">
 
-<aside className="w-[240px] shrink-0">
-  <div className="flex items-center gap-2 mb-4">
-    <span className="block w-1.5 h-4 rounded-full bg-[#00FFA3]" />
-    <h3 className="font-syne text-[10px] tracking-[0.22em] uppercase text-gray-500">
-      Global Repositories
-    </h3>
-  </div>
+          {/* GLOBAL REPOSITORIES — stacks below main on mobile/tablet */}
+          <aside className="w-full lg:w-[240px] shrink-0 order-2 lg:order-1">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="block w-1.5 h-4 rounded-full bg-[#00FFA3]" />
+              <h3 className="font-syne text-[10px] tracking-[0.22em] uppercase text-gray-500">
+                Global Repositories
+              </h3>
+            </div>
 
-  <div className="relative mb-4 group">
-    <div className="relative flex items-center gap-2 px-3 py-2 rounded-lg
-                    border border-white/[0.07] bg-white/[0.03]
-                    focus-within:border-[#00FFA3]/30 transition-colors duration-300">
-      <SearchIcon />
-      <input
-        type="text"
-        value={globalSearch}
-        placeholder="Search global…"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setGlobalSearch(e.target.value)
-        }
-        className="flex-1 bg-transparent font-plex text-[11px] text-gray-200
-                   placeholder-gray-700 outline-none"
-      />
-      {globalSearch && (
-        <button
-          onClick={() => setGlobalSearch("")}
-          className="font-plex text-[10px] text-gray-700 hover:text-gray-400
-                     transition-colors"
-        >
-          ✕
-        </button>
-      )}
-    </div>
-  </div>
+            <div className="relative mb-4 group">
+              <div className="relative flex items-center gap-2 px-3 py-2 rounded-lg
+                              border border-white/[0.07] bg-white/[0.03]
+                              focus-within:border-[#00FFA3]/30 transition-colors duration-300">
+                <SearchIcon />
+                <input
+                  type="text"
+                  value={globalSearch}
+                  placeholder="Search global…"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setGlobalSearch(e.target.value)
+                  }
+                  className="flex-1 min-w-0 bg-transparent font-plex text-[11px] text-gray-200
+                             placeholder-gray-700 outline-none"
+                />
+                {globalSearch && (
+                  <button
+                    onClick={() => setGlobalSearch("")}
+                    className="font-plex text-[10px] text-gray-700 hover:text-gray-400
+                               transition-colors"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
 
-  {globalSearch && (
-    <p className="font-plex text-[10px] text-gray-700 mb-3">
-      {globalResults.length} found
-    </p>
-  )}
+            {globalSearch && (
+              <p className="font-plex text-[10px] text-gray-700 mb-3">
+                {globalResults.length} found
+              </p>
+            )}
 
-  {globalResults.length === 0 && globalSearch !== "" ? (
-    <p className="font-plex text-[10px] text-gray-800 text-center py-6">
-      no match for{" "}
-      <span className="text-[#00FFA3]/50">"{globalSearch}"</span>
-    </p>
-  ) : (
-    <ul className="space-y-2">
-      {globalResults.map((repo) => (
-        <li
-          key={repo._id}
-          onClick={() => navigate(`/repo/${repo.name}/${repo._id}`)}
-          className="group p-3.5 rounded-lg border border-white/[0.05] bg-white/[0.02]
-                     hover:bg-[#00FFA3]/[0.04] hover:border-[#00FFA3]/20
-                     transition-all duration-250 cursor-pointer"
-        >
-          <div className="flex items-center gap-2 mb-1">
-            <FolderIcon />
-            <span className="font-plex text-[11px] text-gray-300 truncate
-                             group-hover:text-white transition-colors">
-              {repo.name}
-            </span>
-          </div>
-          <p className="text-[11px] text-gray-600 leading-relaxed
-                        line-clamp-2 pl-[1.35rem]">
-            {repo.description}
-          </p>
-        </li>
-      ))}
-    </ul>
-  )}
-</aside>
+            {globalResults.length === 0 && globalSearch !== "" ? (
+              <p className="font-plex text-[10px] text-gray-800 text-center py-6">
+                no match for{" "}
+                <span className="text-[#00FFA3]/50">"{globalSearch}"</span>
+              </p>
+            ) : (
+              <ul className="space-y-2 max-h-[280px] lg:max-h-none overflow-y-auto lg:overflow-visible pr-1 lg:pr-0">
+                {globalResults.map((repo) => (
+                  <li
+                    key={repo._id}
+                    onClick={() => navigate(`/repo/${repo.name}/${repo._id}`)}
+                    className="group p-3.5 rounded-lg border border-white/[0.05] bg-white/[0.02]
+                               hover:bg-[#00FFA3]/[0.04] hover:border-[#00FFA3]/20
+                               transition-all duration-250 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <FolderIcon />
+                      <span className="font-plex text-[11px] text-gray-300 truncate
+                                       group-hover:text-white transition-colors">
+                        {repo.name}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-gray-600 leading-relaxed
+                                  line-clamp-2 pl-[1.35rem]">
+                      {repo.description}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </aside>
 
-          <main className="flex-1 min-w-0">
+          {/* MAIN — first on mobile, center column on desktop */}
+          <main className="flex-1 min-w-0 order-1 lg:order-2">
 
-            <div className="mb-8 flex items-end justify-between">
+            <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
               <div>
-                <h2 className="font-syne text-3xl font-bold text-white tracking-tight leading-none">
+                <h2 className="font-syne text-2xl sm:text-3xl font-bold text-white tracking-tight leading-none">
                   Repositories
                 </h2>
                 <p className="mt-1.5 font-plex text-xs text-gray-600">
                   {repositories.length} total &nbsp;·&nbsp; {searchResults.length} shown
                 </p>
               </div>
-              <div className="font-plex text-[10px] text-gray-700 border border-white/[0.06] rounded-md px-3 py-1.5 bg-white/[0.02]">
+              <div className="font-plex text-[10px] text-gray-700 border border-white/[0.06] rounded-md px-3 py-1.5 bg-white/[0.02] self-start sm:self-auto">
                 updated just now
               </div>
             </div>
@@ -239,7 +251,7 @@ const Dashboard = () => {
               <div className="absolute -inset-px rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"
                 style={{ background: "linear-gradient(135deg, #00FFA320, transparent, #00FFA308)", borderRadius: "12px" }} />
 
-              <div className="relative flex items-center gap-3 px-4 py-3 rounded-xl
+              <div className="relative flex items-center gap-3 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl
                               border border-white/[0.07] bg-white/[0.03]
                               focus-within:border-[#00FFA3]/30 transition-colors duration-300">
                 <SearchIcon />
@@ -248,10 +260,10 @@ const Dashboard = () => {
                   value={searchQuery}
                   placeholder="Search your own repositories…"
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                  className="flex-1 bg-transparent font-dm text-sm text-gray-200 placeholder-gray-700 outline-none"
+                  className="flex-1 min-w-0 bg-transparent font-dm text-sm text-gray-200 placeholder-gray-700 outline-none"
                 />
                 {searchQuery && (
-                  <span className="font-plex text-[10px] text-[#00FFA3]/60">
+                  <span className="font-plex text-[10px] text-[#00FFA3]/60 shrink-0">
                     {searchResults.length} found
                   </span>
                 )}
@@ -263,7 +275,7 @@ const Dashboard = () => {
                 <li
                   key={repo._id}
                  onClick={() => navigate(`/repo/${repo.name}/${repo._id}`)}
-                  className="repo-card group relative flex items-center gap-4 px-5 py-4 rounded-xl
+                  className="repo-card group relative flex items-center gap-3 sm:gap-4 px-3.5 sm:px-5 py-3 sm:py-4 rounded-xl
                              border border-white/[0.05] bg-white/[0.02]
                              hover:bg-white/[0.04] hover:border-white/[0.09]
                              transition-all duration-200 cursor-pointer"
@@ -275,14 +287,14 @@ const Dashboard = () => {
                                transition-all duration-300"
                   />
 
-                  <div className="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center
+                  <div className="shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center
                                   bg-gradient-to-br from-[#00FFA3]/8 to-[#A78BFA]/8
                                   border border-white/[0.06] group-hover:border-[#00FFA3]/20 transition-colors">
                     <FolderIcon />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-plex text-sm font-medium text-gray-300 group-hover:text-white transition-colors truncate">
+                    <h4 className="font-plex text-[13px] sm:text-sm font-medium text-gray-300 group-hover:text-white transition-colors truncate">
                       {repo.name}
                     </h4>
                     <p className="font-dm text-xs text-gray-600 mt-0.5 truncate">
@@ -296,7 +308,7 @@ const Dashboard = () => {
             </ul>
 
             {searchResults.length === 0 && searchQuery !== "" && (
-              <div className="py-20 text-center">
+              <div className="py-16 sm:py-20 text-center">
                 <p className="font-plex text-xs text-gray-700">
                   no match for{" "}
                   <span className="text-[#00FFA3]/60">"{searchQuery}"</span>
@@ -306,19 +318,20 @@ const Dashboard = () => {
             )}
           </main>
 
-          <aside className="w-[210px] shrink-0">
-            <div className="flex items-center gap-2 mb-6">
+          {/* UPCOMING EVENTS — horizontal snap-scroll on mobile, vertical list on desktop */}
+          <aside className="w-full lg:w-[210px] shrink-0 order-3 lg:order-3">
+            <div className="flex items-center gap-2 mb-4 lg:mb-6">
               <span className="block w-1.5 h-4 rounded-full bg-[#FF6B4A]" />
               <h3 className="font-syne text-[10px] tracking-[0.22em] uppercase text-gray-500">
                 Upcoming
               </h3>
             </div>
 
-            <ul className="space-y-2.5">
+            <ul className="events-scroll flex lg:flex-col gap-2.5 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-4 px-4 lg:mx-0 lg:px-0">
               {UPCOMING_EVENTS.map((event) => (
                 <li
                   key={event.id}
-                  className="group p-4 rounded-xl border border-white/[0.05] bg-white/[0.02]
+                  className="group shrink-0 w-[200px] lg:w-auto p-4 rounded-xl border border-white/[0.05] bg-white/[0.02]
                              hover:bg-white/[0.04] hover:border-white/[0.09]
                              transition-all duration-200 cursor-pointer"
                 >
@@ -336,7 +349,7 @@ const Dashboard = () => {
               ))}
             </ul>
 
-            <div className="mt-8 pt-6 border-t border-white/[0.04]">
+            <div className="mt-6 lg:mt-8 pt-4 lg:pt-6 border-t border-white/[0.04]">
               <p className="font-plex text-[10px] text-gray-700 leading-relaxed">
                 3 events this month
               </p>

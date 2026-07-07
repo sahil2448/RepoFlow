@@ -97,31 +97,33 @@ const HeatMapProfile: React.FC = () => {
       `}</style>
 
       
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <span className="block w-1 h-3 rounded-full bg-[#00FFA3]/60" />
-          <span className="font-plex text-[10px] uppercase tracking-widest text-gray-600">
-            {year} contributions
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="font-syne text-sm font-bold text-white">
-            {totalContribs.toLocaleString()}
-            <span className="font-plex text-[10px] text-gray-600 font-normal ml-1.5">
-              total
-            </span>
-          </span>
-          {totalContribs === 0 && (
-            <span className="font-plex text-[10px] text-gray-700 border border-white/[0.05]
-                             px-2 py-0.5 rounded">
-              no activity yet
-            </span>
-          )}
-        </div>
-      </div>
+    <div className="flex items-center justify-between gap-3 mb-4
+                overflow-x-auto scrollbar-hide whitespace-nowrap">
+  <div className="flex items-center gap-2 shrink-0">
+    <span className="block w-1 h-3 rounded-full bg-[#00FFA3]/60" />
+    <span className="font-plex text-[10px] uppercase tracking-widest text-gray-600">
+      {year} contributions
+    </span>
+  </div>
+  <div className="flex items-center gap-3 shrink-0">
+    <span className="font-syne text-sm font-bold text-white">
+      {totalContribs.toLocaleString()}
+      <span className="font-plex text-[10px] text-gray-600 font-normal ml-1.5">
+        total
+      </span>
+    </span>
+    {totalContribs === 0 && (
+      <span className="font-plex text-[10px] text-gray-700 border border-white/[0.05]
+                       px-2 py-0.5 rounded">
+        no activity yet
+      </span>
+    )}
+  </div>
+</div>
 
       
       <div className="heatmap-themed w-full">
+        <div className="min-w-[600px]">
         <HeatMap
           value={activityData}
           startDate={new Date(`${year}-01-01`)}
@@ -146,6 +148,7 @@ const HeatMapProfile: React.FC = () => {
             fontSize: "9px",
           }}
         />
+        </div>
       </div>
 
       

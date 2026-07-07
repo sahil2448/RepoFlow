@@ -121,7 +121,7 @@ const DeleteTabPanel: React.FC<DeleteTabPanelProps> = ({
       
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#FF6B4A]/30 to-transparent" />
 
-      <div className="px-8 py-12 flex flex-col items-center gap-6 max-w-md mx-auto">
+      <div className="px-4 sm:px-8 py-8 sm:py-12 flex flex-col items-center gap-6 max-w-md mx-auto">
 
         
         <div className="w-12 h-12 rounded-xl border border-[#FF6B4A]/20
@@ -304,7 +304,7 @@ const RepositoryDetails: React.FC = () => {
   
   if (loading) {
     return (
-      <div className="font-dm max-w-[1380px] mx-auto px-6 py-10 space-y-6">
+      <div className="max-w-[1380px] mx-auto px-4 sm:px-6 py-6 sm:py-10">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-4 w-72" />
         <div className="grid grid-cols-3 gap-3 mt-8">
@@ -333,6 +333,11 @@ const RepositoryDetails: React.FC = () => {
   return (
     <>
       <style>{`
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
         .font-syne { font-family: 'Syne', sans-serif; }
         .font-plex { font-family: 'IBM Plex Mono', monospace; }
         .font-dm   { font-family: 'DM Sans', sans-serif; }
@@ -387,7 +392,7 @@ const RepositoryDetails: React.FC = () => {
       <div className="glow-coral pointer-events-none fixed bottom-0  right-0   w-[400px] h-[400px] z-0" />
 
       <div className="font-dm relative z-10 min-h-[calc(100vh-56px)] text-white">
-        <div className="max-w-[1380px] mx-auto px-6 py-10">
+        <div className="max-w-[1380px] mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
           
           <button
@@ -402,70 +407,66 @@ const RepositoryDetails: React.FC = () => {
             dashboard
           </button>
 
-          
           <div className="fade-up mb-8" style={{ animationDelay: "40ms" }}>
-            <div className="flex items-start justify-between gap-6 flex-wrap">
+  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 sm:gap-6">
 
-              
-              <div>
-                
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="flex items-center gap-1.5 font-plex text-[11px] text-gray-600">
-                    <UserIcon />
-                    {ownerName}
-                  </span>
-                  <span className="text-gray-700 font-plex text-[11px]">/</span>
-                  <h1 className="font-syne text-2xl font-bold text-white tracking-tight leading-none">
-                    {repo.name}
-                  </h1>
-                  
-                  <span className={`flex items-center gap-1 font-plex text-[9px] px-2 py-0.5
-                                    rounded border uppercase tracking-widest
-                                    ${repo.visibility
-                      ? "text-[#00FFA3] bg-[#00FFA3]/[0.07] border-[#00FFA3]/20"
-                      : "text-[#A78BFA] bg-[#A78BFA]/[0.07] border-[#A78BFA]/20"
-                    }`}>
-                    {repo.visibility ? <GlobeIcon /> : <LockIcon />}
-                    {repo.visibility ? "public" : "private"}
-                  </span>
-                </div>
+    <div className="min-w-0">
+      <div className="flex items-center gap-2 mb-2 flex-wrap">
+        <span className="flex items-center gap-1.5 font-plex text-[11px] text-gray-600 shrink-0">
+          <UserIcon />
+          {ownerName}
+        </span>
+        <span className="text-gray-700 font-plex text-[11px] shrink-0">/</span>
+        <h1 className="font-syne text-xl sm:text-2xl font-bold text-white tracking-tight leading-none break-all">
+          {repo.name}
+        </h1>
+        <span className={`flex items-center gap-1 font-plex text-[9px] px-2 py-0.5
+                          rounded border uppercase tracking-widest shrink-0
+                          ${repo.visibility
+            ? "text-[#00FFA3] bg-[#00FFA3]/[0.07] border-[#00FFA3]/20"
+            : "text-[#A78BFA] bg-[#A78BFA]/[0.07] border-[#A78BFA]/20"
+          }`}>
+          {repo.visibility ? <GlobeIcon /> : <LockIcon />}
+          {repo.visibility ? "public" : "private"}
+        </span>
+      </div>
 
-                {repo.description && (
-                  <p className="font-dm text-sm text-gray-500 max-w-lg leading-relaxed">
-                    {repo.description}
-                  </p>
-                )}
-              </div>
+      {repo.description && (
+        <p className="font-dm text-sm text-gray-500 max-w-lg leading-relaxed">
+          {repo.description}
+        </p>
+      )}
+    </div>
 
-
-              <button
-                onClick={handleStar}
-                disabled={!userId || starLoading}
-                className={`flex items-center gap-2.5 px-4 py-2 rounded-xl border
-                            font-plex text-[11px] tracking-wider transition-all duration-200
-                            disabled:opacity-40 disabled:cursor-not-allowed
-                            ${starred
-                    ? "text-[#00FFA3] bg-[#00FFA3]/[0.08] border-[#00FFA3]/25 hover:bg-[#00FFA3]/[0.14]"
-                    : "text-gray-400 bg-white/[0.02] border-white/[0.07] hover:border-white/[0.12] hover:text-white"
-                  }`}
-              >
-                <span className={starred ? "star-pop text-[#00FFA3]" : ""}>
-                  <StarIcon filled={starred} />
-                </span>
-                <span>{starred ? "Starred" : "Star"}</span>
-                <span className={`px-1.5 py-0.5 rounded text-[10px]
-                                  ${starred ? "bg-[#00FFA3]/10" : "bg-white/[0.05]"}`}>
-                  {starCount}
-                </span>
-              </button>
-            </div>
-          </div>
+    <button
+      onClick={handleStar}
+      disabled={!userId || starLoading}
+      className={`flex items-center justify-center gap-2.5 px-4 py-2 rounded-xl border
+                  font-plex text-[11px] tracking-wider transition-all duration-200
+                  disabled:opacity-40 disabled:cursor-not-allowed shrink-0
+                  w-full sm:w-auto
+                  ${starred
+          ? "text-[#00FFA3] bg-[#00FFA3]/[0.08] border-[#00FFA3]/25 hover:bg-[#00FFA3]/[0.14]"
+          : "text-gray-400 bg-white/[0.02] border-white/[0.07] hover:border-white/[0.12] hover:text-white"
+        }`}
+    >
+      <span className={starred ? "star-pop text-[#00FFA3]" : ""}>
+        <StarIcon filled={starred} />
+      </span>
+      <span>{starred ? "Starred" : "Star"}</span>
+      <span className={`px-1.5 py-0.5 rounded text-[10px]
+                        ${starred ? "bg-[#00FFA3]/10" : "bg-white/[0.05]"}`}>
+        {starCount}
+      </span>
+    </button>
+  </div>
+</div>
 
           
           <div
-            className="fade-up grid grid-cols-3 gap-3 mb-8"
-            style={{ animationDelay: "80ms" }}
-          >
+  className="fade-up grid grid-cols-1 xs:grid-cols-3 sm:grid-cols-3 gap-3 mb-8"
+  style={{ animationDelay: "80ms" }}
+>
             {[
               {
                 label: "Stars",
@@ -487,62 +488,62 @@ const RepositoryDetails: React.FC = () => {
               },
             ].map(({ label, value, accent, icon }) => (
               <div
-                key={label}
-                className="relative rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 overflow-hidden"
-              >
-                
-                <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full blur-xl opacity-20"
-                  style={{ backgroundColor: accent }} />
-                <div className="relative flex items-start justify-between">
-                  <div>
-                    <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600 mb-2">
-                      {label}
-                    </p>
-                    <p className="font-syne text-2xl font-bold" style={{ color: accent }}>
-                      {value}
-                    </p>
-                  </div>
-                  <span style={{ color: accent }} className="opacity-40 mt-0.5">{icon}</span>
-                </div>
-              </div>
+  key={label}
+  className="relative rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5 sm:p-4 overflow-hidden"
+>
+  <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full blur-xl opacity-20"
+    style={{ backgroundColor: accent }} />
+  <div className="relative flex items-start justify-between">
+    <div className="min-w-0">
+      <p className="font-plex text-[9px] sm:text-[10px] uppercase tracking-widest text-gray-600 mb-1.5 sm:mb-2 truncate">
+        {label}
+      </p>
+      <p className="font-syne text-lg sm:text-2xl font-bold" style={{ color: accent }}>
+        {value}
+      </p>
+    </div>
+    <span style={{ color: accent }} className="opacity-40 mt-0.5 shrink-0">{icon}</span>
+  </div>
+</div>
             ))}
           </div>
 
           
           <div
-            className="fade-up border-b border-white/[0.05] mb-6"
-            style={{ animationDelay: "110ms" }}
-          >
-            {(
-              [
-                { key: "content" as RepoTab, label: "Content", icon: <TerminalIcon /> },
-                { key: "issues" as RepoTab, label: `Issues`, icon: <IssueIcon /> },
-                { key: "commits" as RepoTab, label: "Commits", icon: <CommitIcon /> },
-                isOwner && { key: "delete" as RepoTab, label: `Delete`, icon: <TrashIcon /> },
-
-              ] as { key: RepoTab; label: string; icon: React.ReactNode }[]
-            ).map(({ key, label, icon }) => (
-              <button
-                key={key}
-                onClick={() => setActiveTab(key)}
-                className={`relative inline-flex items-center gap-2 font-plex text-[11px]
-                            px-4 py-3 transition-colors duration-200
-                            ${activeTab === key ? "text-white" : "text-gray-600 hover:text-gray-300"}`}
-              >
-                {icon}
-                {label}
-                {key === "issues" && openIssues > 0 && (
-                  <span className="font-plex text-[9px] px-1.5 py-0.5 rounded
-                                   bg-[#FF6B4A]/10 border border-[#FF6B4A]/20 text-[#FF6B4A]">
-                    {openIssues}
-                  </span>
-                )}
-                {activeTab === key && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-[#00FFA3]" />
-                )}
-              </button>
-            ))}
-          </div>
+  className="fade-up border-b border-white/[0.05] mb-6 overflow-x-auto scrollbar-hide"
+  style={{ animationDelay: "110ms" }}
+>
+  <div className="flex items-center whitespace-nowrap">
+    {(
+      [
+        { key: "content" as RepoTab, label: "Content", icon: <TerminalIcon /> },
+        { key: "issues" as RepoTab, label: `Issues`, icon: <IssueIcon /> },
+        { key: "commits" as RepoTab, label: "Commits", icon: <CommitIcon /> },
+        isOwner && { key: "delete" as RepoTab, label: `Delete`, icon: <TrashIcon /> },
+      ] as { key: RepoTab; label: string; icon: React.ReactNode }[]
+    ).map(({ key, label, icon }) => (
+      <button
+        key={key}
+        onClick={() => setActiveTab(key)}
+        className={`relative inline-flex items-center gap-2 font-plex text-[11px]
+                    px-3 sm:px-4 py-3 whitespace-nowrap transition-colors duration-200
+                    ${activeTab === key ? "text-white" : "text-gray-600 hover:text-gray-300"}`}
+      >
+        {icon}
+        {label}
+        {key === "issues" && openIssues > 0 && (
+          <span className="font-plex text-[9px] px-1.5 py-0.5 rounded
+                           bg-[#FF6B4A]/10 border border-[#FF6B4A]/20 text-[#FF6B4A]">
+            {openIssues}
+          </span>
+        )}
+        {activeTab === key && (
+          <span className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-[#00FFA3]" />
+        )}
+      </button>
+    ))}
+  </div>
+</div>
 
           
           <div className="fade-up" style={{ animationDelay: "140ms" }}>
@@ -552,37 +553,34 @@ const RepositoryDetails: React.FC = () => {
               <div className="relative rounded-2xl border border-white/[0.07]
                   bg-[#060611] overflow-hidden scanlines">
 
-                
-                <div className="flex items-center justify-between px-4 py-2.5
-                    border-b border-white/[0.05] bg-white/[0.02]">
-                  <div className="flex items-center gap-1.5">
-                    {["#FF6B4A", "#F59E0B", "#00FFA3"].map((c) => (
-                      <span key={c} className="w-2.5 h-2.5 rounded-full opacity-60"
-                        style={{ backgroundColor: c }} />
-                    ))}
-                  </div>
-                  <span className="font-plex text-[10px] text-gray-700">
-                    {repo.name}
-                    {latestCommitMsg && (
-                      <span className="text-gray-800 ml-2">— {latestCommitMsg}</span>
-                    )}
-                  </span>
-                  
-                  {selectedFile ? (
-                    <button
-                      onClick={() => setSelectedFile(null)}
-                      className="font-plex text-[10px] text-[#00FFA3]/60
-                     hover:text-[#00FFA3] transition-colors"
-                    >
-                      ← back
-                    </button>
-                  ) : (
-                    <span className="font-plex text-[10px] text-[#00FFA3]/40">
-                      {files.length} file{files.length !== 1 ? "s" : ""}
-                    </span>
-                  )}
-                </div>
-
+                <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2.5
+    border-b border-white/[0.05] bg-white/[0.02] overflow-x-auto scrollbar-hide">
+  <div className="flex items-center gap-1.5 shrink-0">
+    {["#FF6B4A", "#F59E0B", "#00FFA3"].map((c) => (
+      <span key={c} className="w-2.5 h-2.5 rounded-full opacity-60 shrink-0"
+        style={{ backgroundColor: c }} />
+    ))}
+  </div>
+  <span className="font-plex text-[10px] text-gray-700 truncate min-w-0">
+    {repo.name}
+    {latestCommitMsg && (
+      <span className="text-gray-800 ml-2">— {latestCommitMsg}</span>
+    )}
+  </span>
+  {selectedFile ? (
+    <button
+      onClick={() => setSelectedFile(null)}
+      className="font-plex text-[10px] text-[#00FFA3]/60
+                 hover:text-[#00FFA3] transition-colors shrink-0"
+    >
+      ← back
+    </button>
+  ) : (
+    <span className="font-plex text-[10px] text-[#00FFA3]/40 shrink-0">
+      {files.length} file{files.length !== 1 ? "s" : ""}
+    </span>
+  )}
+</div>
                 {filesLoading ? (
                   <div className="space-y-2 p-4">
                     {[1, 2, 3].map((i) => (
@@ -609,36 +607,37 @@ const RepositoryDetails: React.FC = () => {
                     <div className="divide-y divide-white/[0.03]">
                       {selectedFile.content.split("\n").map((line, i) => (
                         <div key={i}
-                          className="content-line group flex items-start
-                         hover:bg-[#00FFA3]/[0.03] transition-colors duration-150">
-                          <span className="shrink-0 w-12 py-2.5 text-center font-plex
-                               text-[11px] text-gray-800 select-none
-                               border-r border-white/[0.04]">
-                            {String(i + 1).padStart(2, "0")}
-                          </span>
-                          <span className="flex-1 px-5 py-2.5 font-plex text-[12px]
-                               text-gray-300 leading-relaxed break-all">
-                            {line || " "}
-                          </span>
-                          <button
-                            onClick={() => handleCopyLine(line, i)}
-                            className="copy-btn shrink-0 mr-3 mt-2 px-2 py-1 rounded
-                           font-plex text-[9px] border transition-all duration-150
-                           border-white/[0.07] text-gray-600 hover:text-[#00FFA3]
-                           hover:border-[#00FFA3]/20 bg-white/[0.02]"
-                          >
-                            {copiedLine === i ? "copied!" : "copy"}
-                          </button>
-                        </div>
+  className="content-line group flex items-start
+     hover:bg-[#00FFA3]/[0.03] transition-colors duration-150">
+  <span className="shrink-0 w-8 sm:w-12 py-2.5 text-center font-plex
+       text-[10px] sm:text-[11px] text-gray-800 select-none
+       border-r border-white/[0.04]">
+    {String(i + 1).padStart(2, "0")}
+  </span>
+  <span className="flex-1 min-w-0 px-3 sm:px-5 py-2.5 font-plex text-[11px] sm:text-[12px]
+       text-gray-300 leading-relaxed break-all">
+    {line || " "}
+  </span>
+  <button
+    onClick={() => handleCopyLine(line, i)}
+    className="copy-btn shrink-0 mr-2 sm:mr-3 mt-2 px-2 py-1 rounded
+   font-plex text-[9px] border transition-all duration-150
+   border-white/[0.07] text-gray-600 hover:text-[#00FFA3]
+   hover:border-[#00FFA3]/20 bg-white/[0.02]
+   opacity-60 sm:opacity-0"
+  >
+    {copiedLine === i ? "copied!" : "copy"}
+  </button>
+</div>
                       ))}
                     </div>
                   </div>
                 ) : files.length === 0 ? (
                   
-                  <div className="px-6 py-16 flex flex-col items-center gap-4">
-                    <p className="font-plex text-[11px] text-gray-700">
-                      no files pushed yet
-                    </p>
+                   <div className="px-4 sm:px-6 py-12 sm:py-16 flex flex-col items-center gap-4">
+    <p className="font-plex text-[11px] text-gray-700">
+      no files pushed yet
+    </p>
                     <div className="w-full max-w-sm rounded-xl border border-white/[0.06]
                         bg-[#060611] overflow-hidden">
                       <div className="flex items-center gap-1.5 px-4 py-2
@@ -691,22 +690,22 @@ const RepositoryDetails: React.FC = () => {
                         </svg>
 
                         
-                        <span className="flex-1 font-plex text-[12px] text-gray-400
-                             group-hover:text-white transition-colors">
-                          {file.name}
-                        </span>
+                          <span className="flex-1 min-w-0 font-plex text-[12px] text-gray-400
+       group-hover:text-white transition-colors truncate">
+    {file.name}
+  </span>
 
                         
-                        <span className={`font-plex text-[9px] px-1.5 py-0.5 rounded border
-                              ${file.source === "s3"
-                            ? "text-[#00FFA3]/50 border-[#00FFA3]/15"
-                            : "text-[#A78BFA]/50 border-[#A78BFA]/15"
-                          }`}>
-                          {file.source}
-                        </span>
+                        <span className={`shrink-0 font-plex text-[9px] px-1.5 py-0.5 rounded border
+        ${file.source === "s3"
+      ? "text-[#00FFA3]/50 border-[#00FFA3]/15"
+      : "text-[#A78BFA]/50 border-[#A78BFA]/15"
+    }`}>
+    {file.source}
+  </span>
 
                         
-                        <svg className="w-3.5 h-3.5 text-gray-700
+                        <svg className="w-3.5 h-3.5 text-gray-700 shrink-0
                              group-hover:text-[#00FFA3] transition-colors"
                           fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round"

@@ -74,7 +74,7 @@ const AboutUser: React.FC<AboutUserProps> = ({ userDetails }) => {
           </h3>
         </div>
       <div className="relative rounded-2xl border border-white/[0.07]
-                      bg-white/[0.02] p-5 mb-6 overflow-hidden">
+                bg-white/[0.02] p-4 sm:p-5 mb-6 overflow-hidden">
         
         
         
@@ -126,8 +126,8 @@ const AboutUser: React.FC<AboutUserProps> = ({ userDetails }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-plex text-[11px] text-[#00FFA3]/70
-                           hover:text-[#00FFA3] transition-colors duration-150
-                           truncate max-w-[280px]"
+           hover:text-[#00FFA3] transition-colors duration-150
+           truncate max-w-[200px] sm:max-w-[280px]"
               >
                 {userDetails.website}
               </a>
