@@ -1,4 +1,4 @@
-# RepoFlow
+# RepoFlow - AI Powered Version Control System (Real Time)
 
 A full-stack GitHub alternative(Version Control System) built from scratch with a custom CLI version control system, AI-powered semantic duplicate issue detection, realtime code review feature with WebRTC & WebSockets.
 
