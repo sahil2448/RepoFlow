@@ -77,7 +77,10 @@ const Dashboard = () => {
   const navigate = useNavigate();
   useEffect(() => {
     const userId = localStorage.getItem("userId");
-    if (!userId) { console.error("No userId found in localStorage"); return; }
+    if (!userId) {
+      console.error("No userId found in localStorage");
+      navigate("/login")
+     }
 
     const fetchRepositories = async (): Promise<void> => {
       try {

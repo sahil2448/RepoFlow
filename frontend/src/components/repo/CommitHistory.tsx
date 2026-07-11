@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ec2Api } from "../../config/api";
 import { useNavigate } from "react-router-dom";
-
-
-
 interface CommitFile {
   file: string;
   url: string;
@@ -68,8 +65,6 @@ const ChevronIcon: React.FC<{ open: boolean }> = ({ open }) => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
   </svg>
 );
-
-
 
 const CommitHistory: React.FC<CommitHistoryProps> = ({ repoId }) => {
   const [commits, setCommits] = useState<Commit[]>([]);
