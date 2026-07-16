@@ -226,7 +226,7 @@ const Guidelines: React.FC = () => {
               </span>
             </div>
             <h1 className="font-syne text-3xl sm:text-4xl font-bold text-white tracking-tight mb-3">
-              Using the RepoFlow CLI
+              How to use RepoFlow CLI
             </h1>
             <p className="font-dm text-sm text-gray-500 max-w-lg leading-relaxed">
               RepoFlow ships a command-line tool for staging, committing, and pushing your code —
