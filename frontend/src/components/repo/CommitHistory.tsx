@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ec2Api } from "../../config/api";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 interface CommitFile {
   file: string;
   url: string;
@@ -143,49 +143,63 @@ const handleStartReview = (commit: Commit): void => {
   }
 
   
-  if (commits.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 px-4">
-        <div
-          className="w-10 h-10 rounded-xl border border-white/[0.07] bg-white/[0.02]
-                        flex items-center justify-center text-gray-700"
-        >
-          <CommitIcon />
-        </div>
-        <div className="text-center">
-          <p className="font-plex text-[11px] text-gray-700">no commits pushed yet</p>
-          <p className="font-plex text-[10px] text-gray-800 mt-1">run these commands locally:</p>
-        </div>
+  // ── Empty state — now includes CLI Guide link ──
+  
+if (commits.length === 0) {
+  return (
+    
+    <div className="flex flex-col items-center justify-center py-16 gap-4">
+      <div className="w-10 h-10 rounded-xl border border-white/[0.07] bg-white/[0.02]
+                      flex items-center justify-center text-gray-700">
+        <CommitIcon />
+      </div>
+        {/* ✅ Link to full guide */}
+      <Link
+        to="/guidelines"
+        className="flex items-center gap-1.5 font-plex text-[11px] text-[#A78BFA]/70
+                   hover:text-[#A78BFA] transition-colors duration-150"
+      >
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+            d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        View the full CLI guide
+      </Link>
+      <div className="text-center">
+        <p className="font-plex text-[11px] text-gray-700">no commits pushed yet</p>
+        <p className="font-plex text-[10px] text-gray-800 mt-1">
+          push your first commit using the RepoFlow CLI
+        </p>
+      </div>
 
-        
-        <div className="w-full max-w-sm rounded-xl border border-white/[0.06] bg-[#060611] overflow-hidden">
-          <div className="flex items-center gap-1.5 px-4 py-2 border-b border-white/[0.05]">
-            {["#FF6B4A", "#F59E0B", "#00FFA3"].map((c) => (
-              <span
-                key={c}
-                className="w-2 h-2 rounded-full opacity-50"
-                style={{ backgroundColor: c }}
-              />
-            ))}
-            <span className="font-plex text-[10px] text-gray-700 ml-1">terminal</span>
-          </div>
-          <div className="px-4 py-3 space-y-1.5 font-plex text-[11px] overflow-x-auto">
-            {[
-              { cmd: `node index.js init --repoId ${repoId}`, comment: "# link to this repo" },
-              { cmd: "node index.js add yourfile.js", comment: "# stage a file" },
-              { cmd: 'node index.js commit "your message"', comment: "# snapshot" },
-              { cmd: "node index.js push", comment: "# sync to S3 + DB" },
-            ].map(({ cmd, comment }) => (
-              <div key={cmd} className="whitespace-nowrap">
-                <span className="text-[#00FFA3]/80">{cmd}</span>
-                <span className="text-gray-700 ml-2">{comment}</span>
-              </div>
-            ))}
-          </div>
+      {/* CLI cheatsheet */}
+      <div className="w-full max-w-sm rounded-xl border border-white/[0.06] bg-[#060611] overflow-hidden">
+        <div className="flex items-center gap-1.5 px-4 py-2 border-b border-white/[0.05]">
+          {["#FF6B4A","#F59E0B","#00FFA3"].map((c) => (
+            <span key={c} className="w-2 h-2 rounded-full opacity-50" style={{ backgroundColor: c }} />
+          ))}
+          <span className="font-plex text-[10px] text-gray-700 ml-1">terminal</span>
+        </div>
+        <div className="px-4 py-3 space-y-1.5 font-plex text-[11px]">
+          {[
+            { cmd: `node index.js login`,               comment: "# authenticate" },
+            { cmd: `node index.js init ${repoId}`,      comment: "# link this repo" },
+            { cmd: `node index.js add yourfile.js`,     comment: "# stage a file" },
+            { cmd: `node index.js commit "message"`,    comment: "# snapshot" },
+            { cmd: `node index.js push`,                comment: "# sync here" },
+          ].map(({ cmd, comment }) => (
+            <div key={cmd}>
+              <span className="text-[#00FFA3]/80">{cmd}</span>
+              <span className="text-gray-700 ml-2">{comment}</span>
+            </div>
+          ))}
         </div>
       </div>
-    );
-  }
+
+    
+    </div>
+  );
+}
 
   
   return (

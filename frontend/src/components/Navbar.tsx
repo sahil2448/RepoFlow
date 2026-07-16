@@ -25,6 +25,12 @@ const BellIcon: React.FC<{ hasUnread: boolean }> = ({ hasUnread }) => (
       d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
   </svg>
 );
+const TerminalIcon: React.FC = () => (
+  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+      d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>
+);
 
 const Navbar: React.FC = () => {
   const location  = useLocation();
@@ -128,6 +134,19 @@ const Navbar: React.FC = () => {
             <span className="hidden sm:inline">New Repo</span>
           </Link>
 
+          <Link
+            to="/guidelines"
+            className={`flex items-center gap-1.5 font-plex text-[11px] px-3.5 py-1.5
+                        rounded-lg border transition-all duration-200
+                        ${location.pathname === "/guidelines"
+                          ? "text-[#A78BFA] bg-[#A78BFA]/[0.07] border-[#A78BFA]/20"
+                          : "text-gray-500 border-transparent hover:text-gray-200 hover:bg-white/[0.04] hover:border-white/[0.06]"
+                        }`}
+          >
+            <TerminalIcon />
+            {/* ✅ hide text on small screens */}
+            <span className="hidden sm:inline">CLI Guide</span>
+          </Link>
           <span className="mx-1 w-px h-4 bg-white/[0.07] hidden xs:block sm:block" />
 
           <div ref={bellRef} className="relative">

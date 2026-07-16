@@ -9,6 +9,7 @@ import { useAuth } from "./auth";
 import CreateRepo from "./components/repo/CreateRepo";
 import RepositoryDetails from "./components/repo/RepoDetails";
 import ReviewRoom from "./components/review/ReviewRoom";
+import Guidelines from "./components/guidelines/Guidelines";
 
 
 const ProjectRoutes: React.FC = () => {
@@ -58,6 +59,7 @@ const ProjectRoutes: React.FC = () => {
         { path: "/profile/:id",  element: <Profile /> },  
         { path: "/repo/create",  element: <CreateRepo /> },
         { path: "/repo/:name/:id",     element: <RepositoryDetails /> },
+        { path: "/guidelines", element: <Guidelines /> },
       ],
     },
   ]);
