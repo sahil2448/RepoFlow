@@ -15,12 +15,6 @@ interface Step {
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
-const TerminalIcon: React.FC = () => (
-  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-      d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-  </svg>
-);
 const CheckIcon: React.FC = () => (
   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -35,12 +29,6 @@ const CopyIcon: React.FC = () => (
 const ArrowRightIcon: React.FC = () => (
   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-  </svg>
-);
-const ExternalIcon: React.FC = () => (
-  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
   </svg>
 );
 
@@ -80,12 +68,6 @@ const CodeBlock: React.FC<{ code: string; label?: string }> = ({ code, label }) 
 };
 
 // ─── Steps ───────────────────────────────────────────────────────────────────
-
-const NODE_URLS: Record<OS, string> = {
-  mac:     "https://nodejs.org/en/download",
-  windows: "https://nodejs.org/en/download",
-  linux:   "https://nodejs.org/en/download/package-manager",
-};
 
 const NODE_CMDS: Record<OS, string> = {
   mac:     "# Install via Homebrew (recommended)\nbrew install node\n\n# Verify\nnode --version",
@@ -188,14 +170,6 @@ const buildSteps = (os: OS): Step[] => [
   },
 ];
 
-// ─── Tip Card ────────────────────────────────────────────────────────────────
-
-const TIP: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="flex gap-3 rounded-xl border border-[#A78BFA]/20 bg-[#A78BFA]/[0.05] px-4 py-3">
-    <span className="font-plex text-[10px] text-[#A78BFA] uppercase tracking-widest mt-0.5 shrink-0">tip</span>
-    <p className="font-dm text-xs text-gray-400 leading-relaxed">{children}</p>
-  </div>
-);
 
 // ─── Quick Reference Table ────────────────────────────────────────────────────
 
@@ -215,9 +189,7 @@ const COMMANDS = [
 
 const Guidelines: React.FC = () => {
   const [os, setOs]           = useState<OS>("mac");
-  const [copied09, setCopied09] = useState(false);
 
-  const ALIAS_PATH = `node /absolute/path/to/RepoFlow/Backend/index.js`;
   const ALIAS_CODE_MAC = `# Add to ~/.zshrc or ~/.bashrc\nalias rflow="node /absolute/path/to/RepoFlow/Backend/index.js"\n\n# Reload shell\nsource ~/.zshrc\n\n# Now use:\nrflow login\nrflow init my-project\nrflow push`;
   const ALIAS_CODE_WIN = `# PowerShell profile ($PROFILE)\nfunction rflow { node C:\\path\\to\\RepoFlow\\Backend\\index.js $args }\n\n# Then:\nrflow login`;
 
