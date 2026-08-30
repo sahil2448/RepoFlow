@@ -17,7 +17,6 @@
 
 import { createClient } from "redis";
 
-const REDIS_URL = process.env.REDIS_URL;
 const DEFAULT_TTL_SECONDS = 60;
 const FAIL_COOLDOWN_MS = 30_000;
 
@@ -32,6 +31,14 @@ export const cacheKeys = {
   repoByName: (name) => `repo:name:${String(name).toLowerCase()}`,
   userProfile: (id) => `user:profile:${id}`,
 };
+
+// REDIS_URL is read lazily at call time (not module-load time): controllers
+// import this module before `dotenv.config()` runs on the main entry, and ESM
+// imports are hoisted, so `process.env.REDIS_URL` would be undefined during
+// module evaluation. Reading it here guarantees dotenv has already loaded.
+function redisUrl() {
+  return process.env.REDIS_URL;
+}
 
 // Bounded connection behaviour shared by the cache + the Socket.IO adapter.
 // Without these limits, node-redis would retry forever and `await connect()`
@@ -55,7 +62,8 @@ export function createRedisClient(url) {
 
 async function getClient() {
   if (client) return client;
-  if (!REDIS_URL) return null;
+  const url = redisUrl();
+  if (!url) return null;
 
   // Back-off: after a failure, skip connection attempts for 30s so a Redis
   // outage costs ~nothing per request instead of a slow connect() each time.
@@ -65,7 +73,7 @@ async function getClient() {
 
   if (!connectPromise) {
     connectPromise = (async () => {
-      const c = createRedisClient(REDIS_URL);
+      const c = createRedisClient(url);
       c.on("error", () => {
         const now = Date.now();
         if (now - lastErrLogTs > 60_000) {
