@@ -3,3 +3,6 @@
 *.p12
 *.key
 
+
+# Local server env exports - never commit
+env.sh
