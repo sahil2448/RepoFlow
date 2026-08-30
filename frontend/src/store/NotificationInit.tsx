@@ -7,38 +7,7 @@ const NotificationInit: React.FC = () => {
   // const initialized = useRef(false);
   const userId      = localStorage.getItem("userId");
 
-  // useEffect(() => {
-  //   if (!userId || initialized.current) return;
-  //   initialized.current = true;
-
-  //   const fetchNotifications = async () => {
-  //     try {
-  //       const res = await ec2Api.get(`/notifications/${userId}`);
-  //       console.log(res.data);
-  //       notificationStore.setAll(
-  //         res.data.notifications || [],
-  //         res.data.unreadCount   || 0
-  //       );
-  //     } catch (err) {
-  //       console.error("Notification fetch failed:", err);
-  //     }
-  //   };
-
-  //   fetchNotifications();
-
-  //   socket.connect();
-  //   socket.emit("join", userId);
-
-  //   socket.on("notification", (data: any) => {
-  //     notificationStore.addOne(data);
-  //   });
-
-  //   return () => {
-  //     socket.off("notification");
-  //     socket.disconnect();
-  //   };
-  // }, [userId]);
- useEffect(() => {
+useEffect(() => {
   if (!userId) return;
 
   const onNotification = (data: any) => {

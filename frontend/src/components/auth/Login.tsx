@@ -36,8 +36,8 @@ const Login: React.FC = () => {
         .font-dm   { font-family: 'DM Sans', sans-serif; }
 
         .dot-grid {
-          background-color: #060611;
-          background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);
+          background-color: var(--bg-dot);
+          background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
           background-size: 28px 28px;
         }
         .glow-teal {

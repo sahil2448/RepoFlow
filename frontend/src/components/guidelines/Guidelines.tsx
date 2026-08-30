@@ -43,7 +43,7 @@ const CodeBlock: React.FC<{ code: string; label?: string }> = ({ code, label }) 
   };
 
   return (
-    <div className="relative rounded-xl border border-white/[0.07] bg-[#030308] overflow-hidden">
+    <div className="theme-code-surface relative rounded-xl border border-white/[0.07] bg-[#030308] overflow-hidden">
       {/* Terminal top bar */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.05] bg-white/[0.02]">
         <div className="flex items-center gap-1.5">

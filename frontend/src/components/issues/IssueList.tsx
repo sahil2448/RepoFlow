@@ -105,7 +105,7 @@ const IssueList: React.FC<IssueListProps> = ({ repoId, isOwner }) => {
         .font-dm   { font-family: 'DM Sans', sans-serif; }
       `}</style>
 
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between gap-2 mb-4 flex-wrap">
 
         <div className="flex items-center gap-1">
           {(["open", "closed", "all"] as IssueFilter[]).map((f) => (

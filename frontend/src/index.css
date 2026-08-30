@@ -2,7 +2,229 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-base: #F4F4F8;
+  --bg-dot: #F0F0F6;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F8F8FC;
+  --border-card: rgba(0,0,0,0.08);
+  --border-subtle: rgba(0,0,0,0.05);
+  --text-primary: #0D0D1A;
+  --text-secondary: #4B4B6B;
+  --text-muted: #7B7B9B;
+  --dot-color: rgba(0,0,0,0.06);
+  --navbar-bg: #FFFFFF;
+  --accent-mint: #00CC88;
+  --code-bg: #1A1A2E;
+}
+
+.dark {
+  --bg-base: #0A0A18;
+  --bg-dot: #0A0A18;
+  --bg-card: rgba(255,255,255,0.045);
+  --bg-card-hover: rgba(255,255,255,0.07);
+  --border-card: rgba(255,255,255,0.11);
+  --border-subtle: rgba(255,255,255,0.08);
+  --text-primary: #FFFFFF;
+  --text-secondary: #E2E2F2;
+  --text-muted: #9A9AB8;
+  --dot-color: rgba(255,255,255,0.11);
+  --navbar-bg: #0A0A18;
+  --accent-mint: #00FFA3;
+  --code-bg: #1A1A2E;
+}
+
+html,
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+}
 
 body {
-  background-color: #060611;
+  background-color: var(--bg-base);
+}
+
+.dot-grid {
+  background-color: var(--bg-dot) !important;
+  background-image: radial-gradient(var(--dot-color) 1px, transparent 1px) !important;
+}
+
+/* Dark mode: remap hardcoded #060611 to the new richer base */
+.dark [class~="bg-[#060611]"] {
+  background-color: var(--bg-base) !important;
+}
+
+/* Code surfaces stay #1A1A2E in dark mode too */
+.dark .theme-code-surface,
+.dark html .theme-code-surface [class~="bg-[#060611]"],
+.dark html .theme-code-surface [class~="bg-[#030308]"],
+.dark html .theme-code-surface [class*="bg-white/["] {
+  background-color: var(--code-bg) !important;
+}
+
+/* Hide scrollbars but keep scrollability */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Ambient glow for dark mode — adds depth so surfaces don't look flat */
+.dark .glow-teal   { background: radial-gradient(ellipse, rgba(0,255,163,0.09) 0%, transparent 70%); }
+.dark .glow-violet { background: radial-gradient(ellipse, rgba(167,139,250,0.07) 0%, transparent 70%); }
+.dark .glow-coral  { background: radial-gradient(ellipse, rgba(255,107,74,0.06) 0%, transparent 70%); }
+
+/* ═══ THEME OVERRIDES — light mode only (:root:not(.dark)) ═══ */
+
+/* ── Surfaces ── */
+:root:not(.dark) [class*="bg-white/["] {
+  background-color: var(--bg-card) !important;
+}
+
+:root:not(.dark) [class~="bg-[#0A0A16]"] {
+  background-color: var(--bg-card) !important;
+}
+
+:root:not(.dark) [class~="bg-black/20"],
+:root:not(.dark) [class~="bg-black/30"] {
+  background-color: var(--bg-card) !important;
+}
+
+:root:not(.dark) [class~="bg-[#060611]"] {
+  background-color: var(--bg-base) !important;
+}
+
+:root:not(.dark) [class*="hover:bg-white/"]:hover {
+  background-color: var(--bg-card-hover) !important;
+}
+
+:root:not(.dark) [class*="hover:text-white"]:hover,
+:root:not(.dark) [class*="hover:text-gray-200"]:hover,
+:root:not(.dark) [class*="hover:text-gray-300"]:hover,
+:root:not(.dark) [class*="hover:text-gray-400"]:hover {
+  color: var(--text-primary) !important;
+}
+
+:root:not(.dark) [class*="hover:border-white/"]:hover {
+  border-color: var(--border-card) !important;
+}
+
+:root:not(.dark) .group:hover [class*="group-hover:text-white"],
+:root:not(.dark) .group:hover [class*="group-hover:text-gray-200"],
+:root:not(.dark) .group:hover [class*="group-hover:text-gray-300"] {
+  color: var(--text-primary) !important;
+}
+
+:root:not(.dark) [class*="border-white/["] {
+  border-color: var(--border-card) !important;
+}
+
+:root:not(.dark) [class*="divide-white/"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border-subtle) !important;
+}
+
+/* ── Text ── */
+:root:not(.dark) [class~="text-white"],
+:root:not(.dark) [class~="text-gray-200"],
+:root:not(.dark) [class~="text-gray-300"] {
+  color: var(--text-primary) !important;
+}
+
+:root:not(.dark) [class~="text-gray-400"],
+:root:not(.dark) [class~="text-gray-500"] {
+  color: var(--text-secondary) !important;
+}
+
+:root:not(.dark) [class~="text-gray-600"],
+:root:not(.dark) [class~="text-gray-700"],
+:root:not(.dark) [class~="text-gray-800"] {
+  color: var(--text-muted) !important;
+}
+
+:root:not(.dark) [class*="placeholder-gray-700"]::placeholder,
+:root:not(.dark) [class*="placeholder-gray-800"]::placeholder {
+  color: var(--text-muted) !important;
+}
+
+/* ── Accent ── */
+:root:not(.dark) [class*="text-[#00FFA3]"] {
+  color: var(--accent-mint) !important;
+}
+
+:root:not(.dark) [class*="bg-[#00FFA3]"] {
+  background-color: var(--accent-mint) !important;
+}
+
+:root:not(.dark) [class*="border-[#00FFA3]"] {
+  border-color: color-mix(in srgb, var(--accent-mint) 35%, transparent) !important;
+}
+
+/* ── Navbar ── */
+:root:not(.dark) nav[class*="bg-[#060611]"],
+:root:not(.dark) [class~="bg-[#060611]"].theme-navbar,
+:root:not(.dark) .theme-navbar {
+  background-color: var(--navbar-bg) !important;
+}
+
+/* Navbar bell dropdown — use card background for contrast */
+:root:not(.dark) .theme-navbar [class~="bg-[#060611]"] {
+  background-color: var(--bg-card) !important;
+}
+
+/* ═══ CODE SURFACES — always stay dark regardless of mode ═══ */
+/* High specificity (0,4,0) beats general theme overrides (0,3,1) */
+
+/* Backgrounds inside code surfaces */
+:root:not(.dark) .theme-code-surface,
+:root:not(.dark) html .theme-code-surface [class~="bg-[#060611]"],
+:root:not(.dark) html .theme-code-surface [class~="bg-[#030308]"],
+:root:not(.dark) html .theme-code-surface [class*="bg-white/["] {
+  background-color: var(--code-bg) !important;
+}
+
+/* Bright text inside code surfaces */
+:root:not(.dark) html .theme-code-surface [class~="text-white"],
+:root:not(.dark) html .theme-code-surface [class~="text-gray-200"],
+:root:not(.dark) html .theme-code-surface [class~="text-gray-300"] {
+  color: #E5E7EB !important;
+}
+
+:root:not(.dark) html .theme-code-surface [class~="text-gray-400"],
+:root:not(.dark) html .theme-code-surface [class~="text-gray-500"] {
+  color: #9CA3AF !important;
+}
+
+:root:not(.dark) html .theme-code-surface [class~="text-gray-600"],
+:root:not(.dark) html .theme-code-surface [class~="text-gray-700"],
+:root:not(.dark) html .theme-code-surface [class~="text-gray-800"] {
+  color: #4B5563 !important;
+}
+
+:root:not(.dark) html .theme-code-surface [class*="text-[#00FFA3]"] {
+  color: #00FFA3 !important;
+}
+
+/* Borders inside code surfaces stay subtle-white */
+:root:not(.dark) html .theme-code-surface [class*="border-white/["] {
+  border-color: rgba(255,255,255,0.07) !important;
+}
+
+:root:not(.dark) html .theme-code-surface [class*="divide-white/"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255,255,255,0.04) !important;
+}
+
+/* Hover inside code surfaces */
+:root:not(.dark) html .theme-code-surface [class*="hover:bg-white/"]:hover {
+  background-color: rgba(255,255,255,0.04) !important;
+}
+
+:root:not(.dark) html .theme-code-surface [class*="hover:text-white"]:hover,
+:root:not(.dark) html .theme-code-surface [class*="hover:text-gray-200"]:hover,
+:root:not(.dark) html .theme-code-surface [class*="hover:text-gray-300"]:hover,
+:root:not(.dark) html .theme-code-surface [class*="hover:text-gray-400"]:hover {
+  color: #FFFFFF !important;
+}
+
+:root:not(.dark) html .theme-code-surface .group:hover [class*="group-hover:text-white"] {
+  color: #FFFFFF !important;
 }

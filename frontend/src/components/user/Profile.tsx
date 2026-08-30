@@ -450,7 +450,7 @@ setUserDetails((prev) => ({
 
               {activeTab === "overview" ? (
                 <div className="relative rounded-2xl border border-white/[0.07]
-                                bg-white/[0.02] p-5 overflow-hidden">
+                                bg-white/[0.02] p-5 overflow-x-auto">
                   <div className="absolute inset-x-0 top-0 h-px
                                   bg-gradient-to-r from-transparent via-[#00FFA3]/15 to-transparent" />
                   <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600 mb-4">

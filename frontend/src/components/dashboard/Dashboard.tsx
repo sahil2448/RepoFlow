@@ -116,8 +116,8 @@ const Dashboard = () => {
 
         /* Dot grid background */
         .dot-grid {
-          background-color: #060611;
-          background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);
+          background-color: var(--bg-dot);
+          background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
           background-size: 22px 22px;
         }
         @media (min-width: 640px) {

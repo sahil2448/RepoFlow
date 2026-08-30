@@ -550,7 +550,7 @@ const RepositoryDetails: React.FC = () => {
 
             
             {activeTab === "content" && (
-              <div className="relative rounded-2xl border border-white/[0.07]
+              <div className="theme-code-surface relative rounded-2xl border border-white/[0.07]
                   bg-[#060611] overflow-hidden scanlines">
 
                 <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2.5
@@ -649,7 +649,7 @@ const RepositoryDetails: React.FC = () => {
         </svg>
         View the full CLI guide
       </Link>
-                    <div className="w-full max-w-sm rounded-xl border border-white/[0.06]
+                    <div className="theme-code-surface w-full max-w-sm rounded-xl border border-white/[0.06]
                         bg-[#060611] overflow-hidden">
                       <div className="flex items-center gap-1.5 px-4 py-2
                           border-b border-white/[0.05]">

@@ -1,7 +1,5 @@
 import Notification from "../model/notificationModel.js";
 
-
-
 export const getNotifications = async (req, res) => {
   const { userId } = req.params;
   try {
@@ -20,8 +18,6 @@ export const getNotifications = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-
-
 
 export const markAllRead = async (req, res) => {
   const { userId } = req.params;

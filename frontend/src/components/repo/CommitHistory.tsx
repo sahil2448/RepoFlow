@@ -173,7 +173,7 @@ if (commits.length === 0) {
       </div>
 
       {/* CLI cheatsheet */}
-      <div className="w-full max-w-sm rounded-xl border border-white/[0.06] bg-[#060611] overflow-hidden">
+      <div className="theme-code-surface w-full max-w-sm rounded-xl border border-white/[0.06] bg-[#060611] overflow-hidden">
         <div className="flex items-center gap-1.5 px-4 py-2 border-b border-white/[0.05]">
           {["#FF6B4A","#F59E0B","#00FFA3"].map((c) => (
             <span key={c} className="w-2 h-2 rounded-full opacity-50" style={{ backgroundColor: c }} />
@@ -313,7 +313,7 @@ if (commits.length === 0) {
 
                 
                 {isExpanded && (
-                  <div className="ml-11 sm:ml-14 mt-1.5 rounded-xl border border-white/[0.05] bg-[#060611] overflow-hidden">
+                  <div className="theme-code-surface ml-11 sm:ml-14 mt-1.5 rounded-xl border border-white/[0.05] bg-[#060611] overflow-hidden">
                     
                     <div className="flex items-center gap-2 flex-wrap px-3 sm:px-4 py-2 border-b border-white/[0.04]">
                       <div className="flex items-center gap-1.5 shrink-0">

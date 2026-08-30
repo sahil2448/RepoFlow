@@ -4,6 +4,7 @@ import { useNotifications }                    from "../store/useNotifications";
 import { notificationStore }                   from "../store/notificationStore";
 import RepoFlowLogo2 from "../assets/RepoFlowLogo2.png";
 import { ec2Api } from "../config/api";
+import { useTheme } from "../hooks/useTheme";
 
 interface NotificationItem {
   _id:       string;
@@ -32,10 +33,25 @@ const TerminalIcon: React.FC = () => (
   </svg>
 );
 
+const SunIcon: React.FC = () => (
+  <svg className="w-4 h-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+      d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364-1.414 1.414M7.05 16.95l-1.414 1.414m12.728 0-1.414-1.414M7.05 7.05 5.636 5.636M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+  </svg>
+);
+
+const MoonIcon: React.FC = () => (
+  <svg className="w-4 h-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+      d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+  </svg>
+);
+
 const Navbar: React.FC = () => {
   const location  = useLocation();
   const navigate  = useNavigate();
   const userId    = localStorage.getItem("userId");
+  const { theme, toggleTheme } = useTheme();
 
   
   const { notifications, unreadCount } = useNotifications();
@@ -98,7 +114,7 @@ const Navbar: React.FC = () => {
       `}</style>
 
       <nav className={`font-dm sticky top-0 z-50 w-full flex items-center
-                 justify-between px-3 sm:px-6 h-14 bg-[#060611] transition-all duration-300
+                 justify-between px-3 sm:px-6 h-14 bg-[#060611] theme-navbar transition-all duration-300
                  ${scrolled
                    ? "border-b border-white/[0.05] shadow-[0_1px_30px_rgba(0,0,0,0.4)]"
                    : "border-b border-transparent"}`}>
@@ -235,6 +251,20 @@ const Navbar: React.FC = () => {
               </div>
             )}
           </div>
+
+          <button
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            className="relative flex items-center justify-center w-8 h-8
+                       rounded-lg border border-transparent text-gray-500
+                       hover:text-gray-200 hover:bg-white/[0.04] hover:border-white/[0.06]
+                       transition-all duration-200"
+          >
+            <span className="transition-opacity duration-200">
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            </span>
+          </button>
 
           <span className="mx-1 w-px h-4 bg-white/[0.07]" />
 

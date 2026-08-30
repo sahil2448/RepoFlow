@@ -14,7 +14,7 @@ type PanelColors = Record<number, string>;
 
 
 const getPanelColors = (maxCount: number): PanelColors => {
-  const colors: PanelColors = { 0: "rgba(255,255,255,0.04)" };
+  const colors: PanelColors = { 0: "rgba(255,255,255,0.08)" };
 
   
   
@@ -33,7 +33,7 @@ const getPanelColors = (maxCount: number): PanelColors => {
 
 const HeatMapProfile: React.FC = () => {
   const [activityData, setActivityData]   = useState<ActivityEntry[]>([]);
-  const [panelColors, setPanelColors]     = useState<PanelColors>({ 0: "rgba(255,255,255,0.04)" });
+  const [panelColors, setPanelColors]     = useState<PanelColors>({ 0: "rgba(255,255,255,0.08)" });
   const [totalContribs, setTotalContribs] = useState<number>(0);
   const [year, setYear]                   = useState<number>(new Date().getFullYear());
   const [loading, setLoading]             = useState<boolean>(true);
@@ -89,7 +89,7 @@ const HeatMapProfile: React.FC = () => {
           display: block;
         }
         .heatmap-themed text {
-          fill: rgba(255,255,255,0.22) !important;
+          fill: rgba(255,255,255,0.45) !important;
           font-family: 'IBM Plex Mono', monospace !important;
           font-size: 9px !important;
           letter-spacing: 0.03em;
@@ -122,7 +122,7 @@ const HeatMapProfile: React.FC = () => {
 </div>
 
       
-      <div className="heatmap-themed w-full">
+      <div className="heatmap-themed w-full overflow-x-auto scrollbar-hide">
         <div className="min-w-[600px]">
         <HeatMap
           value={activityData}
@@ -143,7 +143,7 @@ const HeatMapProfile: React.FC = () => {
           panelColors={panelColors}
           style={{
             width: "100%",
-            color: "rgba(255,255,255,0.22)",
+            color: "rgba(255,255,255,0.45)",
             fontFamily: "'IBM Plex Mono', monospace",
             fontSize: "9px",
           }}
