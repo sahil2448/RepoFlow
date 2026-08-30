@@ -1,0 +1,5 @@
+# AWS private keys - NEVER commit these
+*.pem
+*.p12
+*.key
+
