@@ -5,6 +5,12 @@ import { configDotenv } from "dotenv";
 import { ObjectId } from "mongodb";
 import { notifyUser } from "../helpers/notifyUser.js";
 import { getIO } from "../helpers/socketInstance.js";
+import {
+  cacheGet,
+  cacheSet,
+  cacheDelete,
+  cacheKeys,
+} from "../helpers/cache.js";
 configDotenv();
 
 const URI = process.env.MONGO_URI;
@@ -98,6 +104,13 @@ async function getAllUsers(req, res) {
 const getUserProfile = async (req, res) => {
   const { id } = req.params;
   try {
+    // Cache hit — serve straight from Redis without touching MongoDB.
+    const key = cacheKeys.userProfile(id);
+    const cached = await cacheGet(key);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     await connectToClient();
     const db = client.db(DB_NAME);
     const user = await db.collection("users").findOne(
@@ -111,11 +124,14 @@ const getUserProfile = async (req, res) => {
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    return res.status(200).json({
+    const payload = {
       ...user,
       followers: user.myFollowers?.length ?? 0,
       following: user.followingUsers?.length ?? 0,
-    });
+    };
+
+    await cacheSet(key, payload, 30); // short TTL: edits appear quickly
+    return res.status(200).json(payload);
   } catch (error) {
     console.error("Error fetching user profile:", error);
     return res.status(500).json({ error: "Internal server error" });
@@ -148,6 +164,8 @@ const updateUserProfile = async (req, res) => {
       );
 
     if (!result) return res.status(404).json({ error: "User not found" });
+
+    await cacheDelete(cacheKeys.userProfile(id));
 
     return res.status(200).json(result);
   } catch (error) {
@@ -252,6 +270,13 @@ const followUser = async (req, res) => {
       { _id: new ObjectId(currentUserId) },
       { $addToSet: { followingUsers: id } },
     );
+
+    // Follower/following counts changed on both profiles — drop cached copies.
+    await cacheDelete(
+      cacheKeys.userProfile(id),
+      cacheKeys.userProfile(currentUserId),
+    );
+
     await notifyUser(getIO(), {
       recipientId: id,
       senderId: currentUserId,

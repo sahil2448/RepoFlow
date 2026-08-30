@@ -5,7 +5,8 @@
   "description": "Alternative of github",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "start:cluster": "pm2 start ecosystem.config.cjs"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +14,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@pinecone-database/pinecone": "^7.2.0",
+    "@socket.io/redis-adapter": "^8.3.0",
     "aws": "^0.0.3-2",
     "aws-sdk": "2.1693.0",
     "bcryptjs": "^3.0.3",
@@ -24,9 +26,13 @@
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.1.1",
     "mongoose": "^9.3.2",
+    "redis": "^6.2.1",
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3",
     "uuid": "^13.0.0",
     "yargs": "^18.0.0"
+  },
+  "devDependencies": {
+    "pm2": "^7.0.4"
   }
 }

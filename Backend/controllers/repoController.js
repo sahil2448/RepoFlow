@@ -8,6 +8,12 @@ import { notifyUser } from "../helpers/notifyUser.js";
 
 import { ObjectId } from "mongodb";
 import logContribution from "../helpers/logContribution.js";
+import {
+  cacheGet,
+  cacheSet,
+  cacheKeys,
+  invalidateRepoCache,
+} from "../helpers/cache.js";
 
 async function createRepository(req, res) {
   const { name, issues, content, description, visibility } = req.body;
@@ -44,6 +50,7 @@ async function createRepository(req, res) {
 
     console.log(ownerUser);
     await logContribution(owner, "repo_created");
+    await invalidateRepoCache(); // the public repo list changed
 
     return res.status(201).json({
       message: "Repository created successfully",
@@ -56,13 +63,23 @@ async function createRepository(req, res) {
 }
 async function getAllRepositories(req, res) {
   try {
+    // Cache hit — serve straight from Redis without touching MongoDB.
+    const cached = await cacheGet(cacheKeys.repoAll);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const repositories = await Repository.find({})
       .populate("owner")
       .populate("issues");
 
-    res
-      .status(200)
-      .json({ repositories, message: "Repositories fetched successfully" });
+    const payload = {
+      repositories,
+      message: "Repositories fetched successfully",
+    };
+
+    await cacheSet(cacheKeys.repoAll, payload);
+    res.status(200).json(payload);
   } catch (error) {
     console.log("Error during fetching all repositories", error);
     res.status(500).json({ error: "Internal server error" });
@@ -73,6 +90,11 @@ async function fetchRepositoryById(req, res) {
   const { id } = req.params;
 
   try {
+    const cached = await cacheGet(cacheKeys.repoById(id));
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const repository = await Repository.findById(id)
       .populate("owner")
       .populate("issues");
@@ -81,10 +103,13 @@ async function fetchRepositoryById(req, res) {
       return res.status(404).json({ error: "Repository not found" });
     }
 
-    res.status(200).json({
+    const payload = {
       repository,
       message: "Repository fetched successfully",
-    });
+    };
+
+    await cacheSet(cacheKeys.repoById(id), payload);
+    res.status(200).json(payload);
   } catch (error) {
     if (error.kind === "ObjectId") {
       return res.status(400).json({ error: "Invalid Repository ID format" });
@@ -98,6 +123,12 @@ async function fetchRepositoryById(req, res) {
 async function fetchRepositoryByName(req, res) {
   const { name } = req.params;
   try {
+    const key = cacheKeys.repoByName(name);
+    const cached = await cacheGet(key);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const repository = await Repository.findOne({ name })
       .populate("owner")
       .populate("issues");
@@ -105,7 +136,10 @@ async function fetchRepositoryByName(req, res) {
     if (!repository) {
       return res.status(404).json({ error: "Repository not found" });
     }
-    res.status(200).json({ repository });
+
+    const payload = { repository };
+    await cacheSet(key, payload);
+    res.status(200).json(payload);
   } catch (error) {
     console.log("Error during fetching repo by name", error);
     res.status(500).json({ error: "Internal server error" });
@@ -144,6 +178,7 @@ async function updateRepositoryById(req, res) {
     repository.description = description;
 
     const updatedRepository = await repository.save();
+    await invalidateRepoCache(id, repository.name);
 
     res.status(200).json({
       message: "Repository updated successfully",
@@ -168,6 +203,7 @@ async function toggleVisibility(req, res) {
     repository.visibility = !repository.visibility;
 
     const updatedRepository = await repository.save();
+    await invalidateRepoCache(id, repository.name);
 
     res.status(200).json({
       message: "Repository visibility toggled successfully",
@@ -192,6 +228,8 @@ async function deleteRepositoryById(req, res) {
     await User.findByIdAndUpdate(repository.owner, {
       $pull: { repositories: repository._id },
     });
+
+    await invalidateRepoCache(id, repository.name);
 
     return res.status(200).json({ message: "Repository deleted successfully" });
   } catch (error) {
@@ -232,6 +270,7 @@ async function starRepository(req, res) {
       );
       updatedRepository = await repository.save();
       await user.save();
+      await invalidateRepoCache(id, repository.name);
 
       return res.status(200).json({
         message: "Repository unstarred successfully",
@@ -251,6 +290,7 @@ async function starRepository(req, res) {
         link: `/repo/${repository.name}/${repository._id}`,
       });
       await user.save();
+      await invalidateRepoCache(id, repository.name);
 
       return res.status(200).json({
         message: "Repository starred successfully",

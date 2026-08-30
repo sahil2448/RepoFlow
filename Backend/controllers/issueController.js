@@ -6,6 +6,7 @@ import { deleteIssueVector } from "../helpers/vectorStore.js";
 import { getIO } from "../helpers/socketInstance.js";
 
 import { notifyUser } from "../helpers/notifyUser.js";
+import { invalidateRepoCache } from "../helpers/cache.js";
 
 const createIssue = async (req, res) => {
   const { title, description } = req.body;
@@ -37,6 +38,7 @@ const createIssue = async (req, res) => {
       link: `/repo/${repository.name}/${id}`,
     });
     await repository.save();
+    await invalidateRepoCache(id, repository.name); // issue list lives in repo payload
 
     embedAndIndexIssue(createdIssue._id, id, title, description);
 
@@ -61,6 +63,7 @@ async function updateIssueById(req, res) {
     if (status) issue.status = status;
 
     await issue.save();
+    await invalidateRepoCache(issue.repository); // repo payload embeds issues
     res.status(200).json({ message: "Issue updated", issue });
   } catch (err) {
     console.error("Error during issue update:", err.message);
@@ -78,6 +81,7 @@ async function deleteIssueById(req, res) {
       { _id: issue.repository },
       { $pull: { issues: issue._id } },
     );
+    await invalidateRepoCache(issue.repository);
 
     deleteIssueVector(id, issue.repository.toString());
 

@@ -3,6 +3,7 @@ import Commit from "../model/commitModel.js";
 import { s3, S3_BUCKET } from "../config/aws-config.js";
 import logContribution from "../helpers/logContribution.js";
 import { v4 as uuidv4 } from "uuid";
+import { invalidateRepoCache } from "../helpers/cache.js";
 
 // POST /cli/repo/init — body: { repoName, visibility }
 export const findOrCreateRepoByName = async (req, res) => {
@@ -28,6 +29,7 @@ export const findOrCreateRepoByName = async (req, res) => {
         content: [],
       });
       await logContribution(ownerId, "repo_created");
+      await invalidateRepoCache(); // repo list changed
     }
 
     return res.status(200).json({
@@ -114,6 +116,7 @@ export const pushCliCommit = async (req, res) => {
     repository.content = fileNames;
     await repository.save();
     await logContribution(userId, "repo_updated");
+    await invalidateRepoCache(repository._id, repository.name);
 
     return res.status(200).json({ message: "Pushed", commitId, storageType });
   } catch (err) {

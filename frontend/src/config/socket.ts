@@ -7,7 +7,10 @@ const socket: Socket = io(BASE_URL, {
   autoConnect:       false,
   reconnection:      true,
   reconnectionDelay: 1000,
-  transports:        ["polling", "websocket"], // basically what they do is that -> polling is for http requests and websocket is for websockets
+  // WebSocket-only to match the backend: the server runs in PM2 cluster mode
+  // without a sticky-session load balancer, so a persistent WebSocket (instead
+  // of HTTP long-polling) keeps each client pinned to one worker.
+  transports: ["websocket"],
 });
 
 export default socket;

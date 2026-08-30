@@ -17,14 +17,20 @@ import mainRouter from "./routes/main.router.js";
 import { setIO } from "./helpers/socketInstance.js";
 import { registerReviewSignaling } from "./helpers/reviewSignaling.js";
 import { cliLogin, cliLogout, cliWhoami } from "./controllers/cliAuth.js";
+import { createAdapter } from "@socket.io/redis-adapter";
+import { createRedisClient } from "./helpers/cache.js";
 
 dotenv.config();
 
 if (process.argv.length <= 2) {
-  startServer();
-} else {
+  // Treat a bare `node index.js` the same as `node index.js start`: boot the
+  // API server. (Previously startServer() only existed inside the yargs else
+  // branch, so plain `npm start` / PM2 `script: index.js` crashed with
+  // "startServer is not defined".)
+  process.argv.splice(2, 0, "start");
+}
 
-  yargs(hideBin(process.argv))
+yargs(hideBin(process.argv))
     .command("start", "Start the server", {}, startServer)
 
     .command(
@@ -142,7 +148,43 @@ if (process.argv.length <= 2) {
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
       },
+      // WebSocket-only transport. PM2 cluster mode has no sticky-session load
+      // balancer, so HTTP long-polling could bounce between workers mid-session.
+      // One persistent WebSocket pins each client to a single worker, and the
+      // Redis adapter below shares rooms/events across all workers.
+      transports: ["websocket"],
     });
+
+    // In cluster mode every worker has its own in-memory Socket.IO rooms.
+    // The Redis adapter makes rooms/events cross-worker, so real-time
+    // notifications and WebRTC signaling keep working on all CPU cores.
+    // Falls back to in-memory (single-process) when REDIS_URL is not set
+    // or Redis is unreachable — the server must still boot and serve.
+    if (process.env.REDIS_URL) {
+      try {
+        const pubClient = createRedisClient(process.env.REDIS_URL);
+        const subClient = pubClient.duplicate();
+        pubClient.on("error", () => {});
+        subClient.on("error", () => {});
+        // Hard cap so a dead Redis can never block server startup.
+        await Promise.race([
+          Promise.all([pubClient.connect(), subClient.connect()]),
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error("Redis adapter connect timeout (8s)")),
+              8000,
+            ),
+          ),
+        ]);
+        io.adapter(createAdapter(pubClient, subClient));
+        console.log("✓ Socket.IO Redis adapter enabled (cluster-ready)");
+      } catch (err) {
+        console.warn(
+          "✗ Socket.IO Redis adapter failed — using in-memory:",
+          err.message,
+        );
+      }
+    }
 
     setIO(io);
     // ✅ TEMPORARY — raw connection + catch-all event logger
@@ -192,4 +234,3 @@ if (process.argv.length <= 2) {
 
     console.log("Server has started!");
   }
-}

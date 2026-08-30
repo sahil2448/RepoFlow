@@ -1,0 +1,16 @@
+# RepoFlow local infrastructure (Docker)
+#
+# Usage:
+#   docker compose up -d redis   # start local Redis for caching
+#   docker compose down          # stop local services
+#
+# Production uses a hosted Redis (e.g. Upstash free tier): set the REDIS_URL
+# env var on the server (rediss://...). No code changes are needed.
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: repoflow-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
