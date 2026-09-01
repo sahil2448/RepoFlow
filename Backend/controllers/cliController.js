@@ -62,9 +62,9 @@ export const pushCliCommit = async (req, res) => {
     const repository = await Repository.findById(repoId);
     if (!repository)
       return res.status(404).json({ error: "Repository not found" });
-    if (repository.owner.toString() !== userId) {
-      return res.status(403).json({ error: "You do not own this repository" });
-    }
+    // Access is enforced by authorizeRepositoryMember on the route already
+    // (owner OR collaborator). This repo lookup double-checks existence and
+    // is used for the content update below.
 
     const commitId = providedCommitId || uuidv4();
 

@@ -15,6 +15,7 @@ import {
   authorizeUser,
   authorizeRepositoryOwner,
 } from "../Middleware/authorizeMiddleware.js";
+import { addCollaborator } from "../controllers/repoController.js";
 
 const repoRouter = express.Router();
 
@@ -50,6 +51,13 @@ repoRouter.delete(
   deleteRepositoryById,
 );
 repoRouter.post("/repo/star/:id", authMiddleware, starRepository);
+
+repoRouter.post(
+  "/repo/collaborators/:id",
+  authMiddleware,
+  authorizeRepositoryOwner, // only the owner can grant access
+  addCollaborator,
+);
 
 repoRouter.get("/repo/:id", fetchRepositoryById);
 

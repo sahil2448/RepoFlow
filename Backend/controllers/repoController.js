@@ -303,6 +303,52 @@ async function starRepository(req, res) {
   }
 }
 
+// Owner-only: grant a user collaborator access to a repository.
+const addCollaborator = async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ error: "userId is required" });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const repository = await Repository.findById(id);
+    if (!repository) {
+      return res.status(404).json({ error: "Repository not found" });
+    }
+
+    if (String(repository.owner) === String(userId)) {
+      return res
+        .status(400)
+        .json({ error: "Owner is already a member of this repository" });
+    }
+
+    const exists = (repository.collaborators || []).some(
+      (cid) => String(cid) === String(userId),
+    );
+    if (exists) {
+      return res.status(200).json({ message: "User is already a collaborator" });
+    }
+
+    repository.collaborators.push(userId);
+    await repository.save();
+    await invalidateRepoCache(id, repository.name);
+
+    return res
+      .status(200)
+      .json({ message: "Collaborator added", collaborators: repository.collaborators });
+  } catch (error) {
+    console.error("Error adding collaborator:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export {
   createRepository,
   getAllRepositories,
@@ -313,4 +359,5 @@ export {
   toggleVisibility,
   deleteRepositoryById,
   starRepository,
+  addCollaborator,
 };

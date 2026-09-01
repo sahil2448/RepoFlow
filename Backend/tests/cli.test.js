@@ -67,3 +67,42 @@ test("CLI push without an auth token is rejected", async () => {
 
   expect(res.status).toBe(401);
 });
+
+test("a collaborator can push to a repo, a non-member cannot", async () => {
+  const owner = await signup("cli_collab_owner", "cli_collab_owner@example.com");
+  const collab = await signup("cli_collab_dev", "cli_collab_dev@example.com");
+  const outsider = await signup("cli_collab_out", "cli_collab_out@example.com");
+
+  const initRes = await request(app)
+    .post("/cli/repo/init")
+    .set("Authorization", `Bearer ${owner.token}`)
+    .send({ repoName: "collab-repo", visibility: true });
+  const repoId = initRes.body.repoId;
+
+  // Owner grants collaborator access
+  const addRes = await request(app)
+    .post(`/repo/collaborators/${repoId}`)
+    .set("Authorization", `Bearer ${owner.token}`)
+    .send({ userId: collab.userId });
+  expect(addRes.status).toBe(200);
+
+  // Collaborator can push
+  const collabPush = await request(app)
+    .post(`/cli/repo/${repoId}/push`)
+    .set("Authorization", `Bearer ${collab.token}`)
+    .send({
+      message: "from collaborator",
+      files: [{ name: "b.txt", content: Buffer.from("b").toString("base64") }],
+    });
+  expect(collabPush.status).toBe(200);
+
+  // Outsider is forbidden
+  const outsidePush = await request(app)
+    .post(`/cli/repo/${repoId}/push`)
+    .set("Authorization", `Bearer ${outsider.token}`)
+    .send({
+      message: "intrusion",
+      files: [{ name: "c.txt", content: Buffer.from("c").toString("base64") }],
+    });
+  expect(outsidePush.status).toBe(403);
+});

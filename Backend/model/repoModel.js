@@ -37,6 +37,12 @@ const RepositorySchema = new Schema({
       ref: "User",
     },
   ],
+  collaborators: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 RepositorySchema.index({ name: 1, owner: 1 }, { unique: true });
 const Repository = mongoose.model("Repository", RepositorySchema);

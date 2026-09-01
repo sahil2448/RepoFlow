@@ -13,6 +13,8 @@ import mongoose from "mongoose";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
+import helmet from "helmet";
+import { rateLimit } from "express-rate-limit";
 import mainRouter from "./routes/main.router.js";
 import { setIO } from "./helpers/socketInstance.js";
 import { registerReviewSignaling } from "./helpers/reviewSignaling.js";
@@ -95,6 +97,24 @@ yargs(hideBin(process.argv))
 
   async function startServer() {
     const app = express();
+
+    // Security hardening:
+    // - helmet() sets secure HTTP headers (CSP, X-Content-Type-Options, etc.)
+    // - trust proxy lets rate-limiter read the real client IP from
+    //   X-Forwarded-For behind CloudFront (otherwise every user shares one IP).
+    // - The auth limiter only throttles /login and /signup to slow brute force.
+    app.set("trust proxy", 1);
+    app.use(helmet());
+
+    const authLimiter = rateLimit({
+      windowMs: 5 * 60 * 1000, // 5 minutes
+      limit: 20, // max 20 requests per window per IP
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { error: "Too many auth attempts — please try again later." },
+    });
+    app.use("/login", authLimiter);
+    app.use("/signup", authLimiter);
 
     app.use(
       cors({
