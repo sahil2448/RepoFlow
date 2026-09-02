@@ -37,6 +37,16 @@ jobs:
           key: mongodb-memory-server-${{ runner.os }}
 
       - name: Run backend tests
+        env:
+          # Keep CI hermetic: these exist before Node starts, so Pinecone /
+          # Gemini / AWS never see a missing config. Real credentials stay in
+          # .env on the server and are never used in CI.
+          PINECONE_API_KEY: ci-dummy-key
+          PINECONE_INDEX: ci-dummy-index
+          GOOGLE_API_KEY: ci-dummy-key
+          AWS_ACCESS_KEY_ID: nope
+          AWS_SECRET_ACCESS_KEY: nope
+          AWS_REGION: us-east-1
         run: npm test
 
       - name: Build frontend
