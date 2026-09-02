@@ -6,3 +6,8 @@
 
 # Local server env exports - never commit
 env.sh
+
+
+# Benchmark/dev scripts
+Backend/benchmark-push.mjs
+*.bench-results.json
