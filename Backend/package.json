@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node index.js",
     "start:cluster": "pm2 start ecosystem.config.cjs",
-    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config jest.config.js"
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --forceExit --config jest.config.js"
   },
   "keywords": [],
   "author": "",

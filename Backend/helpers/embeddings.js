@@ -2,7 +2,12 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 dotenv.config();
 
-const client = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const client = new GoogleGenerativeAI(
+  process.env.GOOGLE_API_KEY ||
+    // Same guard as pinecone-config: keep import-time construction from
+    // throwing when no key is present (CI/tests). Never injected in prod.
+    "repoflow-development-invalid-key",
+);
 const EMBEDDING_DIMENSIONS = 768;
 
 export async function generateEmbedding(text) {
