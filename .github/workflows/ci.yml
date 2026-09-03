@@ -52,8 +52,12 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         run: |
-          # npm install (not npm ci): the lockfile is generated on Windows and
-          # Ubuntu CI can reject it via npm ci's strict platform-optional checks.
-          # npm install reconciles the tree from package.json on any runner.
           npm install --no-audit --no-fund
+          # Vite 8 bundles with rolldown, which needs a platform-native binding
+          # shipped as an npm optional dependency. The lockfile was generated on
+          # Windows (win32 binding), so the Linux runner can miss
+          # @rolldown/binding-linux-x64-gnu (known npm optional-deps bug #4828).
+          # Install it explicitly (--no-save: keeps package.json / lockfile
+          # unchanged and only makes node_modules complete for this runner).
+          npm install --no-save --no-audit --no-fund @rolldown/binding-linux-x64-gnu
           npm run build
