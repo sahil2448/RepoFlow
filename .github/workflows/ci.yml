@@ -52,5 +52,8 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         run: |
-          npm ci
+          # npm install (not npm ci): the lockfile is generated on Windows and
+          # Ubuntu CI can reject it via npm ci's strict platform-optional checks.
+          # npm install reconciles the tree from package.json on any runner.
+          npm install --no-audit --no-fund
           npm run build
