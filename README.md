@@ -610,7 +610,7 @@ Answer:
 
 Answer:
 
-"CORS allows localhost plus deployed Amplify and CloudFront URLs. The frontend likely deploys as a static Vite build, and the backend is a Node server listening on `0.0.0.0` with a configurable port. There is no Dockerfile or GitHub Actions workflow in the current repo, so CI/CD is not implemented yet."
+"CORS allows localhost plus deployed Amplify and CloudFront URLs. The frontend deploys as a static Vite build via AWS Amplify (`amplify.yml` in the repo root), and the backend runs as a Node server on EC2 under PM2 in cluster mode, behind CloudFront. CI/CD is implemented with GitHub Actions: every push to `main` runs the Jest + Supertest + mongodb-memory-server test suite and a production frontend build before the app is deployed to Amplify and the backend is pulled + reloaded on EC2."
 
 #### Q27. How would you deploy this cleanly?
 
@@ -769,8 +769,7 @@ Use these as strengths in interviews. Senior interviewers like honest engineers 
 - `followUser` adds followers, but the frontend treats follow as a toggle; an unfollow branch should be added.
 - User controller mixes native MongoDB driver with Mongoose models.
 - S3 bucket name is hardcoded in `Backend/config/aws-config.js`; it should come from environment config.
-- No unit/integration tests are currently present.
-- No Dockerfile or CI workflow is currently present.
+- The test suite covers auth, repo CRUD, CLI push, and collaborator flows (13 tests); WebRTC signaling, the AI/Pinecone duplicate check, and Socket.IO notification forwarding are not covered by automated tests yet.
 
 Best interview phrasing:
 
