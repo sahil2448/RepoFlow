@@ -11,3 +11,5 @@ env.sh
 # Benchmark/dev scripts
 Backend/benchmark-push.mjs
 *.bench-results.json
+# Personal interview prep notes - keep OFF GitHub, local only
+INTERVIEW_PREP.md
