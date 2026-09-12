@@ -10,9 +10,8 @@ const getStoredUser = (): User => {
 export const AuthProvider = ({children}:{children:ReactNode})=>{
     const [currentUser,setCurrentUser] = useState<User>(getStoredUser);
 
-    return( <AuthContext.Provider value={{currentUser,setCurrentUser}}>
+    return ( <AuthContext.Provider value={{currentUser,setCurrentUser}}>
         {children}
         </AuthContext.Provider>
         );
 };
-
