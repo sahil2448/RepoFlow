@@ -25,6 +25,7 @@ interface DuplicateCheckResult {
   isDuplicate: boolean;
   confidence: number;
   similarIssues: SimilarIssue[];
+  reason?: string;
 }
 
 
@@ -287,6 +288,12 @@ const CreateIssue: React.FC<CreateIssueProps> = ({
                     : "similar issues found"}
                 </span>
               </div>
+
+              {duplicateCheck?.reason && (
+                <p className="font-plex text-[11px] text-[#FF6B4A]/90 leading-relaxed mb-3">
+                  {duplicateCheck.reason}
+                </p>
+              )}
 
               <ul className="space-y-2">
                 {duplicateCheck?.similarIssues.map((issue) => (

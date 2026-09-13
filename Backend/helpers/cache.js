@@ -14,6 +14,8 @@
 //   GET /repo/:id          (repo:id:<id>)      TTL 60s
 //   GET /repo/name/:name   (repo:name:<name>)  TTL 60s
 //   GET /userProfile/:id   (user:profile:<id>) TTL 30s
+//   POST /issue/check-duplicate/:repoId
+//                          (issue:dupcheck:<repoId>:<hash>) TTL 300s
 
 import { createClient } from "redis";
 
@@ -30,6 +32,7 @@ export const cacheKeys = {
   repoById: (id) => `repo:id:${id}`,
   repoByName: (name) => `repo:name:${String(name).toLowerCase()}`,
   userProfile: (id) => `user:profile:${id}`,
+  issueDupCheck: (repoId, hash) => `issue:dupcheck:${repoId}:${hash}`,
 };
 
 // REDIS_URL is read lazily at call time (not module-load time): controllers
