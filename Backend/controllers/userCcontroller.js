@@ -53,7 +53,7 @@ const signup = async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.json({ token, userId: result.insertedId }).status(200);
+    res.json({ token, userId: result.insertedId, username }).status(200);
   } catch (error) {
     console.error("Error during signup", error);
     res.status(500).send("Server error");
@@ -81,7 +81,9 @@ const login = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
 
-    res.json({ token, userId: user._id }).status(200);
+    res
+      .json({ token, userId: user._id, username: user.username, avatar: user.avatar || "" })
+      .status(200);
   } catch (error) {
     return res.status(500).send("Server error");
   }

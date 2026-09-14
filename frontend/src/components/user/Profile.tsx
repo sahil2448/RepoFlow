@@ -87,6 +87,8 @@ const isOwnProfile    = currentUserId === id;
   const [isEditing, setIsEditing] = useState(false);
 const [editData, setEditData] = useState<EditableProfile>(() => toEditableProfile(userDetails));
 const [saveLoading, setSaveLoading] = useState(false);
+const [avatarSaving, setAvatarSaving] = useState(false);
+const [avatarError, setAvatarError] = useState<string>("");
 
 
 const handleEditChange = (
@@ -108,6 +110,9 @@ const handleSaveProfile = async () => {
   username: response.data.username ?? prev.username,
   email:    response.data.email    ?? prev.email,
 }));
+    localStorage.setItem("username", response.data.username ?? editData.username);
+    localStorage.setItem("avatar", response.data.avatar ?? editData.avatar);
+    window.dispatchEvent(new Event("repoflow:profile-updated"));
     setIsEditing(false);
   } catch (error: unknown) {
     const apiError = error as ApiErrorResponse;
@@ -117,6 +122,59 @@ const handleSaveProfile = async () => {
   }
 };
 
+const persistAvatar = async (avatar: string) => {
+  if (!id) return;
+  setAvatarSaving(true);
+  setAvatarError("");
+  const previousAvatar = userDetails.avatar ?? "";
+  setUserDetails((prev) => ({ ...prev, avatar }));
+  setEditData((prev) => ({ ...prev, avatar }));
+  localStorage.setItem("avatar", avatar);
+  window.dispatchEvent(new Event("repoflow:profile-updated"));
+
+  try {
+    const response = await api.put(`/updateProfile/${id}`, { avatar });
+    setUserDetails((prev) => ({ ...prev, ...response.data, avatar: response.data.avatar ?? avatar }));
+  } catch (error: unknown) {
+    const apiError = error as ApiErrorResponse;
+    setUserDetails((prev) => ({ ...prev, avatar: previousAvatar }));
+    setEditData((prev) => ({ ...prev, avatar: previousAvatar }));
+    localStorage.setItem("avatar", previousAvatar);
+    window.dispatchEvent(new Event("repoflow:profile-updated"));
+    setAvatarError(apiError.response?.data?.error ?? "Could not save image");
+  } finally {
+    setAvatarSaving(false);
+  }
+};
+
+const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const file = event.target.files?.[0];
+  event.target.value = "";
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    setAvatarError("Please choose an image file");
+    return;
+  }
+
+  if (file.size > 900 * 1024) {
+    setAvatarError("Use an image under 900KB");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    if (typeof reader.result === "string") {
+      persistAvatar(reader.result);
+    }
+  };
+  reader.readAsDataURL(file);
+};
+
+const handleAvatarDelete = () => {
+  persistAvatar("");
+};
+
   
   useEffect(() => {
     if (!id) return;
@@ -124,6 +182,11 @@ const handleSaveProfile = async () => {
       try {
         const response = await api.get(`/userProfile/${id}`);
         setUserDetails(response.data);
+        if (isOwnProfile) {
+          localStorage.setItem("username", response.data.username || "");
+          localStorage.setItem("avatar", response.data.avatar || "");
+          window.dispatchEvent(new Event("repoflow:profile-updated"));
+        }
       } catch (err) {
         console.error("Cannot fetch user details:", err);
       }
@@ -224,16 +287,46 @@ setUserDetails((prev) => ({
   <aside className="w-full lg:w-[260px] lg:shrink-0 fade-up" style={{ animationDelay: "0ms" }}>
 
               
-<div className="w-full aspect-square max-w-[200px] sm:max-w-[260px] mx-auto lg:mx-0 rounded-2xl
-                bg-gradient-to-br from-[#00FFA3]/10 to-[#A78BFA]/10
-                border border-white/[0.07] flex items-center justify-center mb-5
-                relative overflow-hidden">
+<div className="w-full max-w-[200px] sm:max-w-[260px] mx-auto lg:mx-0 mb-5">
+<div className="group w-full aspect-square rounded-2xl
+                bg-[#0A0A16] border border-white/[0.08] flex items-center justify-center mb-3
+                relative overflow-hidden shadow-[0_18px_50px_rgba(0,0,0,0.25)]">
                 <div className="absolute inset-x-0 top-0 h-px
                                 bg-gradient-to-r from-transparent via-[#00FFA3]/20 to-transparent" />
-                <span className="font-syne text-6xl font-bold text-white/10 select-none">
-                  {userDetails.username?.[0]?.toUpperCase() ?? "U"}
-                </span>
+                {userDetails.avatar ? (
+                  <img src={userDetails.avatar} alt={`${userDetails.username} avatar`} className="h-full w-full object-cover" />
+                ) : (
+                  <span className="font-syne text-6xl font-bold text-white/20 select-none">
+                    {userDetails.username?.[0]?.toUpperCase() ?? "U"}
+                  </span>
+                )}
               </div>
+              {isOwnProfile && (
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <label className="flex cursor-pointer items-center justify-center rounded-lg
+                                    border border-white/[0.10] bg-[#0A0A16] px-3 py-2 font-plex text-[10px]
+                                    uppercase tracking-widest text-gray-300 transition-all duration-200
+                                    hover:border-[#00FFA3]/35 hover:text-[#00FFA3]">
+                    {avatarSaving ? "Saving..." : userDetails.avatar ? "Change Photo" : "Upload Photo"}
+                    <input type="file" accept="image/*" onChange={handleAvatarUpload} className="sr-only" disabled={avatarSaving} />
+                  </label>
+                  {userDetails.avatar && (
+                    <button
+                      onClick={handleAvatarDelete}
+                      disabled={avatarSaving}
+                      className="rounded-lg border border-[#FF6B4A]/25 bg-[#FF6B4A]/[0.08] px-3 py-2
+                                 font-plex text-[10px] uppercase tracking-widest text-[#FF6B4A]
+                                 transition-all duration-200 hover:bg-[#FF6B4A]/[0.14] disabled:opacity-50"
+                    >
+                      Delete Photo
+                    </button>
+                  )}
+                </div>
+              )}
+</div>
+              {isOwnProfile && avatarError && (
+                <p className="mb-3 text-center lg:text-left font-plex text-[10px] text-[#FF6B4A]">{avatarError}</p>
+              )}
               <div className="flex flex-col items-center text-center lg:items-start lg:text-left px-2">
 
               <h2 className="font-syne text-xl font-bold text-white tracking-tight mb-0.5">
@@ -450,7 +543,7 @@ setUserDetails((prev) => ({
 
               {activeTab === "overview" ? (
                 <div className="relative rounded-2xl border border-white/[0.07]
-                                bg-white/[0.02] p-5 overflow-x-auto">
+                                bg-[#0A0A16] p-5 overflow-x-auto">
                   <div className="absolute inset-x-0 top-0 h-px
                                   bg-gradient-to-r from-transparent via-[#00FFA3]/15 to-transparent" />
                   <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600 mb-4">
@@ -460,7 +553,7 @@ setUserDetails((prev) => ({
                 </div>
               ) : (
                 <div className="relative rounded-2xl border border-white/[0.07]
-                                bg-white/[0.02] p-5 overflow-hidden">
+                                bg-[#0A0A16] p-5 overflow-hidden">
                   <div className="absolute inset-x-0 top-0 h-px
                                   bg-gradient-to-r from-transparent via-[#00FFA3]/15 to-transparent" />
                   <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600 mb-4">

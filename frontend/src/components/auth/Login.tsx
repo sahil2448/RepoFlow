@@ -18,6 +18,8 @@ const Login: React.FC = () => {
       const res = await api.post("/login", { email, password });
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.userId);
+      localStorage.setItem("username", res.data.username || "");
+      localStorage.setItem("avatar", res.data.avatar || "");
       setCurrentUser({ userId: res.data.userId });
       setLoading(false);
       window.location.href = "/";

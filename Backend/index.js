@@ -131,7 +131,7 @@ yargs(hideBin(process.argv))
       }),
     );
 
-    app.use(bodyParser.json());
+    app.use(bodyParser.json({ limit: "2mb" }));
     app.use(express.json());
 
     const mongoURI = process.env.MONGO_URI;

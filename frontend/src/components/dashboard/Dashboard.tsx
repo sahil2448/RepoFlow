@@ -14,29 +14,6 @@ interface Repository {
   visibility: boolean;
 }
 
-interface UpcomingEvent {
-  id: number;
-  title: string;
-  date: string;
-  type: "conference" | "meetup" | "summit";
-}
-
-
-
-const UPCOMING_EVENTS: UpcomingEvent[] = [
-  { id: 1, title: "Tech Conference", date: "Dec 15", type: "conference" },
-  { id: 2, title: "Developer Meetup", date: "Dec 25", type: "meetup" },
-  { id: 3, title: "React Summit", date: "Jan 5", type: "summit" },
-];
-
-const EVENT_COLORS: Record<UpcomingEvent["type"], string> = {
-  conference: "text-[#00FFA3] bg-[#00FFA3]/10 border-[#00FFA3]/25",
-  meetup:     "text-[#FF6B4A] bg-[#FF6B4A]/10 border-[#FF6B4A]/25",
-  summit:     "text-[#A78BFA] bg-[#A78BFA]/10 border-[#A78BFA]/25",
-};
-
-
-
 const FolderIcon = () => (
   <svg className="w-3.5 h-3.5 text-gray-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
@@ -58,6 +35,12 @@ const SearchIcon = () => (
   </svg>
 );
 
+const PlusIcon = () => (
+  <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 5v14m7-7H5" />
+  </svg>
+);
+
 
 
 const Dashboard = () => {
@@ -75,6 +58,9 @@ const Dashboard = () => {
 
 
   const navigate = useNavigate();
+  const publicOwnCount = repositories.filter((repo) => repo.visibility).length;
+  const privateOwnCount = repositories.length - publicOwnCount;
+  const visibleGlobalCount = suggestedRepositories.length;
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     if (!userId) {
@@ -142,12 +128,6 @@ const Dashboard = () => {
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1e1e2e; border-radius: 4px; }
 
-        /* Snap scrolling for mobile events row */
-        .events-scroll {
-          scroll-snap-type: x mandatory;
-          -webkit-overflow-scrolling: touch;
-        }
-        .events-scroll > li { scroll-snap-align: start; }
       `}</style>
 
       <section
@@ -170,7 +150,7 @@ const Dashboard = () => {
 
             <div className="relative mb-4 group">
               <div className="relative flex items-center gap-2 px-3 py-2 rounded-lg
-                              border border-white/[0.07] bg-white/[0.03]
+                              border border-white/[0.08] bg-[#0A0A16]
                               focus-within:border-[#00FFA3]/30 transition-colors duration-300">
                 <SearchIcon />
                 <input
@@ -212,7 +192,7 @@ const Dashboard = () => {
                   <li
                     key={repo._id}
                     onClick={() => navigate(`/repo/${repo.name}/${repo._id}`)}
-                    className="group p-3.5 rounded-lg border border-white/[0.05] bg-white/[0.02]
+                    className="group p-3.5 rounded-lg border border-white/[0.07] bg-[#0A0A16]
                                hover:bg-[#00FFA3]/[0.04] hover:border-[#00FFA3]/20
                                transition-all duration-250 cursor-pointer"
                   >
@@ -245,7 +225,7 @@ const Dashboard = () => {
                   {repositories.length} total &nbsp;·&nbsp; {searchResults.length} shown
                 </p>
               </div>
-              <div className="font-plex text-[10px] text-gray-700 border border-white/[0.06] rounded-md px-3 py-1.5 bg-white/[0.02] self-start sm:self-auto">
+              <div className="font-plex text-[10px] text-gray-700 border border-white/[0.08] rounded-md px-3 py-1.5 bg-[#0A0A16] self-start sm:self-auto">
                 updated just now
               </div>
             </div>
@@ -255,7 +235,7 @@ const Dashboard = () => {
                 style={{ background: "linear-gradient(135deg, #00FFA320, transparent, #00FFA308)", borderRadius: "12px" }} />
 
               <div className="relative flex items-center gap-3 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl
-                              border border-white/[0.07] bg-white/[0.03]
+                              border border-white/[0.08] bg-[#0A0A16]
                               focus-within:border-[#00FFA3]/30 transition-colors duration-300">
                 <SearchIcon />
                 <input
@@ -273,13 +253,14 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <ul className="space-y-2">
-              {searchResults.map((repo, i) => (
+            {searchResults.length > 0 ? (
+              <ul className="space-y-2">
+                {searchResults.map((repo, i) => (
                 <li
                   key={repo._id}
                  onClick={() => navigate(`/repo/${repo.name}/${repo._id}`)}
                   className="repo-card group relative flex items-center gap-3 sm:gap-4 px-3.5 sm:px-5 py-3 sm:py-4 rounded-xl
-                             border border-white/[0.05] bg-white/[0.02]
+                             border border-white/[0.07] bg-[#0A0A16]
                              hover:bg-white/[0.04] hover:border-white/[0.09]
                              transition-all duration-200 cursor-pointer"
                   style={{ animationDelay: `${i * 40}ms` }}
@@ -307,54 +288,85 @@ const Dashboard = () => {
 
                   <ChevronIcon />
                 </li>
-              ))}
-            </ul>
-
-            {searchResults.length === 0 && searchQuery !== "" && (
-              <div className="py-16 sm:py-20 text-center">
-                <p className="font-plex text-xs text-gray-700">
-                  no match for{" "}
-                  <span className="text-[#00FFA3]/60">"{searchQuery}"</span>
-                  {" "}in your repositories
+                ))}
+              </ul>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-white/[0.12] bg-[#0A0A16] px-5 py-10 sm:py-14 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-[#00FFA3]">
+                  {searchQuery ? <SearchIcon /> : <FolderIcon />}
+                </div>
+                <h4 className="font-syne text-lg font-bold text-white">
+                  {searchQuery ? "No repositories found" : "Create your first repository"}
+                </h4>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-600">
+                  {searchQuery
+                    ? `Nothing matched "${searchQuery}". Try a different name or clear the search.`
+                    : "Your own repositories will appear here with quick access to code, issues, commits, and review rooms."}
                 </p>
+                {!searchQuery && (
+                  <button
+                    onClick={() => navigate("/repo/create")}
+                    className="mt-5 inline-flex items-center gap-2 rounded-lg border border-[#00FFA3]/25 bg-[#00FFA3]/[0.08] px-4 py-2 font-plex text-[11px] uppercase tracking-widest text-[#00FFA3] transition-all hover:bg-[#00FFA3]/[0.14]"
+                  >
+                    <PlusIcon />
+                    New Repository
+                  </button>
+                )}
               </div>
             )}
           </main>
 
-          {/* UPCOMING EVENTS — horizontal snap-scroll on mobile, vertical list on desktop */}
+          {/* PRODUCTIVE SIDE PANEL */}
           <aside className="w-full lg:w-[210px] shrink-0 order-3 lg:order-3">
             <div className="flex items-center gap-2 mb-4 lg:mb-6">
               <span className="block w-1.5 h-4 rounded-full bg-[#FF6B4A]" />
               <h3 className="font-syne text-[10px] tracking-[0.22em] uppercase text-gray-500">
-                Upcoming
+                Repository Health
               </h3>
             </div>
 
-            <ul className="events-scroll flex lg:flex-col gap-2.5 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-4 px-4 lg:mx-0 lg:px-0">
-              {UPCOMING_EVENTS.map((event) => (
-                <li
-                  key={event.id}
-                  className="group shrink-0 w-[200px] lg:w-auto p-4 rounded-xl border border-white/[0.05] bg-white/[0.02]
-                             hover:bg-white/[0.04] hover:border-white/[0.09]
-                             transition-all duration-200 cursor-pointer"
-                >
-                  <p className="font-dm text-sm font-medium text-gray-300 group-hover:text-white transition-colors leading-snug">
-                    {event.title}
-                  </p>
+            <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-1">
+              <div className="rounded-xl border border-white/[0.07] bg-[#0A0A16] p-4">
+                <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600">Owned</p>
+                <p className="mt-2 font-syne text-2xl font-bold text-white">{repositories.length}</p>
+                <p className="mt-1 text-[11px] leading-5 text-gray-600">active workspaces</p>
+              </div>
 
-                  <div className="mt-2.5 flex items-center justify-between">
-                    <span className="font-plex text-[10px] text-gray-600">{event.date}</span>
-                    <span className={`font-plex text-[9px] px-1.5 py-0.5 rounded border font-medium uppercase tracking-wider ${EVENT_COLORS[event.type]}`}>
-                      {event.type}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+              <div className="rounded-xl border border-white/[0.07] bg-[#0A0A16] p-4">
+                <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600">Discoverable</p>
+                <p className="mt-2 font-syne text-2xl font-bold text-white">{visibleGlobalCount}</p>
+                <p className="mt-1 text-[11px] leading-5 text-gray-600">public repos</p>
+              </div>
+            </div>
 
-            <div className="mt-6 lg:mt-8 pt-4 lg:pt-6 border-t border-white/[0.04]">
-              <p className="font-plex text-[10px] text-gray-700 leading-relaxed">
-                3 events this month
+            <div className="mt-4 rounded-xl border border-white/[0.07] bg-[#0A0A16] p-4">
+              <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600">Repository mix</p>
+              <div className="mt-4 space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">Private</span>
+                  <span className="font-plex text-gray-300">{privateOwnCount}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">Public</span>
+                  <span className="font-plex text-gray-300">{publicOwnCount}</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-white/[0.04]">
+                  <div
+                    className="h-full rounded-full bg-[#00FFA3]"
+                    style={{ width: repositories.length ? `${(publicOwnCount / repositories.length) * 100}%` : "0%" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 rounded-xl border border-white/[0.07] bg-[#0A0A16] p-4">
+              <p className="font-plex text-[10px] uppercase tracking-widest text-gray-600">Next Best Action</p>
+              <p className="mt-2 text-sm leading-6 text-gray-400">
+                {repositories.length === 0
+                  ? "Create a repository to unlock commits, issues, and review rooms."
+                  : privateOwnCount > publicOwnCount
+                    ? "Make a polished repo public when it is ready for discovery."
+                    : "Keep descriptions sharp so global search stays useful."}
               </p>
             </div>
           </aside>

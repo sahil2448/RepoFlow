@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate }      from "react-router-dom";
 import { useNotifications }                    from "../store/useNotifications";
 import { notificationStore }                   from "../store/notificationStore";
 import RepoFlowLogo2 from "../assets/RepoFlowLogo2.png";
-import { ec2Api } from "../config/api";
+import api, { ec2Api } from "../config/api";
 import { useTheme } from "../hooks/useTheme";
 
 interface NotificationItem {
@@ -58,7 +58,37 @@ const Navbar: React.FC = () => {
 
   const [scrolled, setScrolled] = useState<boolean>(false);
   const [bellOpen, setBellOpen] = useState<boolean>(false);
+  const [profileName, setProfileName] = useState<string>(() => localStorage.getItem("username") || "Profile");
+  const [profileAvatar, setProfileAvatar] = useState<string>(() => localStorage.getItem("avatar") || "");
   const bellRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const syncProfile = () => {
+      setProfileName(localStorage.getItem("username") || "Profile");
+      setProfileAvatar(localStorage.getItem("avatar") || "");
+    };
+
+    syncProfile();
+    api.get(`/userProfile/${userId}`)
+      .then((res) => {
+        const nextName = res.data?.username || "Profile";
+        const nextAvatar = res.data?.avatar || "";
+        localStorage.setItem("username", nextName);
+        localStorage.setItem("avatar", nextAvatar);
+        setProfileName(nextName);
+        setProfileAvatar(nextAvatar);
+      })
+      .catch(console.error);
+
+    window.addEventListener("repoflow:profile-updated", syncProfile);
+    window.addEventListener("storage", syncProfile);
+    return () => {
+      window.removeEventListener("repoflow:profile-updated", syncProfile);
+      window.removeEventListener("storage", syncProfile);
+    };
+  }, [userId]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -278,11 +308,15 @@ const Navbar: React.FC = () => {
                         }`}
           >
             <span className="w-5 h-5 rounded-full flex items-center justify-center
-                            bg-gradient-to-br from-[#00FFA3]/20 to-[#A78BFA]/20
+                            bg-[#111827]
                             border border-white/[0.08] font-plex text-[9px] text-gray-300">
-              U
+              {profileAvatar ? (
+                <img src={profileAvatar} alt="" className="h-full w-full rounded-full object-cover" />
+              ) : (
+                profileName.charAt(0).toUpperCase()
+              )}
             </span>
-            <span className="hidden sm:inline">Profile</span>
+            <span className="hidden sm:inline max-w-[120px] truncate">{profileName}</span>
           </Link>
 
         </div>

@@ -74,7 +74,7 @@ const AboutUser: React.FC<AboutUserProps> = ({ userDetails }) => {
           </h3>
         </div>
       <div className="relative rounded-2xl border border-white/[0.07]
-                bg-white/[0.02] p-4 sm:p-5 mb-6 overflow-hidden">
+                bg-[#0A0A16] p-4 sm:p-5 mb-6 overflow-hidden">
         
         
         

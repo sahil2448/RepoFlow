@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import HeatMap from "@uiw/react-heat-map";
 import { ec2Api } from "../../config/api";
+import { useTheme } from "../../hooks/useTheme";
 
 
 
@@ -13,8 +14,10 @@ type PanelColors = Record<number, string>;
 
 
 
-const getPanelColors = (maxCount: number): PanelColors => {
-  const colors: PanelColors = { 0: "rgba(255,255,255,0.08)" };
+const getPanelColors = (maxCount: number, theme: "light" | "dark"): PanelColors => {
+  const colors: PanelColors = {
+    0: theme === "dark" ? "rgba(255,255,255,0.08)" : "#EEF2F7",
+  };
 
   
   
@@ -22,8 +25,14 @@ const getPanelColors = (maxCount: number): PanelColors => {
 
   for (let i = 1; i <= scale; i++) {
     const t = i / scale;
-    const a = 0.15 + t * 0.85;
-    colors[i] = `rgba(0,${Math.round(255 * t)},${Math.round(163 * t)},${a})`;
+    if (theme === "dark") {
+      const a = 0.15 + t * 0.85;
+      colors[i] = `rgba(0,${Math.round(255 * t)},${Math.round(163 * t)},${a})`;
+    } else {
+      const green = Math.round(170 - t * 96);
+      const blue = Math.round(145 - t * 76);
+      colors[i] = `rgb(14, ${green}, ${blue})`;
+    }
   }
   return colors;
 };
@@ -32,8 +41,9 @@ const getPanelColors = (maxCount: number): PanelColors => {
 
 
 const HeatMapProfile: React.FC = () => {
+  const { theme } = useTheme();
   const [activityData, setActivityData]   = useState<ActivityEntry[]>([]);
-  const [panelColors, setPanelColors]     = useState<PanelColors>({ 0: "rgba(255,255,255,0.08)" });
+  const [panelColors, setPanelColors]     = useState<PanelColors>(() => getPanelColors(1, theme));
   const [totalContribs, setTotalContribs] = useState<number>(0);
   const [year, setYear]                   = useState<number>(new Date().getFullYear());
   const [loading, setLoading]             = useState<boolean>(true);
@@ -53,7 +63,7 @@ const HeatMapProfile: React.FC = () => {
           : 1;
 
         setActivityData(data);
-        setPanelColors(getPanelColors(maxCount));
+        setPanelColors(getPanelColors(maxCount, theme));
         setTotalContribs(data.reduce((s, d) => s + d.count, 0));
         setYear(fetchedYear);
       } catch (err) {
@@ -64,7 +74,7 @@ const HeatMapProfile: React.FC = () => {
     };
 
     fetchContributions();
-  }, []);
+  }, [theme]);
 
   if (loading) {
     return (
@@ -89,10 +99,18 @@ const HeatMapProfile: React.FC = () => {
           display: block;
         }
         .heatmap-themed text {
-          fill: rgba(255,255,255,0.45) !important;
+          fill: var(--text-muted) !important;
           font-family: 'IBM Plex Mono', monospace !important;
           font-size: 9px !important;
-          letter-spacing: 0.03em;
+          letter-spacing: 0;
+        }
+        .heatmap-themed rect {
+          stroke: var(--bg-card) !important;
+          stroke-width: 1.25px !important;
+          shape-rendering: geometricPrecision;
+        }
+        .dark .heatmap-themed rect {
+          stroke: rgba(10,10,24,0.96) !important;
         }
       `}</style>
 
@@ -139,11 +157,11 @@ const HeatMapProfile: React.FC = () => {
                         "Jul","Aug","Sep","Oct","Nov","Dec"]}
           rectSize={15}
           space={3}
-          rectProps={{ rx: 2 }}
+          rectProps={{ rx: 2.5 }}
           panelColors={panelColors}
           style={{
             width: "100%",
-            color: "rgba(255,255,255,0.45)",
+            color: "var(--text-muted)",
             fontFamily: "'IBM Plex Mono', monospace",
             fontSize: "9px",
           }}
@@ -156,7 +174,12 @@ const HeatMapProfile: React.FC = () => {
         <span className="font-plex text-[9px] text-gray-700">Less</span>
         {[0.04, 0.2, 0.4, 0.65, 1].map((opacity, i) => (
           <span key={i} className="w-2.5 h-2.5 rounded-sm"
-            style={{ backgroundColor: `rgba(0,255,163,${opacity})` }} />
+            style={{
+              backgroundColor: theme === "dark"
+                ? `rgba(0,255,163,${opacity})`
+                : i === 0 ? "#EEF2F7" : `rgba(14,${Math.round(170 - opacity * 96)},${Math.round(145 - opacity * 76)},1)`,
+              border: theme === "light" ? "1px solid var(--bg-card)" : undefined,
+            }} />
         ))}
         <span className="font-plex text-[9px] text-gray-700">More</span>
       </div>

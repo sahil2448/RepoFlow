@@ -82,6 +82,20 @@ body {
   background-image: radial-gradient(var(--dot-color) 1px, transparent 1px) !important;
 }
 
+.dark .dot-grid [class*="bg-white/["]:not(.theme-code-surface *),
+.dark .dot-grid [class~="bg-[#0A0A16]"] {
+  background-color: rgba(10, 10, 24, 0.96) !important;
+}
+
+.dark .dot-grid [class*="hover:bg-white/"]:hover {
+  background-color: rgba(255, 255, 255, 0.075) !important;
+}
+
+.dark .dot-grid input[class*="bg-white/["],
+.dark .dot-grid textarea[class*="bg-white/["] {
+  background-color: rgba(5, 7, 18, 0.92) !important;
+}
+
 /* Dark mode: remap hardcoded #060611 to the new richer base */
 .dark [class~="bg-[#060611]"] {
   background-color: var(--bg-base) !important;
