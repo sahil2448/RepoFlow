@@ -428,5 +428,3 @@ The ATS task changed RepoFlow from a feature-heavy prototype into a more defensi
 In an interview, the strongest framing is:
 
 “I took an existing full-stack developer platform and hardened it like a production system. I improved runtime scaling with PM2, used Redis carefully for cache and realtime coordination, added integration-style tests with memory MongoDB, strengthened CI/CD, added security and authorization controls, and backed the performance story with a real benchmark instead of a vague claim.”
-
-// just a check
