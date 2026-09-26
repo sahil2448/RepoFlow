@@ -13,3 +13,7 @@ Backend/benchmark-push.mjs
 *.bench-results.json
 # Personal interview prep notes - keep OFF GitHub, local only
 INTERVIEW_PREP.md
+
+# Markdown files - only README.md is ever tracked
+*.md
+!README.md
