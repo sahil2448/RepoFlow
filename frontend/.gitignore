@@ -27,3 +27,6 @@ dist-ssr
 .env.local
 .env.production
 .env.development
+CHANGES_GUIDE.md
+INTERVIEW_PREP_ATS_GUIDE.md
+INTERVIEW_PREP_GUIDE.md
