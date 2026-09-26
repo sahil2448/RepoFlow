@@ -49,6 +49,32 @@
 
   /* Code / terminal surfaces stay dark in BOTH themes */
   --code-bg: #1A1A2E;
+
+  /* ── Auth pages — login / signup ──────────────────────── */
+  --auth-card-bg:       #FFFFFF;
+  --auth-card-border:   rgba(15, 23, 42, 0.12);
+  --auth-card-shadow:   0 24px 60px -20px rgba(15, 23, 42, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  --auth-topline:       linear-gradient(90deg, transparent, rgba(11, 122, 84, 0.45) 30%, rgba(11, 122, 84, 0.45) 70%, transparent);
+  --auth-logo-bg:       rgba(11, 122, 84, 0.08);
+  --auth-logo-border:   rgba(11, 122, 84, 0.28);
+  --auth-wordmark:      #39415A;
+  --auth-label:         #39415A;
+  --auth-input-bg:      #F6F8FB;
+  --auth-input-border:  rgba(15, 23, 42, 0.14);
+  --auth-input-hover:   rgba(15, 23, 42, 0.26);
+  --auth-input-text:    #171B28;
+  --auth-input-ph:      #98A0B5;
+  --auth-icon:          #6E7489;
+  --auth-btn-bg:        linear-gradient(135deg, #0B7A54 0%, #085A3C 100%);
+  --auth-btn-text:      #FFFFFF;
+  --auth-btn-hover:     linear-gradient(135deg, #096143 0%, #064A34 100%);
+  --auth-btn-shadow:    0 14px 28px -12px rgba(11, 122, 84, 0.45);
+  --auth-btn-shadow-hover: 0 18px 32px -14px rgba(11, 122, 84, 0.55);
+  --auth-link:          #0B7A54;
+  --auth-link-hover:    #096143;
+  --auth-glow-mint:     rgba(14, 159, 110, 0.10);
+  --auth-glow-violet:   rgba(109, 91, 208, 0.07);
+  --auth-glow-coral:    rgba(214, 69, 69, 0.05);
 }
 
 .dark {
@@ -65,6 +91,32 @@
   --navbar-bg: #0A0A18;
   --accent-mint: #00FFA3;
   --code-bg: #1A1A2E;
+
+  /* ── Auth pages — login / signup ──────────────────────── */
+  --auth-card-bg:       rgba(255, 255, 255, 0.055);
+  --auth-card-border:   rgba(255, 255, 255, 0.12);
+  --auth-card-shadow:   0 24px 60px -22px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --auth-topline:       linear-gradient(90deg, transparent, rgba(0, 255, 163, 0.55) 30%, rgba(0, 255, 163, 0.55) 70%, transparent);
+  --auth-logo-bg:       rgba(0, 255, 163, 0.08);
+  --auth-logo-border:   rgba(0, 255, 163, 0.25);
+  --auth-wordmark:      #C9CEE2;
+  --auth-label:         #B9C0D4;
+  --auth-input-bg:      rgba(4, 6, 16, 0.55);
+  --auth-input-border:  rgba(255, 255, 255, 0.14);
+  --auth-input-hover:   rgba(255, 255, 255, 0.26);
+  --auth-input-text:    #F1F4FA;
+  --auth-input-ph:      #5B647E;
+  --auth-icon:          #78819E;
+  --auth-btn-bg:        linear-gradient(135deg, #00FFA3 0%, #00B870 100%);
+  --auth-btn-text:      #04140C;
+  --auth-btn-hover:     linear-gradient(135deg, #00EB97 0%, #00A866 100%);
+  --auth-btn-shadow:    0 16px 30px -14px rgba(0, 255, 163, 0.4);
+  --auth-btn-shadow-hover: 0 18px 34px -12px rgba(0, 255, 163, 0.55);
+  --auth-link:          #00FFA3;
+  --auth-link-hover:    #7CFFC9;
+  --auth-glow-mint:     rgba(0, 255, 163, 0.10);
+  --auth-glow-violet:   rgba(167, 139, 250, 0.08);
+  --auth-glow-coral:    rgba(255, 107, 74, 0.05);
 }
 
 html,
@@ -294,6 +346,114 @@ body {
 :root:not(.dark) html .theme-code-surface [class~="text-gray-800"] {
   color: #4B5563 !important;
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   AUTH PAGES — LOGIN / SIGNUP
+   Login.tsx and Signup.tsx use the `rf-*` helpers below. Every color
+   reads from the `--auth-*` variables in `:root` (light) and `.dark`,
+   so the pair stays cohesive in both themes. Static treatment only —
+   a quiet entrance and hover touches, no looping effects.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Font utilities (font imports live in index.html) */
+.font-syne { font-family: 'Syne', sans-serif; }
+.font-plex { font-family: 'IBM Plex Mono', monospace; }
+.font-dm   { font-family: 'DM Sans', sans-serif; }
+
+/* Quiet entrance */
+@keyframes rf-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rf-fade-up { animation: rf-fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rf-fade-up { animation: none; }
+  .rf-btn     { transition: none; }
+}
+
+/* Static ambient color washes behind the auth card */
+.auth-glow {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  filter: blur(70px);
+}
+
+/* Auth card — clearly elevated from the page surface */
+.rf-card {
+  position: relative;
+  background-color: var(--auth-card-bg);
+  border: 1px solid var(--auth-card-border);
+  box-shadow: var(--auth-card-shadow);
+  backdrop-filter: blur(6px);
+}
+.rf-card-topline::before {
+  content: "";
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  top: 0;
+  height: 1px;
+  background: var(--auth-topline);
+}
+
+/* Field labels */
+.rf-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--auth-label);
+}
+
+/* Inputs — distinct fill + border so each field is its own sub-piece */
+.rf-input {
+  width: 100%;
+  background-color: var(--auth-input-bg);
+  border: 1px solid var(--auth-input-border);
+  border-radius: 10px;
+  color: var(--auth-input-text);
+  font-size: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.rf-input::placeholder { color: var(--auth-input-ph); }
+.rf-input:hover { border-color: var(--auth-input-hover); }
+.rf-input:focus {
+  outline: none;
+  background-color: var(--auth-input-bg);
+  border-color: var(--accent-mint);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-mint) 18%, transparent);
+}
+.rf-input:focus::placeholder { color: transparent; }
+
+/* Field leading icons */
+.rf-icon { color: var(--auth-icon); }
+
+/* Primary CTA — solid themed fill, readable on both themes */
+.rf-btn {
+  background-image: var(--auth-btn-bg);
+  color: var(--auth-btn-text);
+  box-shadow: var(--auth-btn-shadow);
+  border: none;
+  cursor: pointer;
+  transition: background-image 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+.rf-btn:hover:not(:disabled) {
+  background-image: var(--auth-btn-hover);
+  box-shadow: var(--auth-btn-shadow-hover);
+  transform: translateY(-1px);
+}
+.rf-btn:active:not(:disabled) { transform: translateY(0); }
+.rf-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Footer cross-links */
+.rf-link {
+  color: var(--auth-link);
+  transition: color 0.15s ease;
+}
+.rf-link:hover { color: var(--auth-link-hover); }
 
 /* Accent text inside code stays in brand pastels */
 :root:not(.dark) html .theme-code-surface [class*="text-[#00FFA3]/"],
