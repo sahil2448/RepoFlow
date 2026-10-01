@@ -1,31 +1,65 @@
 import React, { useState } from "react";
 import { useAuth } from "../../auth";
 import logo from "../../assets/RepoFlowLogo2.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../config/api";
+import toast from "react-hot-toast";
+
+type ApiErrorResponse = {
+  response?: {
+    data?: { error?: string };
+  };
+};
+
+type FormErrors = {
+  email?: string;
+  password?: string;
+};
 
 const Login: React.FC = () => {
   const [email, setEmail]       = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading]   = useState<boolean>(false);
+  const [errors, setErrors]     = useState<FormErrors>({});
 
   const { setCurrentUser } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
     e.preventDefault();
+
+    const nextErrors: FormErrors = {};
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      nextErrors.email = "Please enter your email to sign in.";
+    }
+    if (!password) {
+      nextErrors.password = "Please enter your password to sign in.";
+    }
+    if (nextErrors.email || nextErrors.password) {
+      setErrors(nextErrors);
+      return;
+    }
+    setErrors({});
+
     try {
       setLoading(true);
-      const res = await api.post("/login", { email, password });
+      const res = await api.post("/login", { email: trimmedEmail, password });
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.userId);
       localStorage.setItem("username", res.data.username || "");
       localStorage.setItem("avatar", res.data.avatar || "");
       setCurrentUser({ userId: res.data.userId });
       setLoading(false);
-      window.location.href = "/";
+      toast.success("Logged in successfully!");
+      navigate("/");
     } catch (err) {
       console.error(err);
-      alert("Login Failed!");
+      const apiError = err as ApiErrorResponse;
+      toast.error(
+        apiError.response?.data?.error ||
+          "Login failed. Check your credentials and try again.",
+      );
       setLoading(false);
     }
   };
@@ -108,11 +142,20 @@ const Login: React.FC = () => {
                 name="Email"
                 type="email"
                 value={email}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                className="rf-input py-2.5 pl-9 pr-3.5"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setEmail(e.target.value);
+                  if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+                }}
+                className={"rf-input py-2.5 pl-9 pr-3.5" + (errors.email ? " rf-input-error" : "")}
+                aria-invalid={errors.email ? "true" : undefined}
                 placeholder="you@example.com"
               />
             </div>
+            {errors.email && (
+              <p className="rf-field-error" role="alert">
+                {errors.email}
+              </p>
+            )}
           </div>
           {/* Password field */}
           <div className="flex flex-col gap-1.5">
@@ -139,11 +182,20 @@ const Login: React.FC = () => {
                 name="Password"
                 type="password"
                 value={password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                className="rf-input py-2.5 pl-9 pr-3.5"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setPassword(e.target.value);
+                  if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
+                }}
+                className={"rf-input py-2.5 pl-9 pr-3.5" + (errors.password ? " rf-input-error" : "")}
+                aria-invalid={errors.password ? "true" : undefined}
                 placeholder="••••••••"
               />
             </div>
+            {errors.password && (
+              <p className="rf-field-error" role="alert">
+                {errors.password}
+              </p>
+            )}
           </div>
 
           <button

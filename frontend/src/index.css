@@ -428,6 +428,22 @@ body {
 }
 .rf-input:focus::placeholder { color: transparent; }
 
+/* Field-level validation — red hint under an invalid field */
+.rf-field-error {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  line-height: 1.4;
+  margin-top: 4px;
+  color: var(--coral);
+}
+
+/* Input in an invalid state — coral border + soft glow (kept on hover/focus) */
+.rf-input-error,
+.rf-input-error:focus {
+  border-color: var(--coral);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--coral) 12%, transparent);
+}
+
 /* Field leading icons */
 .rf-icon { color: var(--auth-icon); }
 

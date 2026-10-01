@@ -15,7 +15,11 @@ configDotenv();
 
 const URI = process.env.MONGO_URI;
 const DB_NAME = process.env.DB_NAME;
-const SECRET_KEY = process.env.JWT_SECRET || process.env.SECRET_KEY;
+const SECRET_KEY =
+  process.env.JWT_SECRET || process.env.SECRET_KEY || "repoflow_default_secret";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PASSWORD_LENGTH = 6;
 let client;
 
 async function connectToClient() {
@@ -26,15 +30,48 @@ async function connectToClient() {
 }
 
 const signup = async (req, res) => {
-  const { username, email, password } = req.body;
+  const rawUsername = req.body?.username;
+  const rawEmail = req.body?.email;
+  const rawPassword = req.body?.password;
+
+  const username = typeof rawUsername === "string" ? rawUsername.trim() : "";
+  const email = typeof rawEmail === "string" ? rawEmail.trim() : "";
+  const password = typeof rawPassword === "string" ? rawPassword : "";
+
+  if (!username) {
+    return res.status(400).json({ error: "Username is required." });
+  }
+  if (!email) {
+    return res.status(400).json({ error: "Email is required." });
+  }
+  if (!EMAIL_RE.test(email)) {
+    return res
+      .status(400)
+      .json({ error: "Please enter a valid email address." });
+  }
+  if (!password) {
+    return res.status(400).json({ error: "Password is required." });
+  }
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return res.status(400).json({
+      error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters long.`,
+    });
+  }
+
   try {
     await connectToClient();
     const db = client.db(DB_NAME);
     const userCollection = db.collection("users");
-    const user = await userCollection.findOne({ username });
+    const existingUser = await userCollection.findOne({
+      $or: [{ username }, { email }],
+    });
 
-    if (user) {
-      return res.status(400).send("User already exists");
+    if (existingUser) {
+      const message =
+        existingUser.username === username
+          ? "Username already exists."
+          : "An account with this email already exists.";
+      return res.status(409).json({ error: message });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -53,15 +90,28 @@ const signup = async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.json({ token, userId: result.insertedId, username }).status(200);
+    res
+      .status(200)
+      .json({ token, userId: result.insertedId, username });
   } catch (error) {
     console.error("Error during signup", error);
-    res.status(500).send("Server error");
+    res.status(500).json({ error: "Server error" });
   }
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const rawEmail = req.body?.email;
+  const rawPassword = req.body?.password;
+
+  const email = typeof rawEmail === "string" ? rawEmail.trim() : "";
+  const password = typeof rawPassword === "string" ? rawPassword : "";
+
+  if (!email || !password) {
+    return res
+      .status(400)
+      .json({ error: "Email and password are required." });
+  }
+
   try {
     await connectToClient();
     const db = client.db(DB_NAME);
@@ -70,22 +120,27 @@ const login = async (req, res) => {
     const user = await userCollection.findOne({ email });
 
     if (!user) {
-      return res.status(404).send("Invalid credentials");
+      return res.status(401).json({ error: "Invalid email or password." });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(401).send("Invalid password");
+      return res.status(401).json({ error: "Invalid email or password." });
     }
 
     const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
 
     res
-      .json({ token, userId: user._id, username: user.username, avatar: user.avatar || "" })
-      .status(200);
+      .status(200)
+      .json({
+        token,
+        userId: user._id,
+        username: user.username,
+        avatar: user.avatar || "",
+      });
   } catch (error) {
-    return res.status(500).send("Server error");
+    return res.status(500).json({ error: "Server error" });
   }
 };
 

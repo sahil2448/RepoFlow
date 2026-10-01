@@ -4,6 +4,7 @@ import './index.css'
 import { AuthProvider } from './authContext.tsx'
 import { BrowserRouter as Router } from 'react-router-dom'
 import ProjectRoutes from './Routes.tsx'
+import { Toaster } from 'react-hot-toast'
 // import { NotificationProvider } from './context/NotificationContext.tsx'
 
 const storedTheme = localStorage.getItem('repoflow-theme')
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')!).render(
       {/* <NotificationProvider> */}
         <Router>
           <ProjectRoutes />
+          <Toaster position="top-right" gutter={12} />
         </Router>
       {/* </NotificationProvider>  */}
     </AuthProvider>

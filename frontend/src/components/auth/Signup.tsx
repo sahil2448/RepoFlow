@@ -1,32 +1,84 @@
 import React, { useState } from "react";
 import { useAuth } from "../../auth";
 import logo from "../../assets/RepoFlowLogo2.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../config/api";
+import toast from "react-hot-toast";
+
+type ApiErrorResponse = {
+  response?: {
+    data?: { error?: string };
+  };
+};
+
+type FormErrors = {
+  username?: string;
+  email?: string;
+  password?: string;
+};
 
 const Signup: React.FC = () => {
   const [email, setEmail]       = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading]   = useState<boolean>(false);
+  const [errors, setErrors]     = useState<FormErrors>({});
 
   const { setCurrentUser } = useAuth();
+  const navigate = useNavigate();
+
+  const validate = (): FormErrors => {
+    const nextErrors: FormErrors = {};
+    const trimmedUsername = username.trim();
+    const trimmedEmail = email.trim();
+
+    if (!trimmedUsername) {
+      nextErrors.username = "Username is required.";
+    }
+    if (!trimmedEmail) {
+      nextErrors.email = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      nextErrors.email = "Please enter a valid email address.";
+    }
+    if (!password) {
+      nextErrors.password = "Password is required.";
+    } else if (password.length < 6) {
+      nextErrors.password = "Password must be at least 6 characters long.";
+    }
+    return nextErrors;
+  };
 
   const handleSignup = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
     e.preventDefault();
+
+    const nextErrors = validate();
+    if (nextErrors.username || nextErrors.email || nextErrors.password) {
+      setErrors(nextErrors);
+      return;
+    }
+    setErrors({});
+
     try {
       setLoading(true);
-      const res = await api.post("/signup", { email, password, username });
+      const res = await api.post("/signup", {
+        email: email.trim(),
+        password,
+        username: username.trim(),
+      });
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.userId);
-      localStorage.setItem("username", res.data.username || username);
+      localStorage.setItem("username", res.data.username || username.trim());
       localStorage.setItem("avatar", "");
       setCurrentUser({ userId: res.data.userId });
       setLoading(false);
-      window.location.href = "/";
+      toast.success("Account created successfully!");
+      navigate("/");
     } catch (err) {
       console.error(err);
-      alert("Signup Failed!");
+      const apiError = err as ApiErrorResponse;
+      toast.error(
+        apiError.response?.data?.error || "Signup failed. Please try again.",
+      );
       setLoading(false);
     }
   };
@@ -109,11 +161,20 @@ const Signup: React.FC = () => {
                 name="Username"
                 type="text"
                 value={username}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
-                className="rf-input py-2.5 pl-9 pr-3.5"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setUsername(e.target.value);
+                  if (errors.username) setErrors((prev) => ({ ...prev, username: undefined }));
+                }}
+                className={"rf-input py-2.5 pl-9 pr-3.5" + (errors.username ? " rf-input-error" : "")}
+                aria-invalid={errors.username ? "true" : undefined}
                 placeholder="cooldevname"
               />
             </div>
+            {errors.username && (
+              <p className="rf-field-error" role="alert">
+                {errors.username}
+              </p>
+            )}
           </div>
           {/* Email field */}
           <div className="flex flex-col gap-1.5">
@@ -140,11 +201,20 @@ const Signup: React.FC = () => {
                 name="Email"
                 type="email"
                 value={email}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                className="rf-input py-2.5 pl-9 pr-3.5"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setEmail(e.target.value);
+                  if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+                }}
+                className={"rf-input py-2.5 pl-9 pr-3.5" + (errors.email ? " rf-input-error" : "")}
+                aria-invalid={errors.email ? "true" : undefined}
                 placeholder="you@example.com"
               />
             </div>
+            {errors.email && (
+              <p className="rf-field-error" role="alert">
+                {errors.email}
+              </p>
+            )}
           </div>
           {/* Password field */}
           <div className="flex flex-col gap-1.5">
@@ -171,11 +241,20 @@ const Signup: React.FC = () => {
                 name="Password"
                 type="password"
                 value={password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                className="rf-input py-2.5 pl-9 pr-3.5"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setPassword(e.target.value);
+                  if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
+                }}
+                className={"rf-input py-2.5 pl-9 pr-3.5" + (errors.password ? " rf-input-error" : "")}
+                aria-invalid={errors.password ? "true" : undefined}
                 placeholder="••••••••"
               />
             </div>
+            {errors.password && (
+              <p className="rf-field-error" role="alert">
+                {errors.password}
+              </p>
+            )}
           </div>
 
           <button
