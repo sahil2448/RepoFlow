@@ -202,9 +202,10 @@ const Login: React.FC = () => {
             type="button"
             disabled={loading}
             onClick={handleLogin}
-            className="rf-btn mt-1 w-full rounded-xl py-3 font-plex text-[12px] font-medium uppercase tracking-widest"
+            aria-busy={loading}
+            className={"rf-btn mt-1 w-full rounded-xl py-3 font-plex text-[12px] font-medium uppercase tracking-widest" + (loading ? " rf-btn-loading" : "")}
           >
-            {loading ? "Signing in…" : "Sign In"}
+            {loading ? <span className="rf-spinner" aria-hidden="true" /> : "Sign In"}
           </button>
         </div>
       </div>

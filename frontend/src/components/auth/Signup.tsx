@@ -261,9 +261,10 @@ const Signup: React.FC = () => {
             type="button"
             disabled={loading}
             onClick={handleSignup}
-            className="rf-btn mt-1 w-full rounded-xl py-3 font-plex text-[12px] font-medium uppercase tracking-widest"
+            aria-busy={loading}
+            className={"rf-btn mt-1 w-full rounded-xl py-3 font-plex text-[12px] font-medium uppercase tracking-widest" + (loading ? " rf-btn-loading" : "")}
           >
-            {loading ? "Creating…" : "Create Account"}
+            {loading ? <span className="rf-spinner" aria-hidden="true" /> : "Create Account"}
           </button>
         </div>
       </div>

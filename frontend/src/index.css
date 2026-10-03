@@ -370,6 +370,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .rf-fade-up { animation: none; }
   .rf-btn     { transition: none; }
+  .rf-spinner { animation: none; }
 }
 
 /* Static ambient color washes behind the auth card */
@@ -454,15 +455,37 @@ body {
   box-shadow: var(--auth-btn-shadow);
   border: none;
   cursor: pointer;
-  transition: background-image 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  transition: background-image 0.2s ease, box-shadow 0.2s ease;
 }
+/* Clerk-style: hover only transitions color/shadow — no upward lift */
 .rf-btn:hover:not(:disabled) {
   background-image: var(--auth-btn-hover);
   box-shadow: var(--auth-btn-shadow-hover);
-  transform: translateY(-1px);
 }
-.rf-btn:active:not(:disabled) { transform: translateY(0); }
 .rf-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Clerk-style rotating ribbon — shown while an auth request is in flight */
+.rf-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  vertical-align: middle;
+  animation: rf-spin 0.7s linear infinite;
+}
+
+@keyframes rf-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* While loading: keep the button fully colored (no dim, no lift) */
+.rf-btn:disabled.rf-btn-loading,
+.rf-btn:disabled.rf-btn-loading:hover {
+  opacity: 1;
+  cursor: progress;
+}
 
 /* Footer cross-links */
 .rf-link {
@@ -521,4 +544,157 @@ body {
 
 :root:not(.dark) html .theme-code-surface .group:hover [class*="group-hover:text-white"] {
   color: #FFFFFF !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   DISTINCTION LAYER — shared by every post-login screen (both themes)
+   · separates cards/panels from the page canvas with elevation,
+   · gives floating popovers (bell, menus) a real raised surface,
+   · adds consistent focus rings, scrollbars and selection color,
+   · keeps hover states visible on interactive rows & cards.
+   Pure presentation — no logic sits behind these rules.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* 1 ─ Elevation + floating-surface tokens, tuned per theme ───────── */
+:root {
+  --elev-soft:   0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 22px -8px rgba(15, 23, 42, 0.13);
+  --elev-strong: 0 2px 4px rgba(15, 23, 42, 0.09), 0 18px 40px -12px rgba(15, 23, 42, 0.18);
+  --pop-bg:      #FFFFFF;
+  --pop-border:  rgba(15, 23, 42, 0.16);
+}
+.dark {
+  --elev-soft:   0 0 1px rgba(255, 255, 255, 0.05), 0 14px 34px -12px rgba(0, 0, 0, 0.55);
+  --elev-strong: 0 0 1px rgba(255, 255, 255, 0.06), 0 20px 46px -14px rgba(0, 0, 0, 0.72);
+  --pop-bg:      #171731;
+  --pop-border:  rgba(255, 255, 255, 0.13);
+}
+
+/* 2 ─ DARK: lift #0A0A16 cards/rows — they currently equal the page
+        bg #0A0A18, the reason panels vanish in dark mode ────────── */
+.dark [class*="rounded-lg"][class~="bg-[#0A0A16]"],
+.dark [class*="rounded-xl"][class~="bg-[#0A0A16]"],
+.dark [class*="rounded-2xl"][class~="bg-[#0A0A16]"] {
+  background-color: #16162E !important;
+  box-shadow: var(--elev-soft) !important;
+}
+
+/* 3 ─ DARK: large floating panels (bell dropdown, etc.) that use
+        #060611 get a real raised surface + strong elevation ──────── */
+.dark [class*="rounded-2xl"][class~="bg-[#060611]"]:not(.theme-code-surface) {
+  background-color: rgba(26, 27, 49, 0.96) !important;
+  box-shadow: var(--elev-strong) !important;
+  border-color: var(--pop-border) !important;
+}
+
+/* 4 ─ LIGHT: soft elevation under the big white cards so key
+        sections visibly float off the near-white canvas ─────────── */
+:root:not(.dark) [class*="rounded-xl"][class*="bg-white/["],
+:root:not(.dark) [class*="rounded-2xl"][class*="bg-white/["],
+:root:not(.dark) [class*="rounded-xl"][class~="bg-[#0A0A16]"],
+:root:not(.dark) [class*="rounded-2xl"][class~="bg-[#0A0A16]"] {
+  box-shadow: var(--elev-soft) !important;
+}
+
+/* 5 ─ The bell dropdown floats above everything in both themes ───── */
+.dark .theme-navbar [class*="rounded-2xl"][class~="bg-[#060611]"],
+:root:not(.dark) .theme-navbar [class*="rounded-2xl"][class~="bg-[#060611]"] {
+  box-shadow: var(--elev-strong) !important;
+}
+
+/* 5b ─ Active page pill on the navbar reads as "you are here" in light ─ */
+:root:not(.dark) .theme-navbar a[class*="bg-white/["] {
+  background-color: color-mix(in srgb, var(--accent-mint) 8%, var(--bg-card-hover)) !important;
+  border-color: var(--border-card) !important;
+}
+.dark .theme-navbar [class*="rounded-2xl"][class~="bg-[#060611]"],
+:root:not(.dark) .theme-navbar [class*="rounded-2xl"][class~="bg-[#060611]"] {
+  box-shadow: var(--elev-strong) !important;
+}
+
+/* 6 ─ Interactive repo cards lift & cast a deeper shadow on hover ── */
+.repo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elev-soft) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .repo-card:hover { transform: none; }
+}
+
+/* 7 ─ Focus ring for every text field (both themes) so inputs never
+        look merge-y; opaque/wrapped ones keep the ring on wrappers ─ */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent-mint) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-mint) 10%, transparent);
+}
+input.bg-transparent:focus,
+textarea.bg-transparent:focus {
+  box-shadow: none !important;
+}
+
+/* 8 ─ Keyboard focus for buttons/links — visible, themed, subtle ─── */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-mint) 60%, transparent);
+  outline-offset: 2px;
+}
+
+/* 9 ─ Thin, themed scrollbars (complements per-component ones) ───── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--text-muted) 50%, transparent) transparent;
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-muted) 45%, transparent);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track { background: transparent; }
+
+/* 10 ─ Text selection uses the app accent in both themes ─────────── */
+::selection {
+  background: color-mix(in srgb, var(--accent-mint) 22%, transparent);
+}
+
+/* 11 ─ FORM FIELDS: distinct "wells" in both themes so inputs,
+        textareas and selects never blend into their card ────────── */
+.dark .dot-grid input[class*="bg-white/["],
+.dark .dot-grid textarea[class*="bg-white/["],
+.dark .dot-grid select[class*="bg-white/["],
+.dark .dot-grid input[class*="bg-black/"],
+.dark .dot-grid textarea[class*="bg-black/"],
+.dark .dot-grid select[class*="bg-black/"] {
+  background-color: rgba(7, 10, 24, 0.86) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+.dark .dot-grid input[class*="bg-white/["]:not(:focus),
+.dark .dot-grid textarea[class*="bg-white/["]:not(:focus),
+.dark .dot-grid input[class*="bg-black/"]:not(:focus),
+.dark .dot-grid textarea[class*="bg-black/"]:not(:focus) {
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+:root:not(.dark) .dot-grid input[class*="bg-white/["],
+:root:not(.dark) .dot-grid textarea[class*="bg-white/["],
+:root:not(.dark) .dot-grid input[class*="bg-black/"],
+:root:not(.dark) .dot-grid textarea[class*="bg-black/"] {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-card) !important;
+}
+:root:not(.dark) .dot-grid input[class*="bg-white/["]:not(:focus),
+:root:not(.dark) .dot-grid textarea[class*="bg-white/["]:not(:focus),
+:root:not(.dark) .dot-grid input[class*="bg-black/"]:not(:focus),
+:root:not(.dark) .dot-grid textarea[class*="bg-black/"]:not(:focus) {
+  box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.10) !important;
+}
+
+/* 12 ─ DARK: glass wizard cards (Create Repo / Create Issue etc.)
+        lift a touch so their sunken fields read clearly ─────────── */
+.dark [class*="rounded-xl"][class*="bg-white/["],
+.dark [class*="rounded-2xl"][class*="bg-white/["] {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: var(--elev-soft) !important;
 }
