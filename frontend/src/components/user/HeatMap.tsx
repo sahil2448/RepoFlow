@@ -16,7 +16,7 @@ type PanelColors = Record<number, string>;
 
 const getPanelColors = (maxCount: number, theme: "light" | "dark"): PanelColors => {
   const colors: PanelColors = {
-    0: theme === "dark" ? "rgba(255,255,255,0.08)" : "#EEF2F7",
+    0: theme === "dark" ? "rgba(148,163,184,0.14)" : "#E4E9F1",
   };
 
   
@@ -110,7 +110,7 @@ const HeatMapProfile: React.FC = () => {
           shape-rendering: geometricPrecision;
         }
         .dark .heatmap-themed rect {
-          stroke: rgba(10,10,24,0.96) !important;
+          stroke: #060D21 !important;
         }
       `}</style>
 
@@ -177,7 +177,7 @@ const HeatMapProfile: React.FC = () => {
             style={{
               backgroundColor: theme === "dark"
                 ? `rgba(0,255,163,${opacity})`
-                : i === 0 ? "#EEF2F7" : `rgba(14,${Math.round(170 - opacity * 96)},${Math.round(145 - opacity * 76)},1)`,
+                : i === 0 ? "#E4E9F1" : `rgba(14,${Math.round(170 - opacity * 96)},${Math.round(145 - opacity * 76)},1)`,
               border: theme === "light" ? "1px solid var(--bg-card)" : undefined,
             }} />
         ))}

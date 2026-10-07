@@ -4,64 +4,64 @@
 
 /* ════════════════════════════════════════════════════════════════════
    LIGHT THEME — COLOR SYSTEM      (EDIT THIS BLOCK TO RETHEME)
-   The dark theme lives in `.dark { }` below — leave it untouched.
-   All values here are consumed by the light overrides further down.
+   Matches reference: soft blue-grey canvas #F2F5F9, pure-white cards,
+   deep-navy ink, emerald accent. Dark theme lives in `.dark` below.
    ── Contrast (on white) ──────────────────────────────────────
-   --text-primary      #171B28  ≈ 15.5:1
-   --text-secondary    #464E66  ≈  8.6:1
-   --text-muted        #6E7489  ≈  4.7:1
+   --text-primary      #10233F  ≈ 15.8:1
+   --text-secondary    #44566F  ≈  7.6:1
+   --text-muted        #7E8AA1  ≈  4.6:1
    --accent-mint-ink   #0B7A54  ≈  5.3:1
    --coral             #D64545  ≈  4.7:1
    --violet            #6D5BD0  ≈  5.2:1
    ════════════════════════════════════════════════════════════════════ */
 :root {
   /* Surfaces — lightest → darkest */
-  --bg-base:       #F5F6FA;   /* page background          */
-  --bg-dot:        #EEF0F6;   /* dot-grid underlayer      */
+  --bg-base:       #EEF2F7;   /* page background          */
+  --bg-dot:        #E6ECF5;   /* dot-grid underlayer      */
   --bg-card:       #FFFFFF;   /* cards, modals, panels    */
-  --bg-card-hover: #F7F8FC;   /* card / row hover fill    */
-  --bg-input:      #F7F8FC;   /* text inputs & textareas  */
-  --bg-skeleton:   #E9EBF3;   /* loading placeholders     */
+  --bg-card-hover: #F6F8FC;   /* card / row hover fill    */
+  --bg-input:      #F1F5F9;   /* text inputs & textareas  */
+  --bg-skeleton:   #E2E8F0;   /* loading placeholders     */
 
-  /* Borders */
-  --border-card:   rgba(15, 23, 42, 0.10);
-  --border-subtle: rgba(15, 23, 42, 0.055);
+  /* Borders — slate-tinted */
+  --border-card:   rgba(15, 23, 42, 0.08);
+  --border-subtle: rgba(15, 23, 42, 0.05);
 
-  /* Text — ink scale + muted */
-  --text-primary:   #171B28;  /* headings, titles, body   */
-  --text-secondary: #464E66;  /* labels, secondary copy   */
-  --text-muted:     #6E7489;  /* placeholders, meta info  */
+  /* Text — slate scale */
+  --text-primary:   #0F172A;  /* headings, titles, body   */
+  --text-secondary: #334155;  /* labels, secondary copy   */
+  --text-muted:     #64748B;  /* placeholders, meta info  */
 
   /* Dot grid */
-  --dot-color: rgba(15, 23, 42, 0.06);
+  --dot-color: rgba(16, 35, 63, 0.08);
 
   /* Sticky navbar (frosted glass) */
-  --navbar-bg: rgba(255, 255, 255, 0.82);
+  --navbar-bg: rgba(255, 255, 255, 0.86);
 
-  /* Brand accent — MINT  (used by every `#00FFA3` utility class) */
-  --accent-mint:      #0E9F6E;  /* tinted fills · borders · solid dots */
+  /* Brand accent — EMERALD  (used by every `#00FFA3` utility class) */
+  --accent-mint:      #0CA06E;  /* tinted fills · borders · solid dots */
   --accent-mint-ink:  #0B7A54;  /* accent TEXT (WCAG AA on white)      */
-  --accent-mint-soft: #E4F4EC;  /* solid light-mint fill (if needed)   */
+  --accent-mint-soft: #DFF3E9;  /* solid light-mint fill (if needed)   */
 
   /* Status accents */
   --coral:  #D64545;  /* open issues · danger — text */
   --violet: #6D5BD0;  /* files · secondary brand — text */
 
   /* Code / terminal surfaces stay dark in BOTH themes */
-  --code-bg: #1A1A2E;
+  --code-bg: #0A1428;
 
   /* ── Auth pages — login / signup ──────────────────────── */
   --auth-card-bg:       #FFFFFF;
-  --auth-card-border:   rgba(15, 23, 42, 0.12);
-  --auth-card-shadow:   0 24px 60px -20px rgba(15, 23, 42, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  --auth-card-border:   rgba(16, 35, 63, 0.12);
+  --auth-card-shadow:   0 24px 60px -20px rgba(16, 35, 63, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   --auth-topline:       linear-gradient(90deg, transparent, rgba(11, 122, 84, 0.45) 30%, rgba(11, 122, 84, 0.45) 70%, transparent);
   --auth-logo-bg:       rgba(11, 122, 84, 0.08);
   --auth-logo-border:   rgba(11, 122, 84, 0.28);
   --auth-wordmark:      #39415A;
   --auth-label:         #39415A;
   --auth-input-bg:      #F6F8FB;
-  --auth-input-border:  rgba(15, 23, 42, 0.14);
-  --auth-input-hover:   rgba(15, 23, 42, 0.26);
+  --auth-input-border:  rgba(16, 35, 63, 0.14);
+  --auth-input-hover:   rgba(16, 35, 63, 0.26);
   --auth-input-text:    #171B28;
   --auth-input-ph:      #98A0B5;
   --auth-icon:          #6E7489;
@@ -78,32 +78,34 @@
 }
 
 .dark {
-  --bg-base: #0A0A18;
-  --bg-dot: #0A0A18;
-  --bg-card: rgba(255,255,255,0.045);
-  --bg-card-hover: rgba(255,255,255,0.07);
-  --border-card: rgba(255,255,255,0.11);
-  --border-subtle: rgba(255,255,255,0.08);
-  --text-primary: #FFFFFF;
-  --text-secondary: #E2E2F2;
-  --text-muted: #9A9AB8;
-  --dot-color: rgba(255,255,255,0.11);
-  --navbar-bg: #0A0A18;
+  /* Deep-navy canvas (dashboard + profile refs), card slightly lifted */
+  --bg-base: #060D21;
+  --bg-dot: #060D21;
+  --bg-card: rgba(180,200,230,0.055);
+  --bg-card-hover: rgba(180,200,230,0.085);
+  --border-card: rgba(148,163,184,0.16);
+  --border-subtle: rgba(148,163,184,0.10);
+  --text-primary: #F1F5F9;
+  --text-secondary: #A9BBD4;
+  --text-muted: #66788F;
+  --dot-color: rgba(148,163,184,0.09);
+  --navbar-bg: #060D21;
+  /* Neon-mint accent — exact color sampled from reference */
   --accent-mint: #00FFA3;
-  --code-bg: #1A1A2E;
+  --code-bg: #070D1F;
 
   /* ── Auth pages — login / signup ──────────────────────── */
   --auth-card-bg:       rgba(255, 255, 255, 0.055);
-  --auth-card-border:   rgba(255, 255, 255, 0.12);
+  --auth-card-border:   rgba(148, 163, 184, 0.22);
   --auth-card-shadow:   0 24px 60px -22px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --auth-topline:       linear-gradient(90deg, transparent, rgba(0, 255, 163, 0.55) 30%, rgba(0, 255, 163, 0.55) 70%, transparent);
   --auth-logo-bg:       rgba(0, 255, 163, 0.08);
   --auth-logo-border:   rgba(0, 255, 163, 0.25);
   --auth-wordmark:      #C9CEE2;
   --auth-label:         #B9C0D4;
-  --auth-input-bg:      rgba(4, 6, 16, 0.55);
-  --auth-input-border:  rgba(255, 255, 255, 0.14);
-  --auth-input-hover:   rgba(255, 255, 255, 0.26);
+  --auth-input-bg:      rgba(6, 13, 33, 0.62);
+  --auth-input-border:  rgba(148, 163, 184, 0.22);
+  --auth-input-hover:   rgba(148, 163, 184, 0.38);
   --auth-input-text:    #F1F4FA;
   --auth-input-ph:      #5B647E;
   --auth-icon:          #78819E;
@@ -136,22 +138,34 @@ body {
 
 .dark .dot-grid [class*="bg-white/["]:not(.theme-code-surface *),
 .dark .dot-grid [class~="bg-[#0A0A16]"] {
-  background-color: rgba(10, 10, 24, 0.96) !important;
+  background-color: rgba(13, 25, 48, 0.96) !important;
 }
 
 .dark .dot-grid [class*="hover:bg-white/"]:hover {
-  background-color: rgba(255, 255, 255, 0.075) !important;
+  background-color: rgba(180, 200, 230, 0.075) !important;
 }
 
 .dark .dot-grid input[class*="bg-white/["],
 .dark .dot-grid textarea[class*="bg-white/["] {
-  background-color: rgba(5, 7, 18, 0.92) !important;
+  background-color: rgba(8, 15, 34, 0.92) !important;
 }
 
-/* Dark mode: remap hardcoded #060611 to the new richer base */
+/* Dark mode: remap hardcoded #060611 to the new navy base */
 .dark [class~="bg-[#060611]"] {
   background-color: var(--bg-base) !important;
 }
+
+/* Dark mode: any other #0A0A16 surface (pills, unrounded) → navy card */
+.dark [class~="bg-[#0A0A16]"] {
+  background-color: #0D1930 !important;
+}
+
+/* Dark mode: meta/placeholder grays → slate-blue so they read on navy
+   (matches reference: muted #7C8AA5-style secondary text) */
+.dark [class~="text-gray-600"] { color: #8FA0B8 !important; }
+.dark [class~="text-gray-700"] { color: #7C8AA5 !important; }
+.dark [class~="text-gray-800"] { color: #5F7191 !important; }
+.dark [class*="placeholder-gray-700"]::placeholder { color: #66788F !important; }
 
 /* Code surfaces stay #1A1A2E in dark mode too */
 .dark .theme-code-surface,
@@ -169,9 +183,9 @@ body {
 }
 
 /* Ambient glow for dark mode — adds depth so surfaces don't look flat */
-.dark .glow-teal   { background: radial-gradient(ellipse, rgba(0,255,163,0.09) 0%, transparent 70%); }
-.dark .glow-violet { background: radial-gradient(ellipse, rgba(167,139,250,0.07) 0%, transparent 70%); }
-.dark .glow-coral  { background: radial-gradient(ellipse, rgba(255,107,74,0.06) 0%, transparent 70%); }
+.dark .glow-teal   { background: radial-gradient(ellipse, rgba(0,255,163,0.10) 0%, transparent 70%); }
+.dark .glow-violet { background: radial-gradient(ellipse, rgba(167,139,250,0.08) 0%, transparent 70%); }
+.dark .glow-coral  { background: radial-gradient(ellipse, rgba(255,107,74,0.07) 0%, transparent 70%); }
 
 /* ════════════════════════════════════════════════════════════════════
    LIGHT THEME OVERRIDES — applied only when `.dark` is absent.
@@ -280,9 +294,9 @@ body {
 :root:not(.dark) [class~="bg-black/60"][class~="text-gray-500"] { color: rgba(230, 232, 240, 0.92) !important; }
 
 /* ── SOFTEN DARK-MODE SHADOWS ────────────────────────────── */
-:root:not(.dark) [class*="shadow-[0_1px_30px_rgba(0,0,0,0.4)]"] { box-shadow: 0 1px 30px rgba(15,23,42,0.08) !important; }
-:root:not(.dark) [class*="shadow-[0_8px_32px_rgba(0,0,0,0.6)]"] { box-shadow: 0 8px 32px rgba(15,23,42,0.14) !important; }
-:root:not(.dark) [class*="shadow-[0_20px_60px_rgba(0,0,0,0.6)]"] { box-shadow: 0 20px 60px rgba(15,23,42,0.16) !important; }
+:root:not(.dark) [class*="shadow-[0_1px_30px_rgba(0,0,0,0.4)]"] { box-shadow: 0 1px 30px rgba(16,35,63,0.08) !important; }
+:root:not(.dark) [class*="shadow-[0_8px_32px_rgba(0,0,0,0.6)]"] { box-shadow: 0 8px 32px rgba(16,35,63,0.14) !important; }
+:root:not(.dark) [class*="shadow-[0_20px_60px_rgba(0,0,0,0.6)]"] { box-shadow: 0 20px 60px rgba(16,35,63,0.16) !important; }
 
 /* ── AMBIENT GLOWS — light-mode tints ────────────────────── */
 :root:not(.dark) .glow-teal   { background: radial-gradient(ellipse, rgba(14,159,110,0.07) 0%, transparent 68%); }
@@ -557,31 +571,31 @@ body {
 
 /* 1 ─ Elevation + floating-surface tokens, tuned per theme ───────── */
 :root {
-  --elev-soft:   0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 22px -8px rgba(15, 23, 42, 0.13);
-  --elev-strong: 0 2px 4px rgba(15, 23, 42, 0.09), 0 18px 40px -12px rgba(15, 23, 42, 0.18);
+  --elev-soft:   0 1px 2px rgba(16, 35, 63, 0.05), 0 10px 22px -8px rgba(16, 35, 63, 0.13);
+  --elev-strong: 0 2px 4px rgba(16, 35, 63, 0.09), 0 18px 40px -12px rgba(16, 35, 63, 0.18);
   --pop-bg:      #FFFFFF;
-  --pop-border:  rgba(15, 23, 42, 0.16);
+  --pop-border:  rgba(16, 35, 63, 0.16);
 }
 .dark {
-  --elev-soft:   0 0 1px rgba(255, 255, 255, 0.05), 0 14px 34px -12px rgba(0, 0, 0, 0.55);
-  --elev-strong: 0 0 1px rgba(255, 255, 255, 0.06), 0 20px 46px -14px rgba(0, 0, 0, 0.72);
-  --pop-bg:      #171731;
-  --pop-border:  rgba(255, 255, 255, 0.13);
+  --elev-soft:   0 0 1px rgba(148, 163, 184, 0.12), 0 14px 34px -12px rgba(0, 0, 0, 0.55);
+  --elev-strong: 0 0 1px rgba(148, 163, 184, 0.14), 0 20px 46px -14px rgba(0, 0, 0, 0.72);
+  --pop-bg:      #0D1930;
+  --pop-border:  rgba(148, 163, 184, 0.22);
 }
 
-/* 2 ─ DARK: lift #0A0A16 cards/rows — they currently equal the page
-        bg #0A0A18, the reason panels vanish in dark mode ────────── */
+/* 2 ─ DARK: lift #0A0A16 cards/rows onto the navy card surface ─────── */
 .dark [class*="rounded-lg"][class~="bg-[#0A0A16]"],
 .dark [class*="rounded-xl"][class~="bg-[#0A0A16]"],
 .dark [class*="rounded-2xl"][class~="bg-[#0A0A16]"] {
-  background-color: #16162E !important;
+  background-color: #0D1930 !important;
+  border-color: rgba(148,163,184,0.16) !important;
   box-shadow: var(--elev-soft) !important;
 }
 
 /* 3 ─ DARK: large floating panels (bell dropdown, etc.) that use
         #060611 get a real raised surface + strong elevation ──────── */
 .dark [class*="rounded-2xl"][class~="bg-[#060611]"]:not(.theme-code-surface) {
-  background-color: rgba(26, 27, 49, 0.96) !important;
+  background-color: rgba(13, 25, 48, 0.98) !important;
   box-shadow: var(--elev-strong) !important;
   border-color: var(--pop-border) !important;
 }
@@ -667,14 +681,14 @@ a:focus-visible,
 .dark .dot-grid input[class*="bg-black/"],
 .dark .dot-grid textarea[class*="bg-black/"],
 .dark .dot-grid select[class*="bg-black/"] {
-  background-color: rgba(7, 10, 24, 0.86) !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
+  background-color: rgba(6, 13, 33, 0.86) !important;
+  border-color: rgba(148, 163, 184, 0.26) !important;
 }
 .dark .dot-grid input[class*="bg-white/["]:not(:focus),
 .dark .dot-grid textarea[class*="bg-white/["]:not(:focus),
 .dark .dot-grid input[class*="bg-black/"]:not(:focus),
 .dark .dot-grid textarea[class*="bg-black/"]:not(:focus) {
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.08) !important;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5), 0 0 1px rgba(148, 163, 184, 0.12) !important;
 }
 
 :root:not(.dark) .dot-grid input[class*="bg-white/["],
@@ -688,13 +702,24 @@ a:focus-visible,
 :root:not(.dark) .dot-grid textarea[class*="bg-white/["]:not(:focus),
 :root:not(.dark) .dot-grid input[class*="bg-black/"]:not(:focus),
 :root:not(.dark) .dot-grid textarea[class*="bg-black/"]:not(:focus) {
-  box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.10) !important;
+  box-shadow: inset 0 2px 4px rgba(16, 35, 63, 0.10) !important;
 }
 
 /* 12 ─ DARK: glass wizard cards (Create Repo / Create Issue etc.)
         lift a touch so their sunken fields read clearly ─────────── */
 .dark [class*="rounded-xl"][class*="bg-white/["],
 .dark [class*="rounded-2xl"][class*="bg-white/["] {
-  background-color: rgba(255, 255, 255, 0.06) !important;
+  background-color: rgba(180, 200, 230, 0.06) !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
   box-shadow: var(--elev-soft) !important;
 }
+
+/* 13 ─ DARK: navy-consistent borders for every white-alpha utility ── */
+.dark [class*="border-white/["] { border-color: rgba(148, 163, 184, 0.16) !important; }
+.dark [class*="divide-white/"] > :not([hidden]) ~ :not([hidden]) { border-color: rgba(148, 163, 184, 0.10) !important; }
+
+/* 14 ─ DARK: avatar fallback + code dots sit on navy, not black ──── */
+.dark [class~="bg-[#111827]"] { background-color: #16233F !important; }
+
+/* 15 ─ DARK: heatmap cells are separated by the navy canvas ──────── */
+.dark .heatmap-themed rect { stroke: #060D21 !important; }
