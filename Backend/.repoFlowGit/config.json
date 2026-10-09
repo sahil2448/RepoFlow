@@ -1,6 +1,10 @@
 {
-  "bucket": "repoflow-bucket",
-  "repoId": "6a2ff58db4e172d942254603",
-  "userId": null,
-  "createdAt": "2026-06-29T17:42:44.659Z"
+  "repoId": "6ac6bb28c7c108d677bfc85c",
+  "repoName": "my-first-repo",
+  "apiUrl": "http://localhost:3000",
+  "userId": "6ac6b9378cf440c64eb6d5c1",
+  "pushedCommits": [
+    "b3a42bc2-2ee9-431e-aa0b-795aa221c072",
+    "ffb7132d-3a80-439f-baa4-a52dfb9a1be7"
+  ]
 }

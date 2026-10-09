@@ -4,6 +4,7 @@ import './index.css'
 import { AuthProvider } from './authContext.tsx'
 import { BrowserRouter as Router } from 'react-router-dom'
 import ProjectRoutes from './Routes.tsx'
+import BackendGate from './components/availability/BackendGate.tsx'
 import { Toaster } from 'react-hot-toast'
 // import { NotificationProvider } from './context/NotificationContext.tsx'
 
@@ -18,7 +19,9 @@ createRoot(document.getElementById('root')!).render(
     <AuthProvider>
       {/* <NotificationProvider> */}
         <Router>
-          <ProjectRoutes />
+          <BackendGate>
+            <ProjectRoutes />
+          </BackendGate>
           <Toaster position="top-right" gutter={12} />
         </Router>
       {/* </NotificationProvider>  */}

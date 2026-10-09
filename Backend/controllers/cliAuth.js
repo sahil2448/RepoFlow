@@ -31,10 +31,27 @@ export async function cliLogin(argv = {}) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    const data = await res.json();
+    // The API (or CloudFront/WAF in front of it) may return a plain-text
+    // error body (e.g. "Invalid credentials") instead of JSON. Parse
+    // tolerantly so a wrong password shows a clean message instead of
+    // "Unexpected token 'I', ... is not valid JSON" masked as a network error.
+    const text = await res.text();
+    let data = {};
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = { error: text };
+      }
+    }
 
     if (!res.ok) {
       console.error(`Login failed: ${data.error || res.statusText}`);
+      return;
+    }
+
+    if (!data.token) {
+      console.error(`Login failed: ${data.error || "Unexpected server response."}`);
       return;
     }
 

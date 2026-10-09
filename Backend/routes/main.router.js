@@ -16,6 +16,10 @@ mainRouter.use(commitRouter);
 mainRouter.use(notificationRouter);
 mainRouter.use(cliRouter);
 
+mainRouter.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 mainRouter.get("/", (req, res) => {
   res.send("Main page");
 });
